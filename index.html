@@ -97,6 +97,11 @@ a.btn:not([href]){opacity:.5;pointer-events:none}
 .tl{display:grid;gap:6px}
 .seg{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--line)}
 .seg .t{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.segright{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.segmin{width:58px;padding:3px 6px;text-align:right;font-family:var(--mono);font-size:13px}
+.seg.fixed .segmin{border-color:var(--accent);background:var(--surface);font-weight:600}
+.segreset{padding:1px 7px}
+@media (max-width:480px){.seg{grid-template-columns:48px 1fr;}.seg .segright{grid-column:1/-1;justify-content:flex-end}}
 .chip{font-size:12px;padding:1px 8px;border-radius:999px;white-space:nowrap}
 .chip.ai{background:var(--accent-soft);color:var(--accent)}
 .chip.human{background:var(--talk-soft);color:var(--talk)}
@@ -293,9 +298,13 @@ td.r,th.r{text-align:right}
   <p class="sub">แบ่งเวลาให้อัตโนมัติ ช่วงสีเขียวคือเวลาที่คนต้องเข้ามาคุยสดและตอบคอมเมนต์เอง</p>
   <div class="notice">กฎ TikTok Shop ไม่ให้ใช้เสียง AI หรือเสียงอัดไว้แทนการโต้ตอบสดทั้งรอบ ตารางนี้จึงสลับให้ AI เล่าสินค้า แล้วให้คนเข้ามาคุยสดทุกช่วง ถ้าใช้ตัวละคร AI อย่าให้บังจอเกินครึ่ง และควรแจ้งคนดูว่ามี AI ช่วยนำเสนอ</div>
   <div class="card row" style="margin-bottom:12px">
-    <div style="flex:1;min-width:140px"><label for="dur">ความยาวรอบ</label>
+    <div style="flex:1;min-width:170px"><label for="dur">ความยาวรอบ</label>
       <select id="dur"><option value="40">40 นาที</option><option value="45">45 นาที</option><option value="50">50 นาที</option><option value="60">1 ชั่วโมง</option><option value="75">1 ชม. 15 นาที</option><option value="90">1 ชม. 30 นาที</option><option value="105">1 ชม. 45 นาที</option><option value="120" selected>2 ชั่วโมง</option><option value="150">2 ชม. 30 นาที</option><option value="180">3 ชั่วโมง</option><option value="240">4 ชั่วโมง</option><option value="custom">กำหนดเอง…</option></select>
-      <input id="durCustom" type="number" min="40" max="600" step="5" inputmode="numeric" placeholder="จำนวนนาที (40 ขึ้นไป)" aria-label="ความยาวรอบ (นาที)" hidden style="margin-top:6px"></div>
+      <div id="durCustom" class="row" hidden style="margin-top:6px;flex-wrap:nowrap;gap:6px;align-items:center">
+        <input id="durH" type="number" min="0" max="10" step="1" inputmode="numeric" aria-label="ชั่วโมง" style="width:56px"><span class="mini">ชม.</span>
+        <input id="durM" type="number" min="0" max="59" step="5" inputmode="numeric" aria-label="นาที" style="width:60px"><span class="mini">นาที</span></div></div>
+    <div style="flex:1;min-width:120px"><label for="startAt">เวลาเริ่มไลฟ์ <span class="mini">(ไม่ใส่ก็ได้)</span></label><input id="startAt" type="time" step="60"></div>
+    <div style="flex:1;min-width:120px"><label for="endAt">เวลาจบ</label><input id="endAt" type="time" step="60"></div>
     <div style="flex:1;min-width:120px"><label for="talkEvery">คนคุยสดทุก</label>
       <select id="talkEvery"><option value="2">2 สินค้า</option><option value="3" selected>3 สินค้า</option><option value="1">ทุกสินค้า</option></select></div>
     <div style="flex:1;min-width:120px"><label for="talkLen">คุยสดครั้งละ</label>
@@ -347,6 +356,7 @@ td.r,th.r{text-align:right}
         <div class="clock num" id="clock">00:00:00</div>
         <div class="bar"><i id="prog"></i></div>
         <div class="mini num" id="segLeft"></div>
+        <div class="mini" id="startIn" hidden style="margin-top:4px;font-weight:500"></div>
         <div class="row" style="margin-top:10px">
           <button class="btn primary" id="startBtn">เริ่มรอบ</button>
           <button class="btn" id="pauseBtn">พัก</button>
@@ -433,7 +443,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.9.1"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.10.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
@@ -633,47 +643,94 @@ function scriptFor(s){if(s.type==="open")return pick(T.open)();if(s.type==="clos
 
 /* plan */
 let plan=[];
-/* Live length in minutes: a preset, or "กำหนดเอง" (custom, 40..600). */
+/* Live length in minutes: a preset, or "กำหนดเอง" (custom: hours + minutes, 40..600 in total).
+   Optional start time (HH:MM) shows clock times in the plan, the end time and a countdown;
+   typing an end time sets the length. Each segment's minutes can be set by hand (planOv). */
 const DUR_MIN=40,DUR_MAX=600;
+let planOv={},startAt="";
+function customMin(){return Math.round((+$("#durH").value||0)*60+(+$("#durM").value||0))}
+function setCustom(m){m=Math.min(DUR_MAX,Math.max(DUR_MIN,Math.round(m)));$("#durH").value=Math.floor(m/60);$("#durM").value=m%60}
 function durMin(){const v=$("#dur").value;if(v!=="custom")return +v;
- const n=Math.round(+$("#durCustom").value||0);return Math.min(DUR_MAX,Math.max(DUR_MIN,n||DUR_MIN))}
+ const n=customMin();return Math.min(DUR_MAX,Math.max(DUR_MIN,n||DUR_MIN))}
 function fmtDur(m){if(m<60)return m+" นาที";const h=Math.floor(m/60),r=m%60;return r?`${h} ชม. ${r} นาที`:`${h} ชั่วโมง`}
+const hm2min=s=>{const m=/^(\d{1,2}):(\d{2})/.exec(s||"");return m?(+m[1])*60+(+m[2]):null};
+const min2hm=m=>{m=((Math.round(m)%1440)+1440)%1440;return `${String(Math.floor(m/60)).padStart(2,"0")}:${String(m%60).padStart(2,"0")}`};
+const clockAt=off=>startAt?min2hm(hm2min(startAt)+off):mm(off);
 function buildPlan(){const dur=durMin(),every=+$("#talkEvery").value;let tl=+$("#talkLen").value;
  const P=liveProducts();const open=dur>=120?5:dur>=60?3:2,close=open;
  const perRound=P.length?Math.ceil(P.length/every):0;
  // Long lives present every product twice (and the live-talk slots repeat with them).
  const rounds=P.length&&(dur-open-close-perRound*tl)/P.length>14?2:1,nHuman=perRound*rounds,n=P.length*rounds;
- // Short lives: shorten each live-talk slot (never below 2 min, never removed) so each product still gets about 2 min.
- while(tl>2&&n&&dur-open-close-nHuman*tl<n*2)tl--;
- const left=Math.max(n,dur-open-close-nHuman*tl);
- const base=n?Math.max(1,Math.floor(left/n)):0;let extra=n?Math.max(0,left-base*n):0;
- plan=[{type:"open",name:"เปิดไลฟ์ ทักทาย",min:open}];
- for(let r=0;r<rounds;r++)P.forEach((p,i)=>{plan.push({type:"prod",p,name:(rounds>1?`รอบ ${r+1} · `:"")+`${p.code} ${p.name}`,min:base+(extra-->0?1:0)});
-  if((i+1)%every===0||i===P.length-1)plan.push({type:"human",name:"คนคุยสด ตอบคอมเมนต์",min:tl})});
- plan.push({type:"close",name:"ปิดไลฟ์ สรุปโปร",min:close});
- const total=plan.reduce((a,s)=>a+s.min,0);plan[plan.length-1].min=Math.max(1,close+dur-total);
+ // 1. structure, with a stable key per segment for hand-set minutes
+ let hi=0;plan=[{type:"open",name:"เปิดไลฟ์ ทักทาย",min:open,key:"open"}];
+ for(let r=0;r<rounds;r++)P.forEach((p,i)=>{plan.push({type:"prod",p,name:(rounds>1?`รอบ ${r+1} · `:"")+`${p.code} ${p.name}`,min:0,key:`p:${p.code}:${r}`});
+  if((i+1)%every===0||i===P.length-1)plan.push({type:"human",name:"คนคุยสด ตอบคอมเมนต์",min:tl,key:"h"+(hi++)})});
+ plan.push({type:"close",name:"ปิดไลฟ์ สรุปโปร",min:close,key:"close"});
+ plan.forEach(s=>{const v=planOv[s.key];if(v>0){s.min=s.type==="human"?Math.max(2,v):Math.max(1,v);s.fixed=true}});
+ // 2. free time goes to the products not set by hand. Short lives first shorten each free
+ //    live-talk slot (never below 2 min, never removed) so each product still gets about 2 min.
+ const freeP=plan.filter(s=>s.type==="prod"&&!s.fixed),freeH=plan.filter(s=>s.type==="human"&&!s.fixed);
+ const fixedSum=plan.filter(s=>s.fixed||s.type==="open"||s.type==="close").reduce((a,s)=>a+s.min,0);
+ while(tl>2&&freeP.length&&dur-fixedSum-freeH.length*tl<freeP.length*2)tl--;
+ freeH.forEach(s=>s.min=tl);
+ const left=Math.max(freeP.length,dur-fixedSum-freeH.length*tl);
+ const base=freeP.length?Math.max(1,Math.floor(left/freeP.length)):0;let extra=freeP.length?Math.max(0,left-base*freeP.length):0;
+ freeP.forEach(s=>s.min=base+(extra-->0?1:0));
+ const cl=plan[plan.length-1],total0=plan.reduce((a,s)=>a+s.min,0);if(!cl.fixed)cl.min=Math.max(1,cl.min+dur-total0);
  let t=0;plan.forEach(s=>{s.start=t;t+=s.min;s.text=scriptFor(s)});
- const h=plan.filter(s=>s.type==="human").reduce((a,s)=>a+s.min,0),realTotal=t;
- const tight=P.length&&base<2;
- $("#planSummary").innerHTML=esc(`${fmtDur(dur)} · ${plan.length} ช่วง · สินค้าพูด ${rounds} รอบ ตัวละประมาณ ${base} นาที · คนคุยสดรวม ${h} นาที`)+
-  (tl<+$("#talkLen").value?esc(` (ย่อคุยสดเหลือครั้งละ ${tl} นาที ให้พอดีเวลา)`):"")+
-  (tight||realTotal>dur?`<br><b style="color:var(--warn)">⚠ เวลาน้อยไปสำหรับ ${P.length} สินค้า (รวมจริง ${fmtDur(realTotal)}) ลองเพิ่มเวลาเป็นอย่างน้อย ${fmtDur(Math.ceil((open+close+nHuman*2+n*2)/5)*5)} หรือเอาสินค้าบางตัวออกจากรอบนี้</b>`:"");
+ const h=plan.filter(s=>s.type==="human").reduce((a,s)=>a+s.min,0),realTotal=t,nOv=plan.filter(s=>s.fixed).length;
+ const tight=freeP.length&&base<2;
+ const prodMins=plan.filter(s=>s.type==="prod").map(s=>s.min),avg=prodMins.length?Math.round(prodMins.reduce((a,b)=>a+b,0)/prodMins.length):0;
+ $("#planSummary").innerHTML=esc(`${fmtDur(dur)}${startAt?` · เริ่ม ${startAt} จบ ${min2hm(hm2min(startAt)+realTotal)}`:""} · ${plan.length} ช่วง · สินค้าพูด ${rounds} รอบ ตัวละประมาณ ${avg} นาที · คนคุยสดรวม ${h} นาที`)+
+  (tl<+$("#talkLen").value&&freeH.length?esc(` (ย่อคุยสดเหลือครั้งละ ${tl} นาที ให้พอดีเวลา)`):"")+
+  (nOv?`<br>✎ แก้เวลาเอง ${nOv} ช่วง <button class="btn sm" id="ovReset" type="button">ล้างเวลาที่แก้เอง</button>`:"")+
+  (tight||realTotal>dur?`<br><b style="color:var(--warn)">⚠ เวลาไม่พอ (รวมจริง ${fmtDur(realTotal)} จากที่ตั้งไว้ ${fmtDur(dur)}) ${nOv?"ลองลดเวลาที่แก้เองลง หรือ":"ลอง"}เพิ่มเวลาเป็นอย่างน้อย ${fmtDur(Math.ceil((fixedSum+freeH.length*2+freeP.length*2)/5)*5)} หรือเอาสินค้าบางตัวออกจากรอบนี้</b>`
+   :realTotal<dur?`<br><b style="color:var(--warn)">⚠ ทุกช่วงถูกแก้เวลาเอง รวมได้ ${fmtDur(realTotal)} สั้นกว่าที่ตั้งไว้ ${fmtDur(dur)}</b>`:"");
+ const rb=$("#ovReset");if(rb)rb.onclick=()=>{planOv={};planChanged()};
  $("#basketList").innerHTML=P.length?P.map((p,i)=>`<span><b>#${i+1}</b> ${esc(p.code)} ${esc(p.name)}${aff()&&p.shop?` · ${esc(p.shop)}`:""}${aff()&&p.comm?` · คอม ${p.comm}%`:""}</span>`).join(""):'<span>ยังไม่ได้เลือกสินค้า ไปติ๊ก "ไลฟ์รอบนี้" ในแท็บสินค้า</span>';
- const el=$("#tl");el.innerHTML="";plan.forEach((s,i)=>{const d=document.createElement("div");d.className="seg"+(s.type==="human"?" human":"")+(i===cur&&running?" now":"");
-  d.innerHTML=`<span class="t">${mm(s.start)}</span><span>${esc(s.name)}</span><span class="chip ${s.type==="human"?"human":"ai"}">${s.type==="human"?"คนพูดสด":"AI ช่วย"} · ${s.min} น.</span>`;el.appendChild(d)});
- if(cur>=plan.length)cur=0;}
+ const el=$("#tl");el.innerHTML="";plan.forEach((s,i)=>{const d=document.createElement("div");d.className="seg"+(s.type==="human"?" human":"")+(i===cur&&running?" now":"")+(s.fixed?" fixed":"");
+  d.innerHTML=`<span class="t">${clockAt(s.start)}</span><span>${esc(s.name)}</span><span class="segright"><span class="chip ${s.type==="human"?"human":"ai"}">${s.type==="human"?"คนพูดสด":"AI ช่วย"}</span>`+
+   `<input class="segmin" type="number" min="${s.type==="human"?2:1}" max="180" inputmode="numeric" value="${s.min}" data-key="${esc(s.key)}" aria-label="นาทีของช่วง ${esc(s.name)}" ${running?"disabled":""}><span class="mini">น.</span>`+
+   (s.fixed?`<button class="btn sm segreset" type="button" data-key="${esc(s.key)}" title="กลับไปให้โปรแกรมแบ่งเวลา" aria-label="ยกเลิกเวลาที่แก้เอง">↺</button>`:"")+`</span>`;el.appendChild(d)});
+ el.querySelectorAll(".segmin").forEach(inp=>inp.onchange=()=>{const v=Math.round(+inp.value||0);if(v>0)planOv[inp.dataset.key]=Math.min(180,v);else delete planOv[inp.dataset.key];planChanged()});
+ el.querySelectorAll(".segreset").forEach(b=>b.onclick=()=>{delete planOv[b.dataset.key];planChanged()});
+ syncEndAt();if(cur>=plan.length)cur=0;}
 const PLAN_KEYS=["dur","talkEvery","talkLen"];
 // ls_plan.dur is always minutes (a number); a value that is not a preset shows as "กำหนดเอง".
-function planSettings(){const o={};PLAN_KEYS.forEach(k=>o[k]=$("#"+k).value);o.dur=durMin();return o}
+// ls_plan.start = "HH:MM" or ""; ls_plan.ov = {segment key: minutes set by hand}.
+function planSettings(){const o={};PLAN_KEYS.forEach(k=>o[k]=$("#"+k).value);o.dur=durMin();o.start=startAt;o.ov=planOv;return o}
 function applyPlanSettings(o){PLAN_KEYS.forEach(k=>{const el=$("#"+k);if(!o||o[k]==null)return;const v=String(o[k]);
   if([...el.options].some(x=>x.value===v))el.value=v;
-  else if(k==="dur"&&+v>=DUR_MIN){el.value="custom";$("#durCustom").value=Math.min(DUR_MAX,Math.round(+v))}});
- $("#durCustom").hidden=$("#dur").value!=="custom"}
+  else if(k==="dur"&&+v>=DUR_MIN){el.value="custom";setCustom(+v)}});
+ if(o){startAt=/^\d{2}:\d{2}$/.test(o.start||"")?o.start:"";planOv={};
+  if(o.ov&&typeof o.ov==="object")for(const [k,v] of Object.entries(o.ov))if(+v>0&&+v<=180)planOv[k]=Math.round(+v)}
+ $("#startAt").value=startAt;$("#durCustom").hidden=$("#dur").value!=="custom"}
 const planChanged=()=>{store.set("ls_plan",planSettings());plan=[];buildPlan();renderHome()};
 PLAN_KEYS.forEach(k=>$("#"+k).onchange=planChanged);
 $("#dur").onchange=()=>{const c=$("#dur").value==="custom";$("#durCustom").hidden=!c;
- if(c){if(!$("#durCustom").value)$("#durCustom").value=plan.length?plan.reduce((a,s)=>a+s.min,0):60;$("#durCustom").focus()}planChanged()};
-$("#durCustom").onchange=()=>{const n=Math.round(+$("#durCustom").value||0);if(n<DUR_MIN)$("#durCustom").value=DUR_MIN;else if(n>DUR_MAX)$("#durCustom").value=DUR_MAX;planChanged()};
+ if(c){if(!customMin())setCustom(plan.length?plan.reduce((a,s)=>a+s.min,0):60);$("#durH").focus()}planChanged()};
+["#durH","#durM"].forEach(s=>$(s).onchange=()=>{let m=customMin();if(+$("#durM").value>59){m=Math.floor(m/60)*60+59}setCustom(m||DUR_MIN);planChanged()});
+// end time follows start + real length; typing an end time sets the length (needs a start time)
+function syncEndAt(){const real=plan.reduce((a,s)=>a+s.min,0);$("#endAt").value=startAt&&real?min2hm(hm2min(startAt)+real):"";$("#endAt").disabled=!startAt;
+ $("#endAt").title=startAt?"":"ใส่เวลาเริ่มก่อน"}
+$("#startAt").onchange=()=>{startAt=/^\d{2}:\d{2}/.test($("#startAt").value)?$("#startAt").value.slice(0,5):"";planChanged();updateStartIn()};
+$("#endAt").onchange=()=>{const e=hm2min($("#endAt").value),s=hm2min(startAt);if(e==null||s==null){syncEndAt();return}
+ let d=((e-s)%1440+1440)%1440;
+ if(d<DUR_MIN){$("#planSummary").insertAdjacentHTML("afterbegin",`<b style="color:var(--warn)">⚠ ไลฟ์ต้องยาวอย่างน้อย ${DUR_MIN} นาที</b><br>`);d=DUR_MIN}
+ d=Math.min(DUR_MAX,d);const preset=[...$("#dur").options].find(x=>+x.value===d);
+ if(preset)$("#dur").value=String(d);else{$("#dur").value="custom";setCustom(d)}$("#durCustom").hidden=$("#dur").value!=="custom";
+ planChanged()};
+/* countdown to the planned start (live tab), only before the round starts */
+let startBeeped=false;
+function updateStartIn(){const el=$("#startIn");if(!el)return;const s=hm2min(startAt);
+ if(s==null||running||elapsed>0){el.hidden=true;return}
+ const now=new Date(),nowMin=now.getHours()*60+now.getMinutes()+now.getSeconds()/60;let diff=s-nowMin;if(diff<-720)diff+=1440;else if(diff>720)diff-=1440;
+ if(diff>0){const sec=Math.round(diff*60),h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),x=sec%60;
+  el.textContent=`⏰ อีก ${h?h+" ชม. ":""}${m} นาที ${String(x).padStart(2,"0")} วินาที ถึงเวลาไลฟ์ (${startAt})`;el.style.color="";el.hidden=false;startBeeped=false}
+ else if(diff>-15){el.textContent=`⏰ ถึงเวลาไลฟ์แล้ว (${startAt}) กด "เริ่มรอบ" ได้เลย`;el.style.color="var(--accent)";el.hidden=false;
+  if(!startBeeped){startBeeped=true;try{beep()}catch(e){}}}
+ else el.hidden=true}
+setInterval(updateStartIn,1000);
 const mm=m=>`${String(Math.floor(m/60)).padStart(2,"0")}:${String(Math.round(m%60)).padStart(2,"0")}`;
 
 /* live */
@@ -964,7 +1021,7 @@ $("#cfAdd").onclick=()=>{const t=new Date().toLocaleTimeString("th-TH",{hour:"2-
 /* home */
 function renderHome(){if(!plan.length)buildPlan();
  const talk=plan.filter(s=>s.type==="human").reduce((a,s)=>a+s.min,0),dur=durMin(),sales=orders.reduce((a,o)=>a+o.qty*o.price,0);
- $("#hProd").textContent=fmt(liveProducts().length);$("#hDur").textContent=fmtDur(dur);$("#hTalk").textContent=talk+" น.";$("#hSales").textContent=fmt(sales);
+ $("#hProd").textContent=fmt(liveProducts().length);$("#hDur").textContent=fmtDur(dur)+(startAt?` · ${startAt}`:"");$("#hTalk").textContent=talk+" น.";$("#hSales").textContent=fmt(sales);
  const col={open:"var(--warn)",close:"var(--warn)",prod:"var(--accent)",human:"var(--talk)"};
  $("#hBar").innerHTML=plan.map(s=>`<i style="flex:${s.min};background:${col[s.type]}" title="${esc(s.name)} · ${s.min} นาที"></i>`).join("");
  const st=(id,ok,txt)=>{$(id).classList.toggle("ok",ok);$(id+" .st").textContent=txt};
