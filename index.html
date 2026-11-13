@@ -71,6 +71,13 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:2px}
 .aiscript{white-space:pre-wrap;font-size:14px;background:var(--bg);border-radius:8px;padding:8px 10px;margin-top:6px}
 .pinbar{display:flex;gap:8px;align-items:center;background:var(--warn-soft);border-left:4px solid var(--warn);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-weight:500}
 .pinbar b{font-family:var(--display);font-size:20px}
+a.btn{text-decoration:none;display:inline-block}
+a.btn:not([href]){opacity:.5;pointer-events:none}
+@media (pointer:coarse){.desk-only{display:none!important}}
+.cflist{display:grid;gap:4px;margin-top:6px;max-height:220px;overflow-y:auto}
+.cflist label{display:flex;gap:8px;align-items:center;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.cflist label input{width:auto}
+.cflist .dup{color:var(--muted)}
 .order-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .order-list span{font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:2px 10px}
 /* plan */
@@ -160,7 +167,7 @@ td.r,th.r{text-align:right}
   <div class="hero">
     <div>
       <span class="kicker"><i></i>TIKTOK LIVE ผู้ช่วยขายของ</span>
-      <h2>ไลฟ์ขายของรอบละ 1–2 ชั่วโมง<br>เตรียมครบในหน้าเดียว</h2>
+      <h2>ไลฟ์ขายของรอบละ 40 นาทีขึ้นไป<br>เตรียมครบในหน้าเดียว</h2>
       <p>ใส่สินค้า ระบบจัดตารางและเขียนบทให้ AI ช่วยเล่าสินค้า สลับซีน OBS ให้เอง ส่วนคุณเข้ามาคุยสดและตอบคอมเมนต์ตามช่วงที่กำหนด</p>
       <div class="row">
         <button class="btn solid" id="homeGo">ไปหน้าไลฟ์ ▶</button>
@@ -198,9 +205,26 @@ td.r,th.r{text-align:right}
 
   <div class="steps">
     <button class="step" data-goto="products" id="stProd"><span class="n">1</span><b>ใส่สินค้า</b><small>ชื่อ ราคา จุดขาย และโปร ระบบเขียนบทให้จากข้อมูลนี้</small><span class="st"></span></button>
-    <button class="step" data-goto="plan" id="stPlan"><span class="n">2</span><b>ดูตารางรอบ</b><small>เลือก 1 หรือ 2 ชั่วโมง และความถี่ที่คนเข้ามาคุยสด</small><span class="st"></span></button>
+    <button class="step" data-goto="plan" id="stPlan"><span class="n">2</span><b>ดูตารางรอบ</b><small>เลือกเวลาไลฟ์ 40 นาทีขึ้นไป และความถี่ที่คนเข้ามาคุยสด</small><span class="st"></span></button>
     <button class="step" data-goto="live" id="stObs"><span class="n">3</span><b>ต่อ OBS</b><small>ไม่บังคับ ใช้เมื่ออยากให้สลับซีนคลิปกับกล้องอัตโนมัติ</small><span class="st"></span></button>
     <button class="step" data-goto="live" id="stLive"><span class="n">4</span><b>เริ่มไลฟ์</b><small>อ่านบทบนจอ จับเวลา และจดออเดอร์ระหว่างไลฟ์</small><span class="st"></span></button>
+  </div>
+
+  <div class="card tt" style="margin-top:14px">
+    <div class="row" style="justify-content:space-between;align-items:flex-start">
+      <div style="flex:1;min-width:220px"><b style="font-family:var(--display);font-weight:500">🎵 ต่อ TikTok</b>
+        <div class="mini">ใส่ชื่อบัญชี TikTok ของร้าน แล้วเปิดหน้าไลฟ์ ร้านค้า หรือ LIVE Studio ได้จากปุ่มเดียว</div></div>
+      <div class="row" style="flex-wrap:nowrap;flex:1;min-width:220px"><input id="ttUser" placeholder="@ชื่อบัญชีร้าน" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="ชื่อบัญชี TikTok ของร้าน"><button class="btn" id="ttSave" style="white-space:nowrap">บันทึก</button></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <a class="btn primary" id="ttLive" target="_blank" rel="noopener">▶ เปิดหน้าไลฟ์ของร้าน</a>
+      <a class="btn" href="https://seller-th.tiktok.com/" target="_blank" rel="noopener">🛒 TikTok Shop (Seller Center)</a>
+      <a class="btn desk-only" href="https://www.tiktok.com/studio/download" target="_blank" rel="noopener">🖥 โหลด TikTok LIVE Studio</a>
+      <button class="btn" id="ttCopyBasket">📋 คัดลอกรายการตะกร้า</button>
+    </div>
+    <div class="mini" id="ttMsg" style="margin-top:6px"></div>
+    <details style="margin-top:6px"><summary class="mini" style="cursor:pointer">ต่อได้แค่ไหน ทำไมโปรแกรมกดในไลฟ์แทนไม่ได้</summary>
+      <div class="mini" style="margin-top:4px">TikTok ไม่เปิดช่องทางทางการให้โปรแกรมอื่นเริ่มไลฟ์ ปักตะกร้า หรืออ่านคอมเมนต์ได้ ปุ่มด้านบนจึงพาไปหน้าที่ต้องใช้ ส่วนการเริ่มไลฟ์และปักตะกร้ายังต้องกดในแอป TikTok หรือ LIVE Studio เอง ระหว่างไลฟ์ คัดลอกคอมเมนต์มาวางในกล่อง "ดึงออเดอร์จากคอมเมนต์" ในแท็บไลฟ์ โปรแกรมจะหา CF ให้</div></details>
   </div>
 
   <div class="card" style="margin-top:14px">
@@ -246,8 +270,9 @@ td.r,th.r{text-align:right}
   <p class="sub">แบ่งเวลาให้อัตโนมัติ ช่วงสีเขียวคือเวลาที่คนต้องเข้ามาคุยสดและตอบคอมเมนต์เอง</p>
   <div class="notice">กฎ TikTok Shop ไม่ให้ใช้เสียง AI หรือเสียงอัดไว้แทนการโต้ตอบสดทั้งรอบ ตารางนี้จึงสลับให้ AI เล่าสินค้า แล้วให้คนเข้ามาคุยสดทุกช่วง ถ้าใช้ตัวละคร AI อย่าให้บังจอเกินครึ่ง และควรแจ้งคนดูว่ามี AI ช่วยนำเสนอ</div>
   <div class="card row" style="margin-bottom:12px">
-    <div style="flex:1;min-width:120px"><label for="dur">ความยาวรอบ</label>
-      <select id="dur"><option value="60">1 ชั่วโมง</option><option value="120" selected>2 ชั่วโมง</option></select></div>
+    <div style="flex:1;min-width:140px"><label for="dur">ความยาวรอบ</label>
+      <select id="dur"><option value="40">40 นาที</option><option value="45">45 นาที</option><option value="50">50 นาที</option><option value="60">1 ชั่วโมง</option><option value="75">1 ชม. 15 นาที</option><option value="90">1 ชม. 30 นาที</option><option value="105">1 ชม. 45 นาที</option><option value="120" selected>2 ชั่วโมง</option><option value="150">2 ชม. 30 นาที</option><option value="180">3 ชั่วโมง</option><option value="240">4 ชั่วโมง</option><option value="custom">กำหนดเอง…</option></select>
+      <input id="durCustom" type="number" min="40" max="600" step="5" inputmode="numeric" placeholder="จำนวนนาที (40 ขึ้นไป)" aria-label="ความยาวรอบ (นาที)" hidden style="margin-top:6px"></div>
     <div style="flex:1;min-width:120px"><label for="talkEvery">คนคุยสดทุก</label>
       <select id="talkEvery"><option value="2">2 สินค้า</option><option value="3" selected>3 สินค้า</option><option value="1">ทุกสินค้า</option></select></div>
     <div style="flex:1;min-width:120px"><label for="talkLen">คุยสดครั้งละ</label>
@@ -294,6 +319,16 @@ td.r,th.r{text-align:right}
       <div class="card">
         <div class="mini">ถัดไป</div>
         <div id="nextInfo" style="font-weight:500"></div>
+      </div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between;flex-wrap:nowrap"><div class="mini">🎵 TikTok</div><a class="btn sm" id="ttLive2" target="_blank" rel="noopener" style="white-space:nowrap">▶ เปิดหน้าไลฟ์ของร้าน</a></div>
+        <details id="cfBox" style="margin-top:6px"><summary style="cursor:pointer;font-size:14px">ดึงออเดอร์จากคอมเมนต์ (CF)</summary>
+          <div class="mini" style="margin:4px 0">คัดลอกคอมเมนต์จาก LIVE Studio หรือหน้าไลฟ์ มาวางที่นี่ โปรแกรมจะหาข้อความแบบ "CF A1" หรือ "cf a1 2" ให้ ตรวจแล้วกดบันทึก</div>
+          <textarea id="cfText" rows="4" placeholder="เช่น&#10;น้องมด: CF A1&#10;ป้าแดง: cf b2 2"></textarea>
+          <div class="row" style="margin-top:6px"><button class="btn" id="cfFind">หาออเดอร์</button><button class="btn talk" id="cfAdd" hidden>บันทึกที่เลือก</button></div>
+          <div id="cfList" class="cflist"></div>
+          <div class="mini" id="cfMsg"></div>
+        </details>
       </div>
       <div class="card">
         <div class="mini" style="margin-bottom:6px">จดออเดอร์ด่วน</div>
@@ -354,7 +389,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.5.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.6.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
@@ -505,26 +540,47 @@ function scriptFor(s){if(s.type==="open")return pick(T.open)();if(s.type==="clos
 
 /* plan */
 let plan=[];
-function buildPlan(){const dur=+$("#dur").value,every=+$("#talkEvery").value,tl=+$("#talkLen").value;
- const P=liveProducts();const open=dur>=120?5:3,close=dur>=120?5:3;
- const nHuman=P.length?Math.ceil(P.length/every):0;let left=dur-open-close-nHuman*tl;
- let perProd=P.length?left/P.length:0;const rounds=perProd>14?2:1;perProd=P.length?left/(P.length*rounds):0;
+/* Live length in minutes: a preset, or "กำหนดเอง" (custom, 40..600). */
+const DUR_MIN=40,DUR_MAX=600;
+function durMin(){const v=$("#dur").value;if(v!=="custom")return +v;
+ const n=Math.round(+$("#durCustom").value||0);return Math.min(DUR_MAX,Math.max(DUR_MIN,n||DUR_MIN))}
+function fmtDur(m){if(m<60)return m+" นาที";const h=Math.floor(m/60),r=m%60;return r?`${h} ชม. ${r} นาที`:`${h} ชั่วโมง`}
+function buildPlan(){const dur=durMin(),every=+$("#talkEvery").value;let tl=+$("#talkLen").value;
+ const P=liveProducts();const open=dur>=120?5:dur>=60?3:2,close=open;
+ const perRound=P.length?Math.ceil(P.length/every):0;
+ // Long lives present every product twice (and the live-talk slots repeat with them).
+ const rounds=P.length&&(dur-open-close-perRound*tl)/P.length>14?2:1,nHuman=perRound*rounds,n=P.length*rounds;
+ // Short lives: shorten each live-talk slot (never below 2 min, never removed) so each product still gets about 2 min.
+ while(tl>2&&n&&dur-open-close-nHuman*tl<n*2)tl--;
+ const left=Math.max(n,dur-open-close-nHuman*tl);
+ const base=n?Math.max(1,Math.floor(left/n)):0;let extra=n?Math.max(0,left-base*n):0;
  plan=[{type:"open",name:"เปิดไลฟ์ ทักทาย",min:open}];
- for(let r=0;r<rounds;r++)P.forEach((p,i)=>{plan.push({type:"prod",p,name:(rounds>1?`รอบ ${r+1} · `:"")+`${p.code} ${p.name}`,min:Math.max(1,Math.round(perProd))});
+ for(let r=0;r<rounds;r++)P.forEach((p,i)=>{plan.push({type:"prod",p,name:(rounds>1?`รอบ ${r+1} · `:"")+`${p.code} ${p.name}`,min:base+(extra-->0?1:0)});
   if((i+1)%every===0||i===P.length-1)plan.push({type:"human",name:"คนคุยสด ตอบคอมเมนต์",min:tl})});
  plan.push({type:"close",name:"ปิดไลฟ์ สรุปโปร",min:close});
- const total=plan.reduce((a,s)=>a+s.min,0);plan[plan.length-1].min+=dur-total;
+ const total=plan.reduce((a,s)=>a+s.min,0);plan[plan.length-1].min=Math.max(1,close+dur-total);
  let t=0;plan.forEach(s=>{s.start=t;t+=s.min;s.text=scriptFor(s)});
- const h=plan.filter(s=>s.type==="human").reduce((a,s)=>a+s.min,0);
- $("#planSummary").textContent=`${plan.length} ช่วง · สินค้าพูด ${rounds} รอบ รอบละประมาณ ${Math.round(perProd)} นาที · คนคุยสดรวม ${h} นาที`;
+ const h=plan.filter(s=>s.type==="human").reduce((a,s)=>a+s.min,0),realTotal=t;
+ const tight=P.length&&base<2;
+ $("#planSummary").innerHTML=esc(`${fmtDur(dur)} · ${plan.length} ช่วง · สินค้าพูด ${rounds} รอบ ตัวละประมาณ ${base} นาที · คนคุยสดรวม ${h} นาที`)+
+  (tl<+$("#talkLen").value?esc(` (ย่อคุยสดเหลือครั้งละ ${tl} นาที ให้พอดีเวลา)`):"")+
+  (tight||realTotal>dur?`<br><b style="color:var(--warn)">⚠ เวลาน้อยไปสำหรับ ${P.length} สินค้า (รวมจริง ${fmtDur(realTotal)}) ลองเพิ่มเวลาเป็นอย่างน้อย ${fmtDur(Math.ceil((open+close+nHuman*2+n*2)/5)*5)} หรือเอาสินค้าบางตัวออกจากรอบนี้</b>`:"");
  $("#basketList").innerHTML=P.length?P.map((p,i)=>`<span><b>#${i+1}</b> ${esc(p.code)} ${esc(p.name)}</span>`).join(""):'<span>ยังไม่ได้เลือกสินค้า ไปติ๊ก "ไลฟ์รอบนี้" ในแท็บสินค้า</span>';
  const el=$("#tl");el.innerHTML="";plan.forEach((s,i)=>{const d=document.createElement("div");d.className="seg"+(s.type==="human"?" human":"")+(i===cur&&running?" now":"");
   d.innerHTML=`<span class="t">${mm(s.start)}</span><span>${esc(s.name)}</span><span class="chip ${s.type==="human"?"human":"ai"}">${s.type==="human"?"คนพูดสด":"AI ช่วย"} · ${s.min} น.</span>`;el.appendChild(d)});
  if(cur>=plan.length)cur=0;}
 const PLAN_KEYS=["dur","talkEvery","talkLen"];
-function planSettings(){const o={};PLAN_KEYS.forEach(k=>o[k]=$("#"+k).value);return o}
-function applyPlanSettings(o){PLAN_KEYS.forEach(k=>{const el=$("#"+k);if(o&&o[k]!=null&&[...el.options].some(x=>x.value===String(o[k])))el.value=String(o[k])})}
-PLAN_KEYS.forEach(k=>$("#"+k).onchange=()=>{store.set("ls_plan",planSettings());buildPlan()});
+// ls_plan.dur is always minutes (a number); a value that is not a preset shows as "กำหนดเอง".
+function planSettings(){const o={};PLAN_KEYS.forEach(k=>o[k]=$("#"+k).value);o.dur=durMin();return o}
+function applyPlanSettings(o){PLAN_KEYS.forEach(k=>{const el=$("#"+k);if(!o||o[k]==null)return;const v=String(o[k]);
+  if([...el.options].some(x=>x.value===v))el.value=v;
+  else if(k==="dur"&&+v>=DUR_MIN){el.value="custom";$("#durCustom").value=Math.min(DUR_MAX,Math.round(+v))}});
+ $("#durCustom").hidden=$("#dur").value!=="custom"}
+const planChanged=()=>{store.set("ls_plan",planSettings());plan=[];buildPlan();renderHome()};
+PLAN_KEYS.forEach(k=>$("#"+k).onchange=planChanged);
+$("#dur").onchange=()=>{const c=$("#dur").value==="custom";$("#durCustom").hidden=!c;
+ if(c){if(!$("#durCustom").value)$("#durCustom").value=plan.length?plan.reduce((a,s)=>a+s.min,0):60;$("#durCustom").focus()}planChanged()};
+$("#durCustom").onchange=()=>{const n=Math.round(+$("#durCustom").value||0);if(n<DUR_MIN)$("#durCustom").value=DUR_MIN;else if(n>DUR_MAX)$("#durCustom").value=DUR_MAX;planChanged()};
 const mm=m=>`${String(Math.floor(m/60)).padStart(2,"0")}:${String(Math.round(m%60)).padStart(2,"0")}`;
 
 /* live */
@@ -672,16 +728,57 @@ $("#obsOn").onchange=()=>{obsCfg.on=$("#obsOn").checked;store.set("ls_obs",obsCf
 $("#obsSave").onclick=()=>{obsCfg.host=$("#obsHost").value.trim()||"localhost";obsCfg.port=+$("#obsPort").value||4455;obsCfg.pass=$("#obsPass").value;
  obsCfg.clip=$("#obsClip").value.trim()||"คลิปสินค้า";obsCfg.talk=$("#obsTalk").value.trim()||"พูดขายของ";obsCfg.on=true;store.set("ls_obs",obsCfg);obsFill();obsConnect()};
 
+/* TikTok: links only. TikTok has no official API for starting a live, pinning products or
+   reading comments, so comments are pasted in and scanned for "CF <code> [qty]". */
+const ttCfg=Object.assign({user:""},store.get("ls_tt",{}));
+const ttName=s=>String(s||"").trim().replace(/^https?:\/\/(www\.|m\.)?tiktok\.com\//i,"").replace(/^@/,"").replace(/[/?#].*$/,"").replace(/[^A-Za-z0-9._]/g,"");
+const ttLiveURL=()=>`https://www.tiktok.com/@${encodeURIComponent(ttCfg.user)}/live`;
+function ttFill(){$("#ttUser").value=ttCfg.user?"@"+ttCfg.user:"";
+ ["#ttLive","#ttLive2"].forEach(s=>$(s).href=ttCfg.user?ttLiveURL():"#");
+ $("#ttMsg").textContent=ttCfg.user?`บัญชีร้าน @${ttCfg.user} · ในมือถือ ปุ่มนี้จะเปิดแอป TikTok ให้เอง`:"ยังไม่ได้ใส่ชื่อบัญชีร้าน"}
+["#ttLive","#ttLive2"].forEach(s=>$(s).addEventListener("click",e=>{if(ttCfg.user)return;e.preventDefault();show("home");
+ $("#ttUser").scrollIntoView({block:"center"});$("#ttUser").focus();$("#ttMsg").textContent="ใส่ชื่อบัญชี TikTok ของร้านก่อน แล้วกดบันทึก"}));
+$("#ttSave").onclick=()=>{const n=ttName($("#ttUser").value);ttCfg.user=n;store.set("ls_tt",ttCfg);ttFill();
+ if(n)$("#ttMsg").textContent=`บันทึกแล้ว: @${n}`;else if($("#ttUser").value)$("#ttMsg").textContent="ชื่อบัญชีใช้ได้แค่ตัวอังกฤษ ตัวเลข จุด และขีดล่าง"};
+$("#ttUser").onkeydown=e=>{if(e.key==="Enter")$("#ttSave").click()};
+function copyText(txt){if(navigator.clipboard&&window.isSecureContext!==false)return navigator.clipboard.writeText(txt).catch(()=>copyOld(txt));return copyOld(txt)}
+function copyOld(txt){const t=document.createElement("textarea");t.value=txt;t.style.position="fixed";t.style.opacity="0";document.body.appendChild(t);t.select();
+ const ok=document.execCommand("copy");t.remove();return ok?Promise.resolve():Promise.reject()}
+$("#ttCopyBasket").onclick=()=>{const P=liveProducts();if(!P.length){$("#ttMsg").textContent="ยังไม่ได้เลือกสินค้าสำหรับรอบนี้";return}
+ copyText(P.map((p,i)=>`#${i+1} ${p.code} ${p.name} ${fmt(p.price)} บาท`).join("\n"))
+  .then(()=>$("#ttMsg").textContent=`คัดลอก ${P.length} รายการแล้ว เพิ่มสินค้าเข้าตะกร้าไลฟ์ใน TikTok ตามลำดับนี้`).catch(()=>$("#ttMsg").textContent="คัดลอกไม่ได้ ดูรายการได้ที่แท็บตารางรอบ")};
+
+let cfFound=[];
+function parseCF(text){const byCode=new Map(products.map(p=>[String(p.code).toUpperCase(),p]));const out=[];let prevName="",unknown=0;
+ const re=/(?:^|[^a-z0-9])cf\s*[:.\-]?\s*([a-z]{0,3}\s?\d{1,3})(?:\s*[x*×]?\s*(\d{1,2}))?(?![a-z0-9])/ig;
+ for(const raw of String(text).split(/\r?\n/)){const line=raw.trim();if(!line)continue;let m,hit=false;re.lastIndex=0;
+  while((m=re.exec(line))){hit=true;const p=byCode.get(m[1].replace(/\s/g,"").toUpperCase());if(!p){unknown++;continue}
+   const before=line.slice(0,m.index+(/^[a-z0-9]/i.test(m[0])?0:1)).trim();
+   let name=before.includes(":")?before.split(":")[0].trim():before.replace(/[\s:\-–]+$/,"");if(!name)name=prevName;
+   out.push({name:(name||"ลูกค้า TikTok").slice(0,40),code:p.code,pname:p.name,price:p.price,qty:Math.min(99,Math.max(1,+m[2]||1))})}
+  if(!hit)prevName=line.replace(/[:：]\s*$/,"").slice(0,40)}
+ return{out,unknown}}
+$("#cfFind").onclick=()=>{const {out,unknown}=parseCF($("#cfText").value),today=localDate();
+ cfFound=out.map(o=>({...o,dup:orders.some(x=>x.d===today&&x.name===o.name&&x.code===o.code)}));
+ $("#cfList").innerHTML=cfFound.map((o,i)=>`<label class="${o.dup?"dup":""}"><input type="checkbox" data-cf="${i}" ${o.dup?"":"checked"}><span><b>${esc(o.name)}</b> · <span class="code">${esc(o.code)}</span> ${esc(o.pname)} x${o.qty}${o.dup?" (วันนี้มีออเดอร์นี้แล้ว)":""}</span></label>`).join("");
+ $("#cfAdd").hidden=!cfFound.length;
+ $("#cfMsg").textContent=(cfFound.length?`พบ ${cfFound.length} ออเดอร์ ติ๊กเฉพาะที่ถูกต้องแล้วกดบันทึก`:"ไม่พบข้อความ CF ตามด้วยรหัสสินค้า")+(unknown?` · มี ${unknown} รายการที่รหัสไม่ตรงกับสินค้า`:"")};
+$("#cfAdd").onclick=()=>{const t=new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"}),d=localDate();let n=0;
+ $("#cfList").querySelectorAll("[data-cf]").forEach(c=>{if(!c.checked)return;const o=cfFound[+c.dataset.cf];orders.push({d,t,name:o.name,code:o.code,pname:o.pname,qty:o.qty,price:o.price});n++});
+ if(!n){$("#cfMsg").textContent="ยังไม่ได้ติ๊กออเดอร์";return}
+ store.set("ls_orders",orders);renderOrders();renderHome();cfFound=[];$("#cfList").innerHTML="";$("#cfAdd").hidden=true;$("#cfText").value="";
+ $("#cfMsg").textContent=`บันทึกแล้ว ${n} ออเดอร์ ดูได้ที่แท็บออเดอร์`};
+
 /* home */
 function renderHome(){if(!plan.length)buildPlan();
- const talk=plan.filter(s=>s.type==="human").reduce((a,s)=>a+s.min,0),dur=+$("#dur").value,sales=orders.reduce((a,o)=>a+o.qty*o.price,0);
- $("#hProd").textContent=fmt(liveProducts().length);$("#hDur").textContent=dur/60+" ชม.";$("#hTalk").textContent=talk+" น.";$("#hSales").textContent=fmt(sales);
+ const talk=plan.filter(s=>s.type==="human").reduce((a,s)=>a+s.min,0),dur=durMin(),sales=orders.reduce((a,o)=>a+o.qty*o.price,0);
+ $("#hProd").textContent=fmt(liveProducts().length);$("#hDur").textContent=fmtDur(dur);$("#hTalk").textContent=talk+" น.";$("#hSales").textContent=fmt(sales);
  const col={open:"var(--warn)",close:"var(--warn)",prod:"var(--accent)",human:"var(--talk)"};
  $("#hBar").innerHTML=plan.map(s=>`<i style="flex:${s.min};background:${col[s.type]}" title="${esc(s.name)} · ${s.min} นาที"></i>`).join("");
  const st=(id,ok,txt)=>{$(id).classList.toggle("ok",ok);$(id+" .st").textContent=txt};
  const lp=liveProducts().length,withImg=liveProducts().filter(p=>p.img).length;
  st("#stProd",lp>0,lp?`✓ ไลฟ์ ${lp} จาก ${products.length} รายการ · มีรูป ${withImg}`:"ยังไม่ได้เลือกสินค้า");
- st("#stPlan",plan.length>0,`${plan.length} ช่วง · ${dur/60} ชั่วโมง`);
+ st("#stPlan",plan.length>0,`${plan.length} ช่วง · ${fmtDur(dur)}`);
  st("#stObs",obsReady,obsReady?"✓ ต่อ OBS แล้ว":(obsCfg.on?"กำลังรอ OBS":"ยังไม่ได้เปิดใช้"));
  st("#stLive",running,running?"● กำลังไลฟ์":(orders.length?`มีออเดอร์ ${orders.length} รายการ`:"พร้อมเมื่อคุณพร้อม"));}
 document.querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>show(b.dataset.goto));
@@ -762,9 +859,9 @@ const verNum=v=>String(v).split(".").map(n=>+n||0),newer=(a,b)=>{const x=verNum(
 if(location.protocol==="file:"){
  if(UPDATE_SITE&&navigator.onLine)fetch(UPDATE_SITE+"version.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(v=>{
   if(!v||!newer(v.version,APP_VERSION))return;const b=$("#updBox");b.hidden=false;
-  b.innerHTML=`<div><b>มีเวอร์ชันใหม่ ${esc(v.version)}</b> (ตอนนี้ใช้ ${APP_VERSION})<div class="mini">กดดาวน์โหลด แล้วเปิดไฟล์ที่ได้ สินค้าและออเดอร์เดิมไม่หาย ถ้า Edge เตือน ให้กด "เก็บไว้" (Keep) ไม่ควรอัปเดตตอนกำลังไลฟ์</div></div><a class="btn solid" href="${esc(UPDATE_SITE+v.installer)}" download>⬇ ดาวน์โหลดตัวอัปเดต</a>`}).catch(()=>{});
+  b.innerHTML=`<div><b>มีเวอร์ชันใหม่ ${esc(v.version)}</b> (ตอนนี้ใช้ ${APP_VERSION})<div class="mini">กดดาวน์โหลด แล้วเปิดไฟล์ที่ได้ สินค้าและออเดอร์เดิมไม่หาย ถ้า Edge เตือน ให้กด "เก็บไว้" (Keep) ไม่ควรอัปเดตตอนกำลังไลฟ์</div></div><a class="btn primary" href="${esc(UPDATE_SITE+v.installer)}" download>⬇ ดาวน์โหลดตัวอัปเดต</a>`}).catch(()=>{});
 }else $("#verNote").textContent="เวอร์ชันใหม่จะโหลดเองเมื่อต่อเน็ต แล้วใช้ได้ตอนเปิดครั้งถัดไป";
-renderProducts();aiStateText();buildPlan();obsFill();obsConnect();renderLive();renderHome();
+renderProducts();aiStateText();buildPlan();obsFill();ttFill();obsConnect();renderLive();renderHome();
 </script>
 <script>
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){navigator.serviceWorker.register("sw.js").catch(()=>{})}
