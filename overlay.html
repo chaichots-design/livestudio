@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="th" translate="no">
+<head>
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LiveStudio ป้ายสินค้า</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@500;600&display=swap">
+<style>
+/* OBS Browser Source overlay. Transparent page; LiveStudio (index.html) sets the URL hash
+   with the current segment via obs-websocket SetInputSettings. Opened without a hash it
+   shows demo data so it can be previewed in a normal browser.
+   Sizes use --u, a unit that fits both portrait 1080x1920 and landscape 1920x1080 frames. */
+:root{--u:min(1vw,.9vh);--pink:#e2365b;--purple:#b5179e;--green:#1f7a5a;--ink:#18202b;--muted:#5d6876}
+html,body{margin:0;height:100%;background:transparent;overflow:hidden}
+body{font-family:"Kanit","IBM Plex Sans Thai","Leelawadee UI",sans-serif;color:var(--ink)}
+.wrap{position:absolute;left:calc(var(--u)*5);right:calc(var(--u)*5);display:flex}
+.wrap.top{top:calc(var(--u)*17)}
+.wrap.bottom{bottom:calc(var(--u)*40)}
+.card{position:relative;max-width:calc(var(--u)*78);background:rgba(255,255,255,.96);border-radius:calc(var(--u)*3.2);
+  padding:calc(var(--u)*3) calc(var(--u)*3.6) calc(var(--u)*3) calc(var(--u)*4.4);box-shadow:0 calc(var(--u)*1) calc(var(--u)*4) rgba(0,0,0,.28);overflow:hidden}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:calc(var(--u)*1.4);background:linear-gradient(180deg,var(--pink),var(--purple))}
+.card.talk::before{background:var(--green)}
+.top-row{display:flex;gap:calc(var(--u)*1.4);align-items:center;flex-wrap:wrap}
+.code{font-weight:600;font-size:calc(var(--u)*3);color:#fff;background:var(--pink);padding:0 calc(var(--u)*1.6);border-radius:calc(var(--u)*1.2);letter-spacing:.03em}
+.tag{font-family:"IBM Plex Sans Thai",sans-serif;font-weight:500;font-size:calc(var(--u)*2.3);color:var(--muted);background:#f1f2f5;padding:calc(var(--u)*.3) calc(var(--u)*1.4);border-radius:999px}
+.tag.live{color:#fff;background:var(--green)}
+.name{font-weight:600;font-size:calc(var(--u)*4.6);line-height:1.25;margin:calc(var(--u)*1.2) 0 calc(var(--u)*.6)}
+.price-row{display:flex;align-items:baseline;gap:calc(var(--u)*2);flex-wrap:wrap}
+.price{font-weight:700;font-size:calc(var(--u)*7.4);line-height:1.1;background:linear-gradient(90deg,var(--pink),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
+.promo{font-family:"IBM Plex Sans Thai",sans-serif;font-weight:600;font-size:calc(var(--u)*2.9);color:var(--purple)}
+.cta{display:inline-block;margin-top:calc(var(--u)*1.6);font-weight:600;font-size:calc(var(--u)*3.3);color:#fff;
+  background:linear-gradient(90deg,var(--pink),var(--purple));padding:calc(var(--u)*.7) calc(var(--u)*2.6);border-radius:999px}
+.card.talk .cta{background:var(--green)}
+.sub{font-family:"IBM Plex Sans Thai",sans-serif;font-weight:500;font-size:calc(var(--u)*2.8);color:var(--muted);margin-top:calc(var(--u)*.6)}
+.in{animation:in .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes in{from{transform:translateX(calc(var(--u)*-110))}to{transform:none}}
+.demo{position:fixed;right:8px;bottom:8px;font:12px system-ui;color:#fff;background:rgba(0,0,0,.55);padding:4px 8px;border-radius:6px}
+</style>
+</head>
+<body>
+<div class="wrap top" id="wrap"></div>
+<script>
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const baht=n=>"฿"+Number(n||0).toLocaleString("th-TH");
+const DEMO={s:"prod",c:"A1",n:"เซรั่มวิตามินซี 30ml",p:290,pr:"ซื้อ 2 ขวดเหลือ 499",b:1,pos:"top"};
+let lastKey="";
+function data(){const h=location.hash.slice(1);if(!h)return Object.assign({demo:true},DEMO);try{return JSON.parse(decodeURIComponent(h))}catch(e){return{s:"idle"}}}
+function card(d){
+  const ai='<span class="tag">มี AI ช่วยนำเสนอ</span>';
+  if(d.s==="prod")return`<div class="card in"><div class="top-row"><span class="code">${esc(d.c)}</span>${ai}</div>
+    <div class="name">${esc(d.n)}</div><div class="price-row"><span class="price">${baht(d.p)}</span>${d.pr?`<span class="promo">${esc(d.pr)}</span>`:""}</div>
+    <div class="cta">${d.b?`กดตะกร้า #${esc(d.b)} หรือพิมพ์ CF ${esc(d.c)}`:`พิมพ์ CF ${esc(d.c)} ในคอมเมนต์`}</div></div>`;
+  if(d.s==="human")return`<div class="card talk in"><div class="top-row"><span class="tag live">● คุยสด</span></div>
+    <div class="name">ถามมาได้เลย ตอบสดทุกคำถาม</div>${d.last?`<div class="sub">เพิ่งพูดถึง ${esc(d.last.c)} ${esc(d.last.n)}</div><div class="cta">พิมพ์ CF ${esc(d.last.c)} ในคอมเมนต์</div>`:""}</div>`;
+  if(d.s==="open")return`<div class="card in"><div class="top-row"><span class="tag live">● LIVE</span></div>
+    <div class="name">ยินดีต้อนรับเข้าไลฟ์</div><div class="sub">ราคาพิเศษเฉพาะในไลฟ์ กดติดตามไว้ไม่พลาดโปร</div><div class="cta">อยากได้ตัวไหน พิมพ์ CF ตามด้วยรหัส</div></div>`;
+  if(d.s==="close")return`<div class="card in"><div class="top-row"><span class="tag live">● ใกล้ปิดไลฟ์</span></div>
+    <div class="name">รีบ CF ก่อนโปรหมด</div><div class="sub">โปรราคาไลฟ์หมดเมื่อปิดไลฟ์ ขอบคุณทุกคนที่อยู่ด้วยกันค่ะ</div></div>`;
+  return"";}
+function render(){const d=data(),key=JSON.stringify(d);if(key===lastKey)return;lastKey=key;
+  const w=document.getElementById("wrap");w.className="wrap "+(d.pos==="bottom"?"bottom":"top");
+  w.innerHTML=card(d)+(d.demo?'<div class="demo">ตัวอย่าง: เปิดผ่าน OBS แล้วป้ายจะเปลี่ยนตามรอบไลฟ์เอง</div>':"");}
+addEventListener("hashchange",render);render();
+</script>
+</body>
+</html>

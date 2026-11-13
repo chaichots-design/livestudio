@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="th" translate="no">
+<head>
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#e2365b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<title>ไลฟ์สตูดิโอ ขายของ</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: sticky tab bar + one working panel; live panel is a teleprompter with a timeline strip */
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --ink:#18202b; --muted:#5d6876; --line:#dfe3e8;
+  --accent:#e2365b; --accent-soft:#fde7ec; --talk:#1f7a5a; --talk-soft:#e1f3ec; --warn:#a86400; --warn-soft:#fdf1dc;
+  --display:"Kanit","IBM Plex Sans Thai",sans-serif; --body:"IBM Plex Sans Thai",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12161c; --surface:#1b2129; --ink:#e9edf2; --muted:#9aa5b2; --line:#2c3440;
+  --accent:#ff5c7c; --accent-soft:#3a1a23; --talk:#4cc79a; --talk-soft:#15322a; --warn:#f0b04f; --warn-soft:#3a2c14; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161c; --surface:#1b2129; --ink:#e9edf2; --muted:#9aa5b2; --line:#2c3440;
+  --accent:#ff5c7c; --accent-soft:#3a1a23; --talk:#4cc79a; --talk-soft:#15322a; --warn:#f0b04f; --warn-soft:#3a2c14; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 48px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+header .in{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px 0}
+.brand{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.brand h1{font-family:var(--display);font-weight:600;font-size:20px;margin:0}
+.onair{font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:2px 8px;border-radius:4px;border:1px solid var(--line);color:var(--muted)}
+.onair.live{background:var(--accent);border-color:var(--accent);color:#fff}
+nav{display:flex;gap:4px;overflow-x:auto;margin-top:6px}
+nav button{font:inherit;font-weight:500;background:none;border:0;border-bottom:3px solid transparent;padding:8px 12px;color:var(--muted);cursor:pointer;white-space:nowrap}
+nav button[aria-selected="true"]{color:var(--ink);border-color:var(--accent)}
+h2{font-family:var(--display);font-weight:500;font-size:18px;margin:4px 0 4px}
+.sub{color:var(--muted);margin:0 0 14px;font-size:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+.btn{font:inherit;font-weight:500;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:8px 14px;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.talk{background:var(--talk);border-color:var(--talk);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,nav button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 9px;width:100%}
+label{font-size:12px;color:var(--muted);display:block;margin-bottom:2px}
+.notice{background:var(--warn-soft);color:var(--ink);border-radius:8px;padding:10px 12px;font-size:14px;margin-bottom:14px;border-left:4px solid var(--warn)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+/* products */
+.plist{display:grid;gap:10px}
+.prod{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.prod .wide{grid-column:span 2}.prod .full{grid-column:1/-1}
+@media(max-width:560px){.prod{grid-template-columns:1fr 1fr}.prod .wide{grid-column:1/-1}}
+.prodhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.code{font-family:var(--mono);font-size:12px;background:var(--accent-soft);color:var(--accent);padding:1px 7px;border-radius:4px}
+.btn.sm{padding:3px 10px;font-size:13px}
+.prodbody{display:grid;grid-template-columns:132px minmax(0,1fr);gap:14px}
+@media(max-width:560px){.prodbody{grid-template-columns:1fr}}
+.photo{display:grid;gap:6px;align-content:start}
+.photo img,.photo .ph{width:100%;aspect-ratio:1;border-radius:10px;object-fit:cover;background:var(--bg);border:1px solid var(--line)}
+.photo .ph{display:grid;place-items:center;text-align:center;color:var(--muted);font-size:13px;border-style:dashed}
+@media(max-width:560px){.photo{grid-template-columns:96px 1fr;align-items:start}.photo img,.photo .ph{grid-row:span 3}}
+.basket{font-size:12px;font-weight:600;background:var(--talk-soft);color:var(--talk);padding:1px 8px;border-radius:999px;white-space:nowrap}
+.card.off{opacity:.55}
+.pick{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--ink);margin:0;cursor:pointer}
+.pick input{width:auto}
+.aiscript{white-space:pre-wrap;font-size:14px;background:var(--bg);border-radius:8px;padding:8px 10px;margin-top:6px}
+.pinbar{display:flex;gap:8px;align-items:center;background:var(--warn-soft);border-left:4px solid var(--warn);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-weight:500}
+.pinbar b{font-family:var(--display);font-size:20px}
+.order-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.order-list span{font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+/* plan */
+.tl{display:grid;gap:6px}
+.seg{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--line)}
+.seg .t{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.chip{font-size:12px;padding:1px 8px;border-radius:999px;white-space:nowrap}
+.chip.ai{background:var(--accent-soft);color:var(--accent)}
+.chip.human{background:var(--talk-soft);color:var(--talk)}
+.seg.human{border-left:4px solid var(--talk)}
+.seg.now{outline:2px solid var(--accent)}
+/* live */
+.livegrid{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:14px}
+@media(max-width:760px){.livegrid{grid-template-columns:1fr}}
+.clock{font-family:var(--mono);font-size:34px;line-height:1.1}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;background:var(--accent);width:0}
+.prompter{font-size:21px;line-height:1.75;min-height:220px;white-space:pre-wrap}
+.prompter.human{background:var(--talk-soft)}
+.segtitle{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.disclose{font-size:13px;color:var(--muted);margin-top:8px}
+.side{display:grid;gap:10px;align-content:start}
+.mini{font-size:13px;color:var(--muted)}
+/* orders */
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
+th{font-weight:500;color:var(--muted);font-size:12px}
+td.r,th.r{text-align:right}
+.tablebox{overflow-x:auto}
+.totals{display:flex;gap:24px;flex-wrap:wrap;margin:12px 0}
+.totals b{font-family:var(--mono);font-size:22px;display:block}
+/* home */
+.brand img{width:28px;height:28px;border-radius:7px}
+.hero{position:relative;overflow:hidden;border-radius:16px;padding:28px 24px;color:#fff;
+  background:radial-gradient(120% 140% at 100% 0%,#ff8a5c 0%,transparent 55%),linear-gradient(135deg,#e2365b 0%,#b5179e 100%);
+  display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:20px;align-items:center}
+.hero h2{font-family:var(--display);font-weight:600;font-size:30px;line-height:1.25;margin:6px 0 8px;color:#fff}
+.hero p{margin:0 0 18px;opacity:.92;max-width:44ch}
+.hero .kicker{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;background:rgba(255,255,255,.18);padding:3px 10px;border-radius:999px}
+.hero .kicker i{width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.3)}
+.hero .btn{border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.12);color:#fff}
+.hero .btn.solid{background:#fff;color:#b5179e;border-color:#fff;font-weight:600}
+.hero svg{width:100%;height:auto;display:block}
+@media(max-width:620px){.hero{grid-template-columns:1fr;padding:22px 18px}.hero h2{font-size:24px}.hero .art{display:none}}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}
+@media(max-width:620px){.stats{grid-template-columns:1fr 1fr}}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.stat b{display:block;font-family:var(--display);font-weight:600;font-size:24px;line-height:1.2}
+.stat span{font-size:12px;color:var(--muted)}
+.sessbar{display:flex;height:14px;border-radius:7px;overflow:hidden;gap:2px;margin:10px 0 8px}
+.sessbar i{display:block;height:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px;background:var(--c)}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+@media(max-width:760px){.steps{grid-template-columns:1fr 1fr}}
+@media(max-width:420px){.steps{grid-template-columns:1fr}}
+.step{font:inherit;text-align:left;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;display:grid;gap:4px;align-content:start;transition:border-color .15s,transform .15s}
+.step:hover{border-color:var(--accent);transform:translateY(-1px)}
+.step:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.step .n{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-family:var(--display);font-weight:600;background:var(--accent-soft);color:var(--accent);margin-bottom:4px}
+.step.ok .n{background:var(--talk-soft);color:var(--talk)}
+.step b{font-family:var(--display);font-weight:500;font-size:16px}
+.step small{color:var(--muted);font-size:13px;line-height:1.5}
+.step .st{font-size:12px;color:var(--muted)}
+.step.ok .st{color:var(--talk)}
+.rulecard{display:flex;gap:12px;align-items:flex-start;margin-top:14px;background:var(--talk-soft);border-radius:12px;padding:14px}
+.rulecard .ic{flex:none;width:34px;height:34px;border-radius:50%;background:var(--talk);color:#fff;display:grid;place-items:center;font-size:17px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+</head>
+<body>
+<header><div class="in">
+  <div class="brand"><img src="icon-192.png" alt=""><h1>ไลฟ์สตูดิโอ ขายของ</h1><span class="onair" id="onair">OFF AIR</span></div>
+  <nav role="tablist">
+    <button role="tab" data-tab="home" aria-selected="true">หน้าแรก</button>
+    <button role="tab" data-tab="products" aria-selected="false">1. สินค้า</button>
+    <button role="tab" data-tab="plan" aria-selected="false">2. ตารางรอบ</button>
+    <button role="tab" data-tab="live" aria-selected="false">3. ไลฟ์</button>
+    <button role="tab" data-tab="orders" aria-selected="false">4. ออเดอร์</button>
+  </nav>
+</div></header>
+
+<main class="wrap">
+
+<section id="tab-home">
+  <div class="hero">
+    <div>
+      <span class="kicker"><i></i>TIKTOK LIVE ผู้ช่วยขายของ</span>
+      <h2>ไลฟ์ขายของรอบละ 1–2 ชั่วโมง<br>เตรียมครบในหน้าเดียว</h2>
+      <p>ใส่สินค้า ระบบจัดตารางและเขียนบทให้ AI ช่วยเล่าสินค้า สลับซีน OBS ให้เอง ส่วนคุณเข้ามาคุยสดและตอบคอมเมนต์ตามช่วงที่กำหนด</p>
+      <div class="row">
+        <button class="btn solid" id="homeGo">ไปหน้าไลฟ์ ▶</button>
+        <button class="btn" data-goto="products">แก้รายการสินค้า</button>
+      </div>
+    </div>
+    <div class="art" aria-hidden="true">
+      <svg viewBox="0 0 190 220">
+        <rect x="45" y="6" width="100" height="196" rx="18" fill="rgba(255,255,255,.16)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
+        <rect x="56" y="22" width="78" height="96" rx="8" fill="rgba(255,255,255,.22)"/>
+        <circle cx="95" cy="60" r="16" fill="rgba(255,255,255,.75)"/><path d="M71 112c4-18 44-18 48 0z" fill="rgba(255,255,255,.75)"/>
+        <rect x="62" y="28" width="30" height="13" rx="4" fill="#fff"/><text x="77" y="38" font-family="IBM Plex Mono,monospace" font-size="8" font-weight="600" text-anchor="middle" fill="#e2365b">LIVE</text>
+        <rect x="56" y="128" width="62" height="9" rx="4.5" fill="rgba(255,255,255,.55)"/>
+        <rect x="56" y="143" width="46" height="9" rx="4.5" fill="rgba(255,255,255,.4)"/>
+        <rect x="56" y="158" width="54" height="9" rx="4.5" fill="rgba(255,255,255,.3)"/>
+        <rect x="56" y="178" width="78" height="14" rx="7" fill="#fff"/><text x="95" y="188" font-family="IBM Plex Sans Thai,sans-serif" font-size="8" font-weight="600" text-anchor="middle" fill="#b5179e">CF A1</text>
+        <path d="M150 60l22-10M152 80h24M150 100l22 10" stroke="rgba(255,255,255,.6)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="26" cy="150" r="13" fill="rgba(255,255,255,.22)"/><path d="M20 150l4 4 8-8" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b class="num" id="hProd">0</b><span>สินค้าในรอบนี้</span></div>
+    <div class="stat"><b id="hDur">2 ชม.</b><span>ความยาวรอบ</span></div>
+    <div class="stat"><b id="hTalk">0 น.</b><span>คนคุยสดรวม</span></div>
+    <div class="stat"><b class="num" id="hSales">0</b><span>ยอดขายรอบนี้ (บาท)</span></div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between"><b style="font-family:var(--display);font-weight:500">หน้าตารอบไลฟ์</b><button class="btn" data-goto="plan" style="padding:4px 12px;font-size:13px">ดูตารางเต็ม</button></div>
+    <div class="sessbar" id="hBar"></div>
+    <div class="legend"><span style="--c:var(--warn)">เปิดและปิดไลฟ์</span><span style="--c:var(--accent)">AI ช่วยเล่าสินค้า</span><span style="--c:var(--talk)">คนคุยสด</span></div>
+  </div>
+
+  <div class="steps">
+    <button class="step" data-goto="products" id="stProd"><span class="n">1</span><b>ใส่สินค้า</b><small>ชื่อ ราคา จุดขาย และโปร ระบบเขียนบทให้จากข้อมูลนี้</small><span class="st"></span></button>
+    <button class="step" data-goto="plan" id="stPlan"><span class="n">2</span><b>ดูตารางรอบ</b><small>เลือก 1 หรือ 2 ชั่วโมง และความถี่ที่คนเข้ามาคุยสด</small><span class="st"></span></button>
+    <button class="step" data-goto="live" id="stObs"><span class="n">3</span><b>ต่อ OBS</b><small>ไม่บังคับ ใช้เมื่ออยากให้สลับซีนคลิปกับกล้องอัตโนมัติ</small><span class="st"></span></button>
+    <button class="step" data-goto="live" id="stLive"><span class="n">4</span><b>เริ่มไลฟ์</b><small>อ่านบทบนจอ จับเวลา และจดออเดอร์ระหว่างไลฟ์</small><span class="st"></span></button>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="row" style="justify-content:space-between">
+      <div><b style="font-family:var(--display);font-weight:500">สำรองข้อมูลและย้ายเครื่อง</b>
+        <div class="mini">เก็บสินค้า ออเดอร์ และการตั้งค่ารอบไว้ในไฟล์เดียว เอาไปกู้คืนในเครื่องอื่นได้ (ไม่รวมรหัส OBS)</div></div>
+      <div class="row"><button class="btn" id="backupAll">⬇ สำรองทั้งหมด</button><button class="btn" id="restoreAll">⬆ กู้คืนจากไฟล์สำรอง</button></div>
+    </div>
+    <div class="mini" id="bMsg" style="margin-top:6px"></div>
+  </div>
+
+  <div class="rulecard">
+    <span class="ic">🎙</span>
+    <div><b>ช่วงสีเขียวต้องเป็นคนพูดสด</b><div class="mini" style="margin-top:2px">กฎ TikTok Shop ไม่ให้ใช้เสียง AI หรือคลิปเก่าแทนการพูดสดทั้งรอบ โปรแกรมจึงเว้นช่วงให้คุณเข้ามาทักทายและตอบคอมเมนต์เป็นระยะ ถ้าใช้ตัวละคร AI อย่าให้เกินครึ่งจอ และแจ้งคนดูว่ามี AI ช่วยนำเสนอ</div></div>
+  </div>
+  <div class="rulecard" id="updBox" hidden style="justify-content:space-between;flex-wrap:wrap"></div>
+  <p class="mini" style="text-align:center;margin-top:14px">LiveStudio เวอร์ชัน <b id="appVer"></b> · <span id="verNote">มีเวอร์ชันใหม่ ให้เปิดไฟล์ติดตั้งตัวใหม่ทับได้เลย สินค้าและออเดอร์เดิมไม่หาย</span></p>
+</section>
+
+<section id="tab-products" hidden>
+  <h2>สินค้าในรอบนี้</h2>
+  <p class="sub">ติ๊ก "ไลฟ์รอบนี้" เฉพาะสินค้าที่จะขาย แล้วกด ▲▼ เรียงตามลำดับที่จะพูด เลขตะกร้าจะนับตามลำดับนี้ ใส่รูปแล้วให้ AI เขียนชื่อ จุดขาย และบทพูดให้ได้ ข้อมูลเก็บไว้ในเครื่องนี้</p>
+  <details class="card" id="aiBox" style="margin-bottom:12px">
+    <summary style="cursor:pointer"><b style="font-family:var(--display);font-weight:500">✨ ตั้งค่า AI เขียนบทจากรูป</b> <span class="mini" id="aiState"></span></summary>
+    <div style="display:grid;gap:6px;margin-top:8px">
+      <div class="mini">ใช้ Claude ของ Anthropic ต้องต่อเน็ต และใช้ API key ของคุณเอง (สมัครที่ console.anthropic.com) ค่าใช้จ่ายประมาณ 1 บาทต่อสินค้า key เก็บไว้ในเครื่องนี้เท่านั้น ไม่อยู่ในไฟล์สำรอง</div>
+      <div class="row" style="flex-wrap:nowrap"><input id="aiKey" type="password" autocomplete="off" placeholder="sk-ant-..." aria-label="API key"><button class="btn" id="aiSave" style="white-space:nowrap">บันทึก</button><button class="btn" id="aiClear" style="white-space:nowrap">ลบ key</button></div>
+    </div>
+  </details>
+  <div class="row" style="margin-bottom:12px">
+    <button class="btn" id="addProd">+ เพิ่มสินค้า</button>
+    <button class="btn" id="resetProd">ใช้ข้อมูลตัวอย่าง</button>
+    <span style="flex:1"></span>
+    <button class="btn" id="expProd">⬇ ส่งออกไฟล์ (Excel)</button>
+    <button class="btn" id="impProd">⬆ นำเข้าจากไฟล์</button>
+  </div>
+  <p class="mini" id="pMsg" style="margin:-4px 0 10px">ไฟล์ .csv เปิดและแก้ใน Excel ได้ นำเข้าแล้วสินค้าที่รหัสซ้ำจะถูกอัปเดต รหัสใหม่จะถูกเพิ่ม</p>
+  <div class="plist" id="plist"></div>
+</section>
+
+<section id="tab-plan" hidden>
+  <h2>ตารางรอบไลฟ์</h2>
+  <p class="sub">แบ่งเวลาให้อัตโนมัติ ช่วงสีเขียวคือเวลาที่คนต้องเข้ามาคุยสดและตอบคอมเมนต์เอง</p>
+  <div class="notice">กฎ TikTok Shop ไม่ให้ใช้เสียง AI หรือเสียงอัดไว้แทนการโต้ตอบสดทั้งรอบ ตารางนี้จึงสลับให้ AI เล่าสินค้า แล้วให้คนเข้ามาคุยสดทุกช่วง ถ้าใช้ตัวละคร AI อย่าให้บังจอเกินครึ่ง และควรแจ้งคนดูว่ามี AI ช่วยนำเสนอ</div>
+  <div class="card row" style="margin-bottom:12px">
+    <div style="flex:1;min-width:120px"><label for="dur">ความยาวรอบ</label>
+      <select id="dur"><option value="60">1 ชั่วโมง</option><option value="120" selected>2 ชั่วโมง</option></select></div>
+    <div style="flex:1;min-width:120px"><label for="talkEvery">คนคุยสดทุก</label>
+      <select id="talkEvery"><option value="2">2 สินค้า</option><option value="3" selected>3 สินค้า</option><option value="1">ทุกสินค้า</option></select></div>
+    <div style="flex:1;min-width:120px"><label for="talkLen">คุยสดครั้งละ</label>
+      <select id="talkLen"><option value="3">3 นาที</option><option value="5" selected>5 นาที</option><option value="8">8 นาที</option></select></div>
+  </div>
+  <div class="card" style="margin-bottom:12px">
+    <b style="font-family:var(--display);font-weight:500">📌 ลำดับสินค้าในตะกร้าไลฟ์</b>
+    <div class="mini">ก่อนไลฟ์ เพิ่มสินค้าเข้าตะกร้าใน TikTok ตามลำดับนี้ เลขตะกร้าจะตรงกับที่โปรแกรมพูดและขึ้นป้าย ระหว่างไลฟ์โปรแกรมจะเตือนให้ปักตะกร้าทุกครั้งที่เปลี่ยนสินค้า</div>
+    <div class="order-list" id="basketList"></div>
+  </div>
+  <p class="mini" id="planSummary"></p>
+  <div class="tl" id="tl"></div>
+</section>
+
+<section id="tab-live" hidden>
+  <div class="livegrid">
+    <div>
+      <div class="card">
+        <div class="segtitle"><span id="segChip" class="chip ai">AI นำเสนอ</span><b id="segName" style="font-family:var(--display);font-weight:500;font-size:18px"></b></div>
+        <div class="pinbar" id="pinbar" hidden>📌 ปักตะกร้าตอนนี้ <b id="pinNo"></b> <span id="pinName" class="mini" style="color:var(--ink)"></span></div>
+        <div class="prompter" id="prompter"></div>
+        <p class="disclose" id="disclose"></p>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="prevSeg">◀ ก่อนหน้า</button>
+        <button class="btn primary" id="speak">อ่านออกเสียง</button>
+        <button class="btn" id="stopSpeak">หยุดเสียง</button>
+        <button class="btn" id="newScript">เปลี่ยนบท</button>
+        <button class="btn" id="nextSeg">ถัดไป ▶</button>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card">
+        <div class="mini">เวลาที่ผ่านไป</div>
+        <div class="clock num" id="clock">00:00:00</div>
+        <div class="bar"><i id="prog"></i></div>
+        <div class="mini num" id="segLeft"></div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn primary" id="startBtn">เริ่มรอบ</button>
+          <button class="btn" id="pauseBtn">พัก</button>
+        </div>
+        <label style="display:flex;gap:6px;align-items:center;margin-top:10px;font-size:13px"><input type="checkbox" id="autoNext" style="width:auto" checked> เลื่อนช่วงอัตโนมัติเมื่อหมดเวลา</label>
+      </div>
+      <div class="card">
+        <div class="mini">ถัดไป</div>
+        <div id="nextInfo" style="font-weight:500"></div>
+      </div>
+      <div class="card">
+        <div class="mini" style="margin-bottom:6px">จดออเดอร์ด่วน</div>
+        <div style="display:grid;gap:6px">
+          <input id="qName" placeholder="ชื่อลูกค้า">
+          <div class="row" style="flex-wrap:nowrap"><select id="qCode"></select><input id="qQty" type="number" min="1" value="1" style="width:70px"></div>
+          <button class="btn talk" id="qAdd">บันทึกออเดอร์</button>
+          <div class="mini" id="qMsg"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="mini" style="margin-bottom:4px">สลับซีน OBS อัตโนมัติ</div>
+        <label style="display:flex;gap:6px;align-items:center;font-size:13px"><input type="checkbox" id="obsOn" style="width:auto"> สลับซีนตามตารางเมื่อเริ่มรอบ</label>
+        <details><summary class="mini" style="cursor:pointer">ตั้งค่า OBS</summary>
+          <div style="display:grid;gap:6px;margin-top:6px">
+            <div class="row" style="flex-wrap:nowrap"><div style="flex:2"><label for="obsHost">เครื่องที่เปิด OBS</label><input id="obsHost"></div><div style="flex:1"><label for="obsPort">Port</label><input id="obsPort" type="number"></div></div>
+            <div><label for="obsPass">รหัส WebSocket ของ OBS</label><input id="obsPass" type="password" autocomplete="off"></div>
+            <div><label for="obsClip">ชื่อซีนคลิปสินค้า (ช่วง AI)</label><input id="obsClip"></div>
+            <div><label for="obsTalk">ชื่อซีนพูดสด (ช่วงคน เปิดและปิดไลฟ์)</label><input id="obsTalk"></div>
+            <button class="btn" id="obsSave">บันทึกแล้วเชื่อมต่อ</button>
+          </div>
+        </details>
+        <div class="mini" id="obsStatus" style="margin-top:6px">ปิดอยู่</div>
+        <div style="border-top:1px solid var(--line);margin-top:10px;padding-top:10px">
+          <div class="mini" style="margin-bottom:4px">ป้ายสินค้าบนจอไลฟ์ (overlay)</div>
+          <label style="display:flex;gap:6px;align-items:center;font-size:13px"><input type="checkbox" id="ovOn" style="width:auto"> แสดงป้ายสินค้า ราคา และ CF ตามรอบ</label>
+          <div class="row" style="margin-top:6px;flex-wrap:nowrap">
+            <select id="ovPos" style="flex:1" aria-label="ตำแหน่งป้าย"><option value="top">ป้ายด้านบน</option><option value="bottom">ป้ายด้านล่าง</option></select>
+            <button class="btn" id="ovPreview" style="white-space:nowrap">ดูตัวอย่าง</button>
+          </div>
+          <button class="btn" id="ovInstall" style="width:100%;margin-top:6px">ติดตั้งป้ายลงใน OBS</button>
+          <div class="mini" id="ovMsg" style="margin-top:4px">กดติดตั้งครั้งเดียว ป้ายจะถูกเพิ่มในทั้ง 2 ซีน</div>
+        </div>
+      </div>
+      <div class="card">
+        <label for="voiceSel">เสียงอ่าน</label>
+        <select id="voiceSel"></select>
+        <label for="rate" style="margin-top:6px">ความเร็ว</label>
+        <input id="rate" type="range" min="0.7" max="1.4" step="0.1" value="1">
+        <label style="display:flex;gap:6px;align-items:center;margin-top:10px;font-size:13px;color:var(--ink)"><input type="checkbox" id="aiAuto" style="width:auto"> AI พากย์ช่วงสินค้าให้อัตโนมัติ</label>
+        <label for="aiRep" style="margin-top:6px">ในช่วงสินค้าเดียวกัน พูดซ้ำด้วยบทใหม่</label>
+        <select id="aiRep"><option value="0">ไม่พูดซ้ำ</option><option value="2">ทุก 2 นาที</option><option value="3" selected>ทุก 3 นาที</option></select>
+        <div class="mini" id="voiceNote" style="margin-top:6px">เมื่อเปิดพากย์อัตโนมัติ ช่วงคุยสดจะรอให้คุณกด "ถัดไป" เอง เพื่อยืนยันว่ามีคนอยู่หน้าไลฟ์</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tab-orders" hidden>
+  <h2>ออเดอร์รอบนี้</h2>
+  <div class="totals"><div><span class="mini">ออเดอร์</span><b id="tCount">0</b></div><div><span class="mini">ชิ้น</span><b id="tQty">0</b></div><div><span class="mini">ยอดขาย (บาท)</span><b id="tSum">0</b></div></div>
+  <div class="card tablebox"><table><thead><tr><th>เวลา</th><th>ลูกค้า</th><th>สินค้า</th><th class="r">จำนวน</th><th class="r">รวม</th><th></th></tr></thead><tbody id="obody"></tbody></table></div>
+  <h2 style="margin-top:20px">ขายดีรายสินค้า</h2>
+  <div class="card tablebox"><table><thead><tr><th>รหัส</th><th>สินค้า</th><th class="r">ชิ้น</th><th class="r">ยอด</th></tr></thead><tbody id="sbody"></tbody></table></div>
+  <div class="row" style="margin-top:12px"><button class="btn" id="copySum">คัดลอกสรุปยอด</button><button class="btn" id="expOrd">⬇ ส่งออกไฟล์ (Excel)</button><button class="btn" id="impOrd">⬆ นำเข้าออเดอร์</button><button class="btn" id="clearOrders">ล้างออเดอร์ทั้งหมด</button><span class="mini" id="clearMsg"></span></div>
+</section>
+</main>
+
+<input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
+<script>
+const APP_VERSION="1.5.0"; // kept in sync with package.json by tools/make_release.py
+const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
+const SAMPLE=[
+ {code:"A1",name:"เซรั่มวิตามินซี 30ml",price:290,points:"ผิวดูกระจ่างใสใน 2 สัปดาห์|เนื้อบางซึมไว ไม่เหนียว|ใช้ได้ทั้งเช้าและเย็น",promo:"ซื้อ 2 ขวดเหลือ 499"},
+ {code:"A2",name:"ครีมกันแดด SPF50 PA++++",price:259,points:"บางเบา ไม่วอก|กันน้ำกันเหงื่อ|ใช้แทนไพรเมอร์ได้",promo:"แถมซองทดลอง 3 ซอง"},
+ {code:"A3",name:"โฟมล้างหน้าอ่อนโยน",price:159,points:"ไม่แห้งตึงหลังล้าง|pH อ่อนโยน|ฟองแน่น ใช้ได้นาน",promo:"ส่งฟรีเมื่อซื้อคู่"},
+ {code:"B1",name:"กระบอกน้ำเก็บอุณหภูมิ 750ml",price:349,points:"เย็นได้นาน 24 ชั่วโมง|ฝาล็อก ไม่หก|ล้างง่าย ไม่มีกลิ่น",promo:"ลด 50 บาทเฉพาะในไลฟ์"},
+ {code:"B2",name:"กล่องเก็บอาหาร 5 ชิ้น",price:299,points:"เข้าไมโครเวฟได้|ซ้อนเก็บประหยัดที่|ฝาซีลกันรั่ว",promo:"ซื้อ 2 ชุดแถมถุงผ้า"},
+ {code:"B3",name:"ไม้ถูพื้นรีดน้ำในตัว",price:390,points:"ไม่ต้องใช้มือบิด|หัวหมุน 360 องศา|ผ้าซักเครื่องได้",promo:"แถมผ้าเปลี่ยน 1 ผืน"},
+ {code:"C1",name:"เสื้อยืดคอตตอน Oversize",price:199,points:"ผ้านุ่ม ไม่ยืดย้วย|มี 6 สี|ไซซ์ S ถึง 2XL",promo:"3 ตัว 499"},
+ {code:"C2",name:"กางเกงขาม้าเอวยางยืด",price:329,points:"ใส่สบายทั้งวัน|ช่วยพรางสะโพก|ผ้าไม่ต้องรีด",promo:"ลด 30 บาทเมื่อกดติดตาม"},
+ {code:"C3",name:"กระเป๋าผ้าแคนวาส",price:179,points:"จุของเยอะ ใส่โน้ตบุ๊ก 14 นิ้วได้|มีช่องซิปด้านใน|ผ้าหนา ทนทาน",promo:"แถมพวงกุญแจ"},
+ {code:"D1",name:"ชาสมุนไพรดอกอัญชัน 20 ซอง",price:129,points:"หอม ดื่มง่าย|ไม่มีน้ำตาล|ชงได้ทั้งร้อนและเย็น",promo:"ซื้อ 3 กล่องส่งฟรี"}];
+let products=store.get("ls_products",SAMPLE.map(p=>({...p})));
+let orders=store.get("ls_orders",[]);
+const fmt=n=>Number(n||0).toLocaleString("th-TH");
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+
+/* tabs */
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.tab));
+function show(t){document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
+ ["home","products","plan","live","orders"].forEach(x=>$("#tab-"+x).hidden=x!==t);scrollTo(0,0);
+ if(t==="home")renderHome(); if(t==="plan")buildPlan(); if(t==="live"){if(!plan.length)buildPlan();renderLive()} if(t==="orders")renderOrders();}
+
+/* products. p.on === false = not in this live; list order = speaking order; basket number = position among "on" products */
+const liveProducts=()=>products.filter(p=>p.on!==false);
+const basketNo=p=>liveProducts().indexOf(p)+1;
+function renderProducts(){const el=$("#plist");el.innerHTML="";
+ products.forEach((p,i)=>{const d=document.createElement("div"),on=p.on!==false,n=basketNo(p);d.className="card"+(on?"":" off");
+  d.innerHTML=`<div class="prodhead"><div class="row" style="gap:8px">
+    <label class="pick"><input type="checkbox" data-on="${i}" ${on?"checked":""}> ไลฟ์รอบนี้</label><span class="code">${esc(p.code)}</span>${on?`<span class="basket">ตะกร้า #${n}</span>`:""}</div>
+   <div class="row" style="gap:4px;flex-wrap:nowrap"><button class="btn sm" data-mv="${i}" data-d="-1" aria-label="เลื่อนขึ้น" ${i?"":"disabled"}>▲</button><button class="btn sm" data-mv="${i}" data-d="1" aria-label="เลื่อนลง" ${i<products.length-1?"":"disabled"}>▼</button><button class="btn sm" data-del="${i}">ลบ</button></div></div>
+  <div class="prodbody">
+   <div class="photo">${p.img?`<img src="${esc(p.img)}" alt="รูป ${esc(p.name)}">`:`<div class="ph">📷<br>ยังไม่มีรูป</div>`}
+    <label class="btn sm" style="text-align:center;margin:0;color:var(--ink);font-size:13px">📷 ${p.img?"เปลี่ยนรูป":"ใส่รูปสินค้า"}<input type="file" accept="image/*" data-img="${i}" hidden></label>
+    <button class="btn sm primary" data-ai="${i}">✨ AI เขียนจากรูป</button>
+   </div>
+   <div><div class="prod">
+    <div><label for="c${i}">รหัส</label><input id="c${i}" data-k="code" data-i="${i}" value="${esc(p.code)}"></div>
+    <div class="wide"><label for="n${i}">ชื่อสินค้า</label><input id="n${i}" data-k="name" data-i="${i}" value="${esc(p.name)}"></div>
+    <div><label for="p${i}">ราคา (บาท)</label><input id="p${i}" type="number" data-k="price" data-i="${i}" value="${p.price}"></div>
+    <div class="full"><label for="pt${i}">จุดขาย (คั่นด้วย |)</label><input id="pt${i}" data-k="points" data-i="${i}" value="${esc(p.points)}"></div>
+    <div class="full"><label for="pr${i}">โปรในไลฟ์</label><input id="pr${i}" data-k="promo" data-i="${i}" value="${esc(p.promo)}"></div>
+   </div>
+   <div class="mini" id="aim${i}" style="margin-top:6px"></div>
+   ${p.scripts&&p.scripts.length?`<details style="margin-top:6px"><summary class="mini" style="cursor:pointer">บทพูดจาก AI ${p.scripts.length} แบบ (ใช้สลับกันตอนไลฟ์)</summary>${p.scripts.map(s=>`<div class="aiscript">${esc(fillScript(s,p))}</div>`).join("")}<button class="btn sm" data-noai="${i}" style="margin-top:6px">กลับไปใช้บทแบบเดิม</button></details>`:""}
+   </div>
+  </div>`;el.appendChild(d)});
+ el.querySelectorAll("input[data-k]").forEach(inp=>inp.oninput=()=>{const p=products[inp.dataset.i];p[inp.dataset.k]=inp.dataset.k==="price"?+inp.value:inp.value;store.set("ls_products",products);plan=[];if(inp.dataset.k==="code")inp.closest(".card").querySelector(".code").textContent=inp.value});
+ el.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{products.splice(+b.dataset.del,1);save()});
+ el.querySelectorAll("[data-on]").forEach(b=>b.onchange=()=>{products[+b.dataset.on].on=b.checked;save()});
+ el.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{const i=+b.dataset.mv,j=i+ +b.dataset.d;if(j<0||j>=products.length)return;[products[i],products[j]]=[products[j],products[i]];save()});
+ el.querySelectorAll("[data-img]").forEach(inp=>inp.onchange=()=>setPhoto(+inp.dataset.img,inp.files[0]));
+ el.querySelectorAll("[data-ai]").forEach(b=>b.onclick=()=>aiWrite(+b.dataset.ai,b));
+ el.querySelectorAll("[data-noai]").forEach(b=>b.onclick=()=>{delete products[+b.dataset.noai].scripts;save()});
+ fillCodes();}
+function save(){const ok=store.set("ls_products",products);plan=[];renderProducts();
+ if(!ok)$("#pMsg").textContent="⚠ ที่เก็บข้อมูลในเครื่องเต็ม บันทึกไม่ได้ ลองลบรูปสินค้าที่ไม่ได้ใช้ หรือกดสำรองทั้งหมดแล้วลบสินค้าเก่าออก";return ok}
+
+/* photos: shrink to 640px JPEG so ~10-20 products fit in localStorage */
+function loadImage(file){return new Promise((res,rej)=>{const url=URL.createObjectURL(file),im=new Image();
+ im.onload=()=>{URL.revokeObjectURL(url);res(im)};im.onerror=()=>{URL.revokeObjectURL(url);rej(new Error("เปิดรูปนี้ไม่ได้ ลองใช้ไฟล์ .jpg หรือ .png"))};im.src=url})}
+async function shrinkImage(file,max=640){const im=await loadImage(file),s=Math.min(1,max/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement("canvas");
+ c.width=Math.round(im.naturalWidth*s);c.height=Math.round(im.naturalHeight*s);const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0,c.width,c.height);return c.toDataURL("image/jpeg",.82)}
+async function setPhoto(i,file){if(!file)return;const m=()=>$("#aim"+i);
+ try{const old=products[i].img;products[i].img=await shrinkImage(file);if(!save()){products[i].img=old;save()}else m().textContent="ใส่รูปแล้ว กด ✨ AI เขียนจากรูป เพื่อให้ AI เขียนบทให้"}
+ catch(e){m().textContent=e.message}}
+
+/* AI scripts from a product photo: Claude via the official SDK (loaded from a CDN only when used,
+   so the rest of the app stays offline). The owner's own API key lives only in localStorage "ls_ai". */
+const aiCfg=Object.assign({key:""},store.get("ls_ai",{}));
+const SDK_URL="https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@1.3.0/+esm";
+let sdkPromise=null,sdkMod=null;
+function aiStateText(){$("#aiState").textContent=aiCfg.key?"· พร้อมใช้":"· ยังไม่ได้ใส่ API key";$("#aiKey").value=aiCfg.key?"••••••••"+aiCfg.key.slice(-4):""}
+$("#aiSave").onclick=()=>{const v=$("#aiKey").value.trim();if(v&&!v.startsWith("••")){aiCfg.key=v;store.set("ls_ai",aiCfg)}aiStateText()};
+$("#aiClear").onclick=()=>{aiCfg.key="";store.set("ls_ai",aiCfg);aiStateText()};
+const AI_SYSTEM=`คุณเขียนบทพูดขายของสำหรับไลฟ์ TikTok Shop เป็นภาษาไทย น้ำเสียงแม่ค้าเป็นกันเอง สุภาพ ลงท้าย "ค่ะ" ฟังแล้วอยากซื้อ
+ดูจากรูปสินค้าและข้อมูลที่ร้านให้มา แล้วตอบเป็น JSON ตาม schema:
+- name: ชื่อสินค้าสั้นๆ ที่คนดูเข้าใจทันที (ถ้าร้านให้ชื่อมาแล้ว ใช้ชื่อเดิม)
+- points: จุดขาย 3 ข้อ ข้อละไม่เกิน 12 คำ
+- scripts: บทพูด 3 แบบที่เปิดเรื่องต่างกัน แต่ละแบบพูดจบใน 40 ถึง 60 วินาที แบ่งเป็นย่อหน้าสั้นๆ ด้วยการขึ้นบรรทัดใหม่
+ในทุกบทให้ใช้ตัวแทนเหล่านี้แทนค่าจริง โปรแกรมจะเติมให้เอง: {CODE} รหัสสินค้า, {PRICE} ราคา, {BASKET} เลขตะกร้า และ {PROMO} โปรในไลฟ์ (ใส่ {PROMO} เฉพาะเมื่อร้านบอกว่ามีโปร)
+ทุกบทต้องจบด้วยการชวนกดตะกร้าเลข {BASKET} หรือพิมพ์ CF {CODE}
+ห้ามอ้างสิ่งที่ไม่เห็นในรูปและร้านไม่ได้บอก เช่น สรรพคุณทางการแพทย์ ผลลัพธ์ที่รับประกัน รีวิวลูกค้า ยอดขาย ส่วนลด หรือของแถม ถ้ารูปไม่ชัด ให้พูดกว้างๆ จากสิ่งที่เห็นได้`;
+const AI_SCHEMA={type:"object",additionalProperties:false,required:["name","points","scripts"],
+ properties:{name:{type:"string"},points:{type:"array",items:{type:"string"}},scripts:{type:"array",items:{type:"string"}}}};
+const isDefault=(k,v)=>!String(v||"").trim()||(k==="name"&&v==="สินค้าใหม่")||(k==="points"&&/^จุดเด่น 1\|/.test(v));
+async function aiWrite(i,btn){const p=products[i],m=$("#aim"+i);
+ if(!p.img){m.textContent="ใส่รูปสินค้าก่อน แล้วค่อยกด ✨";return}
+ if(!aiCfg.key){m.textContent="ยังไม่ได้ใส่ API key เปิด \"ตั้งค่า AI เขียนบทจากรูป\" ด้านบน";$("#aiBox").open=true;$("#aiBox").scrollIntoView({behavior:"smooth"});return}
+ if(!navigator.onLine){m.textContent="ต้องต่ออินเทอร์เน็ตก่อนใช้ AI";return}
+ btn.disabled=true;m.textContent="⏳ AI กำลังดูรูปและเขียนบท ประมาณ 10 ถึง 30 วินาที...";
+ try{
+  sdkPromise=sdkPromise||import(SDK_URL);const mod=await sdkPromise,Anthropic=mod.default||mod.Anthropic;sdkMod=mod;
+  const client=new Anthropic({apiKey:aiCfg.key,dangerouslyAllowBrowser:true});
+  const info=[`ข้อมูลจากร้าน:`,`รหัสสินค้า: ${p.code}`,`ชื่อ: ${isDefault("name",p.name)?"(ยังไม่มี ให้ตั้งจากรูป)":p.name}`,`ราคา: ${p.price?p.price+" บาท":"(ยังไม่กำหนด)"}`,
+   `จุดขายที่ร้านเขียนไว้: ${isDefault("points",p.points)?"(ยังไม่มี)":p.points.split("|").join(", ")}`,`โปรในไลฟ์: ${p.promo||"(ไม่มี)"}`].join("\n");
+  const r=await client.beta.messages.create({model:"claude-opus-5-5",max_tokens:16000,
+   betas:["server-side-fallback-2026-07-01"],fallbacks:"default",
+   output_config:{effort:"low",format:{type:"json_schema",schema:AI_SCHEMA}},
+   system:AI_SYSTEM,
+   messages:[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:p.img.split(",")[1]}},{type:"text",text:info}]}]});
+  if(r.stop_reason==="refusal")throw new Error("AI ไม่เขียนให้สำหรับรูปนี้ ลองใช้รูปสินค้าที่ชัดกว่านี้");
+  if(r.stop_reason==="max_tokens")throw new Error("บทยาวเกินไป ลองกดใหม่อีกครั้ง");
+  const tb=r.content.find(b=>b.type==="text");if(!tb)throw new Error("AI ไม่ได้ตอบกลับมา ลองใหม่อีกครั้ง");
+  const out=JSON.parse(tb.text),scripts=(out.scripts||[]).filter(s=>typeof s==="string"&&s.trim()).slice(0,5);
+  if(!scripts.length)throw new Error("AI ไม่ได้ส่งบทกลับมา ลองใหม่อีกครั้ง");
+  const changed=["บทพูด "+scripts.length+" แบบ"];
+  if(isDefault("name",p.name)&&out.name){p.name=out.name.trim();changed.push("ชื่อสินค้า")}
+  if(isDefault("points",p.points)&&Array.isArray(out.points)&&out.points.length){p.points=out.points.map(s=>String(s).replace(/\|/g," ").trim()).filter(Boolean).slice(0,5).join("|");changed.push("จุดขาย")}
+  p.scripts=scripts;save();$("#aim"+i).textContent="✓ AI เขียนแล้ว: "+changed.join(", ")+" ตรวจทานก่อนไลฟ์ด้วยนะคะ";
+ }catch(e){const M=sdkMod||{},is=c=>c&&e instanceof c;let msg;
+  if(is(M.AuthenticationError))msg="API key ไม่ถูกต้อง ตรวจใน \"ตั้งค่า AI เขียนบทจากรูป\"";
+  else if(is(M.PermissionDeniedError))msg="API key นี้ไม่มีสิทธิ์ใช้งาน ตรวจบัญชีที่ console.anthropic.com";
+  else if(is(M.RateLimitError))msg="เรียกใช้ถี่เกินไป รอสักครู่แล้วลองใหม่";
+  else if(is(M.BadRequestError))msg=/credit|billing/i.test(e.message||"")?"เครดิตในบัญชี Anthropic หมด เติมที่ console.anthropic.com":"ส่งข้อมูลไม่ผ่าน ลองเปลี่ยนรูปแล้วกดใหม่";
+  else if(is(M.APIConnectionError))msg="ต่อ AI ไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่";
+  else if(is(M.APIError))msg=`AI มีปัญหาชั่วคราว (${e.status||"?"}) ลองใหม่อีกครั้ง`;
+  else if(!sdkMod){msg="โหลดตัวเชื่อม AI ไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่";sdkPromise=null}
+  else msg=(e&&e.message)||"เกิดข้อผิดพลาด";
+  m.textContent="⚠ "+msg}
+ finally{btn.disabled=false}}
+$("#addProd").onclick=()=>{products.push({code:"N"+(products.length+1),name:"สินค้าใหม่",price:0,points:"จุดเด่น 1|จุดเด่น 2|จุดเด่น 3",promo:""});save()};
+$("#resetProd").onclick=()=>{products=SAMPLE.map(p=>({...p}));save()};
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+/* scripts */
+const T={
+ open:[p=>`สวัสดีค่ะทุกคน ยินดีต้อนรับเข้าไลฟ์นะคะ วันนี้เรามีสินค้า ${liveProducts().length} รายการ ราคาพิเศษเฉพาะในไลฟ์เท่านั้น ใครเพิ่งเข้ามา กดติดตามไว้ก่อนเลยนะคะ จะได้ไม่พลาดโปร`,
+       p=>`มาแล้วค่า ไลฟ์รอบนี้จัดเต็ม ${liveProducts().length} รายการ ของดีราคาไลฟ์ ใครอยากได้ตัวไหน พิมพ์ CF ตามด้วยรหัสสินค้าในคอมเมนต์ หรือกดตะกร้าตามเลขที่บอกได้เลยค่ะ`],
+ hook:[p=>`ตัวต่อไปนะคะ รหัส ${p.code} ${p.name} ตัวนี้คนถามเยอะมาก`,p=>`มาดูตัวนี้กันค่ะ ${p.name} รหัส ${p.code} บอกเลยว่าคุ้ม`,p=>`ใครกำลังหา${p.name}อยู่ ตัวนี้เลยค่ะ รหัส ${p.code}`],
+ point:[x=>`ข้อแรก ${x}`,x=>`จุดเด่นคือ ${x}`,x=>`แล้วก็ ${x}`,x=>`อีกเรื่องที่ชอบมากคือ ${x}`],
+ price:[p=>`ราคาในไลฟ์ ${fmt(p.price)} บาทเท่านั้น`,p=>`ทั้งหมดนี้ ${fmt(p.price)} บาทค่ะ`],
+ promo:[p=>p.promo?`และโปรพิเศษวันนี้ ${p.promo}`:"",p=>p.promo?`พิเศษเฉพาะคนดูไลฟ์ ${p.promo}`:""],
+ cta:[p=>`สนใจพิมพ์ CF ${p.code} ได้เลยนะคะ หรือกดตะกร้า เลข ${basketNo(p)}`,p=>`กดตะกร้าสีเหลือง เลข ${basketNo(p)} ได้เลยค่ะ หรือพิมพ์ CF ${p.code} แอดมินจดให้`],
+ human:[`ช่วงคุยสด: ทักทายคนที่เพิ่งเข้ามาโดยเรียกชื่อ\nไล่ตอบคำถามในคอมเมนต์ 3 ถึง 5 ข้อ\nย้ำออเดอร์ที่ CF เข้ามา และถามว่าอยากให้หยิบสินค้าตัวไหนมาดูใกล้ๆ`,
+        `ช่วงคุยสด: ถือสินค้าที่เพิ่งพูดไปให้กล้องดูใกล้ๆ\nตอบเรื่องไซซ์ สี การส่ง ที่คนถาม\nขอบคุณคนที่กดใจหรือส่งของขวัญ`],
+ close:[p=>`ใกล้หมดเวลาแล้วนะคะ ใครยังไม่ได้ CF รีบเลย โปรหมดเมื่อปิดไลฟ์ ขอบคุณทุกคนที่อยู่ด้วยกันวันนี้ แล้วเจอกันรอบหน้านะคะ`]};
+// AI scripts keep placeholders so they stay right after price edits or reordering
+function fillScript(s,p){return String(s).replace(/\{CODE\}/g,p.code).replace(/\{NAME\}/g,p.name)
+ .replace(/\{PRICE\}/g,p.price?`${fmt(p.price)} บาท`:"ราคาพิเศษในไลฟ์").replace(/\{BASKET\}/g,basketNo(p)||"")
+ .replace(/\{PROMO\}/g,p.promo||"").replace(/[ \t]+\n/g,"\n").trim()}
+function productScript(p){if(p.scripts&&p.scripts.length)return fillScript(pick(p.scripts),p);
+ const pts=(p.points||"").split("|").map(s=>s.trim()).filter(Boolean);
+ const a=[pick(T.hook)(p),...pts.map((x,i)=>(i===0?T.point[0]:pick(T.point.slice(1)))(x)),pick(T.price)(p),pick(T.promo)(p),pick(T.cta)(p)].filter(Boolean);return a.join("\n\n")}
+function scriptFor(s){if(s.type==="open")return pick(T.open)();if(s.type==="close")return T.close[0]();if(s.type==="human")return pick(T.human);return productScript(s.p)}
+
+/* plan */
+let plan=[];
+function buildPlan(){const dur=+$("#dur").value,every=+$("#talkEvery").value,tl=+$("#talkLen").value;
+ const P=liveProducts();const open=dur>=120?5:3,close=dur>=120?5:3;
+ const nHuman=P.length?Math.ceil(P.length/every):0;let left=dur-open-close-nHuman*tl;
+ let perProd=P.length?left/P.length:0;const rounds=perProd>14?2:1;perProd=P.length?left/(P.length*rounds):0;
+ plan=[{type:"open",name:"เปิดไลฟ์ ทักทาย",min:open}];
+ for(let r=0;r<rounds;r++)P.forEach((p,i)=>{plan.push({type:"prod",p,name:(rounds>1?`รอบ ${r+1} · `:"")+`${p.code} ${p.name}`,min:Math.max(1,Math.round(perProd))});
+  if((i+1)%every===0||i===P.length-1)plan.push({type:"human",name:"คนคุยสด ตอบคอมเมนต์",min:tl})});
+ plan.push({type:"close",name:"ปิดไลฟ์ สรุปโปร",min:close});
+ const total=plan.reduce((a,s)=>a+s.min,0);plan[plan.length-1].min+=dur-total;
+ let t=0;plan.forEach(s=>{s.start=t;t+=s.min;s.text=scriptFor(s)});
+ const h=plan.filter(s=>s.type==="human").reduce((a,s)=>a+s.min,0);
+ $("#planSummary").textContent=`${plan.length} ช่วง · สินค้าพูด ${rounds} รอบ รอบละประมาณ ${Math.round(perProd)} นาที · คนคุยสดรวม ${h} นาที`;
+ $("#basketList").innerHTML=P.length?P.map((p,i)=>`<span><b>#${i+1}</b> ${esc(p.code)} ${esc(p.name)}</span>`).join(""):'<span>ยังไม่ได้เลือกสินค้า ไปติ๊ก "ไลฟ์รอบนี้" ในแท็บสินค้า</span>';
+ const el=$("#tl");el.innerHTML="";plan.forEach((s,i)=>{const d=document.createElement("div");d.className="seg"+(s.type==="human"?" human":"")+(i===cur&&running?" now":"");
+  d.innerHTML=`<span class="t">${mm(s.start)}</span><span>${esc(s.name)}</span><span class="chip ${s.type==="human"?"human":"ai"}">${s.type==="human"?"คนพูดสด":"AI ช่วย"} · ${s.min} น.</span>`;el.appendChild(d)});
+ if(cur>=plan.length)cur=0;}
+const PLAN_KEYS=["dur","talkEvery","talkLen"];
+function planSettings(){const o={};PLAN_KEYS.forEach(k=>o[k]=$("#"+k).value);return o}
+function applyPlanSettings(o){PLAN_KEYS.forEach(k=>{const el=$("#"+k);if(o&&o[k]!=null&&[...el.options].some(x=>x.value===String(o[k])))el.value=String(o[k])})}
+PLAN_KEYS.forEach(k=>$("#"+k).onchange=()=>{store.set("ls_plan",planSettings());buildPlan()});
+const mm=m=>`${String(Math.floor(m/60)).padStart(2,"0")}:${String(Math.round(m%60)).padStart(2,"0")}`;
+
+/* live */
+let cur=0,running=false,elapsed=0,segElapsed=0,last=0,timer=null,wake=null;
+function renderLive(){if(!plan.length)return;const s=plan[cur];
+ $("#segName").textContent=s.name;const human=s.type==="human";
+ $("#segChip").className="chip "+(human?"human":"ai");$("#segChip").textContent=human?"ถึงเวลาคุยสด":"AI ช่วยนำเสนอ";
+ $("#prompter").textContent=s.text;$("#prompter").parentElement.classList.toggle("prompter-h",human);$("#prompter").classList.toggle("human",human);
+ $("#speak").disabled=human;
+ $("#pinbar").hidden=s.type!=="prod";if(s.type==="prod"){$("#pinNo").textContent="#"+basketNo(s.p);$("#pinName").textContent=`${s.p.code} ${s.p.name}`}
+ $("#disclose").textContent=human?"ช่วงนี้ให้คนพูดเอง ไม่ใช้เสียง AI":"ใส่ข้อความบนจอไลฟ์ว่า \"ไลฟ์นี้มี AI ช่วยนำเสนอสินค้า\" และให้ตัวละคร AI กินพื้นที่ไม่เกินครึ่งจอ";
+ const n=plan[cur+1];$("#nextInfo").textContent=n?`${n.name} (${n.min} นาที)`:"จบรอบ";
+ tick(true);if(s.p)$("#qCode").value=s.p.code;if(running){syncScene();pushOverlay()}}
+function tick(noAdv){const total=plan.reduce((a,s)=>a+s.min,0)*60;
+ const hms=x=>[x/3600,x%3600/60,x%60].map(v=>String(Math.floor(v)).padStart(2,"0")).join(":");
+ $("#clock").textContent=hms(elapsed);$("#prog").style.width=Math.min(100,elapsed/total*100)+"%";
+ const left=plan[cur].min*60-segElapsed,s=plan[cur];
+ // With AI voice on, a live-talk segment never ends by itself: the host must press "ถัดไป" (proves someone is there).
+ const hold=voiceCfg.auto&&s.type==="human"&&left<=0;
+ $("#segLeft").textContent=hold?"หมดเวลาคุยสดแล้ว กด \"ถัดไป\" เมื่อพร้อมให้ AI พูดต่อ":`ช่วงนี้เหลือ ${hms(Math.max(0,left))}`;
+ $("#segLeft").style.color=hold?"var(--talk)":"";
+ if(noAdv||!running)return;
+ if(hold){if(!holdBeeped){beep();holdBeeped=true}return}
+ if(voiceCfg.auto&&s.type==="prod"&&repeatAt>0&&segElapsed>=repeatAt&&left>45&&!speechSynthesis.speaking){
+  repeatAt+=voiceCfg.rep*60;s.text=scriptFor(s);$("#prompter").textContent=s.text;speakText(s.text)}
+ if(left<=0&&$("#autoNext").checked){if(cur<plan.length-1)go(1);else stop()}}
+function loop(){const now=Date.now(),dt=(now-last)/1000;last=now;elapsed+=dt;segElapsed+=dt;tick()}
+let repeatAt=0,holdBeeped=false;
+function segStarted(){holdBeeped=false;repeatAt=voiceCfg.rep>0?voiceCfg.rep*60:0;const i=cur;
+ if(running&&voiceCfg.auto&&plan[cur].type==="prod")setTimeout(()=>{if(running&&cur===i)speakText(plan[i].text)},1500)}
+function start(){if(!plan.length)buildPlan();running=true;last=Date.now();timer=setInterval(loop,500);$("#onair").textContent="ON AIR";$("#onair").classList.add("live");$("#startBtn").textContent="รีเซ็ตรอบ";
+ try{navigator.wakeLock&&navigator.wakeLock.request("screen").then(w=>wake=w).catch(()=>{})}catch(e){}}
+function stop(){running=false;clearInterval(timer);try{speechSynthesis.cancel()}catch(e){}setScene(obsCfg.talk);pushOverlay();$("#onair").textContent="OFF AIR";$("#onair").classList.remove("live");try{wake&&wake.release()}catch(e){}}
+$("#startBtn").onclick=()=>{if(running||elapsed>0){stop();elapsed=0;segElapsed=0;cur=0;$("#startBtn").textContent="เริ่มรอบ";$("#pauseBtn").textContent="พัก";renderLive();return}start();renderLive();segStarted()};
+$("#pauseBtn").onclick=()=>{if(running){stop();$("#pauseBtn").textContent="ไลฟ์ต่อ"}else if(elapsed>0){start();$("#pauseBtn").textContent="พัก";renderLive()}};
+function go(d){cur=Math.max(0,Math.min(plan.length-1,cur+d));segElapsed=0;try{speechSynthesis.cancel()}catch(e){}renderLive();segStarted();
+ if(plan[cur].type==="human")beep()}
+$("#nextSeg").onclick=()=>go(1);$("#prevSeg").onclick=()=>go(-1);
+$("#newScript").onclick=()=>{plan[cur].text=scriptFor(plan[cur]);renderLive()};
+function beep(){try{const c=new (window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.frequency.value=880;o.connect(g);g.connect(c.destination);g.gain.value=.15;o.start();o.stop(c.currentTime+.4)}catch(e){}}
+
+/* speech: Thai voices first, Edge's online "Natural" voices (best quality, need internet) at the top */
+const voiceCfg=Object.assign({voice:"",rate:1,auto:false,rep:3},store.get("ls_voice",{}));
+let voices=[];
+function loadVoices(){try{voices=speechSynthesis.getVoices();const rank=v=>(/^th/i.test(v.lang)?0:2)+(/natural|online/i.test(v.name)?0:1);
+ const th=voices.filter(v=>/^th/i.test(v.lang)),list=(th.length?th:voices).slice().sort((a,b)=>rank(a)-rank(b));
+ $("#voiceSel").innerHTML=list.map(v=>`<option value="${esc(v.name)}">${esc(v.name.replace(/^Microsoft /,""))}${/natural|online/i.test(v.name)?" ★":""}</option>`).join("")||"<option value=\"\">ไม่พบเสียงในเครื่องนี้</option>";
+ if(voiceCfg.voice&&list.some(v=>v.name===voiceCfg.voice))$("#voiceSel").value=voiceCfg.voice;
+ $("#voiceNote").textContent=th.length?"เมื่อเปิดพากย์อัตโนมัติ ช่วงคุยสดจะรอให้คุณกด \"ถัดไป\" เอง เพื่อยืนยันว่ามีคนอยู่หน้าไลฟ์":"ไม่พบเสียงภาษาไทยในเครื่องนี้ ต่อเน็ตแล้วเปิดโปรแกรมใหม่ (Edge มีเสียงไทยออนไลน์) หรือเพิ่มเสียงไทยใน Settings ของ Windows"}catch(e){}}
+if("speechSynthesis" in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
+function speakText(text){try{speechSynthesis.cancel();const v=voices.find(v=>v.name===$("#voiceSel").value);
+ // one utterance per paragraph: long single utterances can stop early in Chromium
+ String(text).split(/\n+/).map(s=>s.trim()).filter(Boolean).forEach(part=>{const u=new SpeechSynthesisUtterance(part);u.lang="th-TH";if(v)u.voice=v;u.rate=+$("#rate").value;speechSynthesis.speak(u)})}
+ catch(e){$("#disclose").textContent="เครื่องนี้ไม่รองรับการอ่านออกเสียง ใช้อ่านเองจากบทบนจอได้เลย"}}
+$("#speak").onclick=()=>speakText(plan[cur].text);
+$("#stopSpeak").onclick=()=>{try{speechSynthesis.cancel()}catch(e){}};
+function saveVoice(){voiceCfg.voice=$("#voiceSel").value;voiceCfg.rate=+$("#rate").value;voiceCfg.auto=$("#aiAuto").checked;voiceCfg.rep=+$("#aiRep").value;store.set("ls_voice",voiceCfg)}
+$("#rate").value=voiceCfg.rate;$("#aiAuto").checked=voiceCfg.auto;$("#aiRep").value=String(voiceCfg.rep);
+["#voiceSel","#rate","#aiRep"].forEach(s=>$(s).onchange=saveVoice);
+$("#aiAuto").onchange=()=>{saveVoice();if(voiceCfg.auto&&running&&plan[cur].type==="prod"&&!speechSynthesis.speaking){repeatAt=segElapsed+voiceCfg.rep*60;speakText(plan[cur].text)}};
+
+/* orders */
+function fillCodes(){$("#qCode").innerHTML=products.map(p=>`<option value="${esc(p.code)}">${esc(p.code)} ${esc(p.name)}</option>`).join("")}
+$("#qAdd").onclick=()=>{const name=$("#qName").value.trim(),code=$("#qCode").value,qty=Math.max(1,+$("#qQty").value||1);
+ if(!name){$("#qMsg").textContent="ใส่ชื่อลูกค้าก่อน";return}const p=products.find(x=>x.code===code);if(!p)return;
+ orders.push({d:localDate(),t:new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"}),name,code,pname:p.name,qty,price:p.price});store.set("ls_orders",orders);
+ $("#qMsg").textContent=`บันทึกแล้ว: ${name} ${code} x${qty}`;$("#qName").value="";$("#qQty").value=1;$("#qName").focus()};
+function renderOrders(){const ob=$("#obody");ob.innerHTML=orders.length?"":`<tr><td colspan="6" class="mini">ยังไม่มีออเดอร์ จดได้จากแท็บไลฟ์ระหว่างไลฟ์</td></tr>`;
+ orders.forEach((o,i)=>{const tr=document.createElement("tr");tr.innerHTML=`<td class="num">${o.t}</td><td>${esc(o.name)}</td><td><span class="code">${esc(o.code)}</span> ${esc(o.pname)}</td><td class="r num">${o.qty}</td><td class="r num">${fmt(o.qty*o.price)}</td><td><button class="btn" data-o="${i}" style="padding:2px 8px;font-size:12px">ลบ</button></td>`;ob.appendChild(tr)});
+ ob.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{orders.splice(+b.dataset.o,1);store.set("ls_orders",orders);renderOrders()});
+ const q=orders.reduce((a,o)=>a+o.qty,0),sum=orders.reduce((a,o)=>a+o.qty*o.price,0);
+ $("#tCount").textContent=fmt(orders.length);$("#tQty").textContent=fmt(q);$("#tSum").textContent=fmt(sum);
+ const by={};orders.forEach(o=>{by[o.code]=by[o.code]||{n:o.pname,q:0,s:0};by[o.code].q+=o.qty;by[o.code].s+=o.qty*o.price});
+ const rows=Object.entries(by).sort((a,b)=>b[1].s-a[1].s);$("#sbody").innerHTML=rows.map(([c,v])=>`<tr><td><span class="code">${esc(c)}</span></td><td>${esc(v.n)}</td><td class="r num">${v.q}</td><td class="r num">${fmt(v.s)}</td></tr>`).join("")||`<tr><td colspan="4" class="mini">ยังไม่มีข้อมูล</td></tr>`;}
+$("#copySum").onclick=()=>{const txt=`สรุปไลฟ์ ${new Date().toLocaleDateString("th-TH")}\nออเดอร์ ${orders.length} · ยอด ${$("#tSum").textContent} บาท\n`+orders.map(o=>`${o.name} ${o.code} x${o.qty} = ${fmt(o.qty*o.price)}`).join("\n");
+ navigator.clipboard.writeText(txt).then(()=>$("#clearMsg").textContent="คัดลอกแล้ว").catch(()=>$("#clearMsg").textContent="คัดลอกไม่ได้ในหน้านี้")};
+let armed=false;$("#clearOrders").onclick=()=>{if(!armed){armed=true;$("#clearOrders").textContent="กดอีกครั้งเพื่อยืนยันล้าง";setTimeout(()=>{armed=false;$("#clearOrders").textContent="ล้างออเดอร์ทั้งหมด"},3000);return}
+ orders=[];store.set("ls_orders",orders);armed=false;$("#clearOrders").textContent="ล้างออเดอร์ทั้งหมด";renderOrders()};
+
+/* OBS scene switching (obs-websocket v5, built into OBS 28+).
+   prod segments -> clip scene; open/human/close and pause/stop -> live-talk scene.
+   The talk scene always stays in the loop (see CLAUDE.md hard rule). */
+const obsCfg=Object.assign({host:"localhost",port:4455,pass:"",clip:"คลิปสินค้า",talk:"พูดขายของ",on:false,ov:true,ovPos:"top"},store.get("ls_obs",{}));
+let ws=null,obsReady=false,reqId=0,pending={},retry=null;
+async function sha(s){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s));return btoa(String.fromCharCode(...new Uint8Array(b)))}
+function obsStatus(t,ok){const el=$("#obsStatus");el.textContent=t;el.style.color=ok?"var(--talk)":"var(--muted)";if(!$("#tab-home").hidden&&plan.length)renderHome()}
+function obsConnect(){clearTimeout(retry);if(ws){ws.onclose=null;try{ws.close()}catch(e){}ws=null}obsReady=false;
+ if(!obsCfg.on){obsStatus("ปิดอยู่");return}
+ obsStatus("กำลังต่อ OBS...");
+ try{ws=new WebSocket(`ws://${obsCfg.host}:${obsCfg.port}`)}catch(e){obsStatus("ที่อยู่หรือ Port ไม่ถูกต้อง");return}
+ ws.onmessage=async ev=>{let m;try{m=JSON.parse(ev.data)}catch(e){return}
+  if(m.op===0){const d={rpcVersion:1,eventSubscriptions:0},a=m.d&&m.d.authentication;
+   if(a){if(!window.crypto||!crypto.subtle){obsStatus("เปิดหน้านี้แบบนี้ใช้รหัส OBS ไม่ได้ ให้ปิดรหัสใน OBS หรือเปิดจากไอคอนโปรแกรม");return}
+    d.authentication=await sha(await sha(obsCfg.pass+a.salt)+a.challenge)}
+   ws.send(JSON.stringify({op:1,d}))}
+  else if(m.op===2){obsReady=true;checkScenes()}
+  else if(m.op===7){const p=pending[m.d.requestId];delete pending[m.d.requestId];if(p)p(m.d)}};
+ ws.onclose=ev=>{const was=obsReady;obsReady=false;
+  if(ev.code===4009){obsStatus("รหัส WebSocket ไม่ถูก แก้ในตั้งค่า OBS ด้านบน");return}
+  obsStatus((was?"หลุดจาก OBS":"ยังต่อ OBS ไม่ได้ (เปิด OBS และเปิด WebSocket Server แล้วหรือยัง)")+" · จะลองใหม่ใน 5 วินาที");
+  retry=setTimeout(obsConnect,5000)}}
+function obsReq(type,data){return new Promise(res=>{if(!obsReady)return res(null);const id="r"+(++reqId);pending[id]=res;
+ ws.send(JSON.stringify({op:6,d:{requestType:type,requestId:id,requestData:data||{}}}));setTimeout(()=>{if(pending[id]){delete pending[id];res(null)}},5000)})}
+async function checkScenes(){const r=await obsReq("GetSceneList");if(!r)return;
+ const names=((r.responseData&&r.responseData.scenes)||[]).map(s=>s.sceneName),miss=[obsCfg.clip,obsCfg.talk].filter(n=>!names.includes(n));
+ if(miss.length)obsStatus(`ต่อ OBS แล้ว แต่ไม่พบซีน "${miss.join('", "')}" · ซีนที่มีใน OBS: ${names.join(", ")}`);
+ else{obsStatus("ต่อ OBS แล้ว ซีนครบ พร้อมสลับ",true);ovMissing=false;if(running)syncScene();pushOverlay()}}
+async function setScene(name){if(!obsReady||!name)return;const r=await obsReq("SetCurrentProgramScene",{sceneName:name});
+ if(r&&r.requestStatus&&r.requestStatus.result)obsStatus("ซีนตอนนี้: "+name,true);
+ else obsStatus("สลับซีนไม่ได้: "+((r&&r.requestStatus&&r.requestStatus.comment)||"OBS ไม่ตอบ"))}
+function syncScene(){if(plan.length)setScene(plan[cur].type==="prod"?obsCfg.clip:obsCfg.talk)}
+
+/* overlay: one OBS Browser Source (OV_NAME) shown in both scenes; the app rewrites its URL hash
+   with the current segment, and overlay.html re-renders on hashchange. */
+const OV_NAME="LiveStudio ป้ายสินค้า";
+function overlayData(){const d={s:"idle",pos:obsCfg.ovPos};if(!running||!plan.length||!obsCfg.ov)return d;
+ const s=plan[cur];d.s=s.type;
+ if(s.type==="prod")Object.assign(d,{c:s.p.code,n:s.p.name,p:s.p.price,pr:s.p.promo,b:basketNo(s.p)});
+ else for(let i=cur;i>=0;i--)if(plan[i].type==="prod"){d.last={c:plan[i].p.code,n:plan[i].p.name};break}
+ return d}
+function overlayURL(d){return new URL("overlay.html",location.href).href.split("#")[0]+"#"+encodeURIComponent(JSON.stringify(d))}
+let ovMissing=false;
+async function pushOverlay(){if(!obsReady||ovMissing)return;const r=await obsReq("SetInputSettings",{inputName:OV_NAME,inputSettings:{url:overlayURL(overlayData())},overlay:true});
+ if(r&&r.requestStatus&&!r.requestStatus.result&&r.requestStatus.code===600){ovMissing=true;$("#ovMsg").textContent="ยังไม่ได้ติดตั้งป้ายใน OBS กด \"ติดตั้งป้ายลงใน OBS\""}}
+const ok=r=>r&&r.requestStatus&&r.requestStatus.result;
+$("#ovInstall").onclick=async()=>{const m=$("#ovMsg");
+ if(!obsReady){m.textContent="ต้องต่อ OBS ให้ได้ก่อน (ติ๊กสลับซีน แล้วใส่รหัสในตั้งค่า OBS)";return}
+ m.textContent="กำลังติดตั้งป้าย...";
+ const vs=await obsReq("GetVideoSettings"),w=ok(vs)?vs.responseData.baseWidth:1080,h=ok(vs)?vs.responseData.baseHeight:1920;
+ const settings={url:overlayURL(overlayData()),width:w,height:h,css:"body{background-color:rgba(0,0,0,0);margin:0;overflow:hidden}",shutdown:false,restart_when_active:false};
+ const list=await obsReq("GetInputList");const exists=ok(list)&&(list.responseData.inputs||[]).some(i=>i.inputName===OV_NAME);
+ if(exists){if(!ok(await obsReq("SetInputSettings",{inputName:OV_NAME,inputSettings:settings,overlay:true}))){m.textContent="อัปเดตป้ายใน OBS ไม่ได้";return}}
+ else{const r=await obsReq("CreateInput",{sceneName:obsCfg.clip,inputName:OV_NAME,inputKind:"browser_source",inputSettings:settings,sceneItemEnabled:true});
+  if(!ok(r)){m.textContent="สร้างป้ายใน OBS ไม่ได้: "+((r&&r.requestStatus&&r.requestStatus.comment)||"OBS ไม่ตอบ");return}}
+ for(const sc of [obsCfg.clip,obsCfg.talk]){const it=await obsReq("GetSceneItemList",{sceneName:sc});
+  if(ok(it)&&!(it.responseData.sceneItems||[]).some(i=>i.sourceName===OV_NAME)){const r=await obsReq("CreateSceneItem",{sceneName:sc,sourceName:OV_NAME,sceneItemEnabled:true});
+   if(!ok(r)){m.textContent=`เพิ่มป้ายในซีน "${sc}" ไม่ได้`;return}}}
+ ovMissing=false;m.textContent=`ติดตั้งป้ายแล้วในซีน "${obsCfg.clip}" และ "${obsCfg.talk}" (ขนาด ${w}x${h}) ป้ายจะขึ้นเมื่อกดเริ่มรอบ`;m.style.color="var(--talk)"};
+$("#ovOn").onchange=()=>{obsCfg.ov=$("#ovOn").checked;store.set("ls_obs",obsCfg);pushOverlay()};
+$("#ovPos").onchange=()=>{obsCfg.ovPos=$("#ovPos").value;store.set("ls_obs",obsCfg);pushOverlay()};
+$("#ovPreview").onclick=()=>{const p=products[0];const d=running&&plan.length?overlayData():(p?{s:"prod",c:p.code,n:p.name,p:p.price,pr:p.promo,pos:obsCfg.ovPos}:{});
+ window.open(overlayURL(d),"ls_overlay","width=405,height=720")};
+function obsFill(){$("#ovOn").checked=obsCfg.ov;$("#ovPos").value=obsCfg.ovPos;$("#obsOn").checked=obsCfg.on;$("#obsHost").value=obsCfg.host;$("#obsPort").value=obsCfg.port;$("#obsPass").value=obsCfg.pass;$("#obsClip").value=obsCfg.clip;$("#obsTalk").value=obsCfg.talk}
+$("#obsOn").onchange=()=>{obsCfg.on=$("#obsOn").checked;store.set("ls_obs",obsCfg);obsConnect()};
+$("#obsSave").onclick=()=>{obsCfg.host=$("#obsHost").value.trim()||"localhost";obsCfg.port=+$("#obsPort").value||4455;obsCfg.pass=$("#obsPass").value;
+ obsCfg.clip=$("#obsClip").value.trim()||"คลิปสินค้า";obsCfg.talk=$("#obsTalk").value.trim()||"พูดขายของ";obsCfg.on=true;store.set("ls_obs",obsCfg);obsFill();obsConnect()};
+
+/* home */
+function renderHome(){if(!plan.length)buildPlan();
+ const talk=plan.filter(s=>s.type==="human").reduce((a,s)=>a+s.min,0),dur=+$("#dur").value,sales=orders.reduce((a,o)=>a+o.qty*o.price,0);
+ $("#hProd").textContent=fmt(liveProducts().length);$("#hDur").textContent=dur/60+" ชม.";$("#hTalk").textContent=talk+" น.";$("#hSales").textContent=fmt(sales);
+ const col={open:"var(--warn)",close:"var(--warn)",prod:"var(--accent)",human:"var(--talk)"};
+ $("#hBar").innerHTML=plan.map(s=>`<i style="flex:${s.min};background:${col[s.type]}" title="${esc(s.name)} · ${s.min} นาที"></i>`).join("");
+ const st=(id,ok,txt)=>{$(id).classList.toggle("ok",ok);$(id+" .st").textContent=txt};
+ const lp=liveProducts().length,withImg=liveProducts().filter(p=>p.img).length;
+ st("#stProd",lp>0,lp?`✓ ไลฟ์ ${lp} จาก ${products.length} รายการ · มีรูป ${withImg}`:"ยังไม่ได้เลือกสินค้า");
+ st("#stPlan",plan.length>0,`${plan.length} ช่วง · ${dur/60} ชั่วโมง`);
+ st("#stObs",obsReady,obsReady?"✓ ต่อ OBS แล้ว":(obsCfg.on?"กำลังรอ OBS":"ยังไม่ได้เปิดใช้"));
+ st("#stLive",running,running?"● กำลังไลฟ์":(orders.length?`มีออเดอร์ ${orders.length} รายการ`:"พร้อมเมื่อคุณพร้อม"));}
+document.querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>show(b.dataset.goto));
+$("#homeGo").onclick=()=>show("live");
+
+/* files: export / import (CSV opens in Excel with Thai intact thanks to the UTF-8 BOM) */
+function localDate(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+function download(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;
+ document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000)}
+function csvCell(v){v=String(v??"");if(/^[=+@\t]/.test(v))v="'"+v;return /[",\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+const toCSV=rows=>"﻿"+rows.map(r=>r.map(csvCell).join(",")).join("\r\n")+"\r\n";
+function parseCSV(text){text=text.replace(/^﻿/,"");const rows=[];let row=[],cell="",q=false;
+ for(let i=0;i<text.length;i++){const c=text[i];
+  if(q){if(c==='"'){if(text[i+1]==='"'){cell+='"';i++}else q=false}else cell+=c}
+  else if(c==='"')q=true;else if(c===","){row.push(cell);cell=""}
+  else if(c==="\n"||c==="\r"){if(c==="\r"&&text[i+1]==="\n")i++;row.push(cell);rows.push(row);row=[];cell=""}
+  else cell+=c}
+ if(cell!==""||row.length){row.push(cell);rows.push(row)}
+ return rows.filter(r=>r.some(x=>x.trim()!==""))}
+const unq=v=>String(v??"").trim().replace(/^'(?=[=+@\t])/,"");
+function colMap(head,spec){const h=head.map(x=>unq(x).toLowerCase()),m={};
+ for(const k in spec){m[k]=h.findIndex(x=>spec[k].includes(x))}return m}
+const num=v=>{const n=parseFloat(String(v).replace(/[^\d.\-]/g,""));return isFinite(n)?n:0};
+
+const P_COLS={code:["รหัส","code"],name:["ชื่อสินค้า","ชื่อ","name"],price:["ราคา","ราคา (บาท)","price"],points:["จุดขาย","points"],promo:["โปร","โปรในไลฟ์","promo"]};
+const O_COLS={d:["วันที่","date"],t:["เวลา","time"],name:["ลูกค้า","ชื่อลูกค้า","customer"],code:["รหัส","code"],pname:["สินค้า","ชื่อสินค้า","product"],qty:["จำนวน","qty"],price:["ราคาต่อชิ้น","ราคา","price"]};
+
+$("#expProd").onclick=()=>{download(`livestudio-สินค้า-${localDate()}.csv`,toCSV([["รหัส","ชื่อสินค้า","ราคา","จุดขาย","โปรในไลฟ์"],...products.map(p=>[p.code,p.name,p.price,p.points,p.promo])]),"text/csv;charset=utf-8");
+ $("#pMsg").textContent=`ส่งออกสินค้า ${products.length} รายการแล้ว ไฟล์อยู่ในโฟลเดอร์ Downloads`};
+$("#expOrd").onclick=()=>{if(!orders.length){$("#clearMsg").textContent="ยังไม่มีออเดอร์ให้ส่งออก";return}
+ download(`livestudio-ออเดอร์-${localDate()}.csv`,toCSV([["วันที่","เวลา","ลูกค้า","รหัส","สินค้า","จำนวน","ราคาต่อชิ้น","รวม"],...orders.map(o=>[o.d||"",o.t,o.name,o.code,o.pname,o.qty,o.price,o.qty*o.price])]),"text/csv;charset=utf-8");
+ $("#clearMsg").textContent=`ส่งออกออเดอร์ ${orders.length} รายการแล้ว ไฟล์อยู่ในโฟลเดอร์ Downloads`};
+$("#backupAll").onclick=()=>{download(`livestudio-สำรอง-${localDate()}.json`,JSON.stringify({app:"LiveStudio",format:1,exported:new Date().toISOString(),products,orders,plan:planSettings()},null,1),"application/json");
+ $("#bMsg").textContent=`สำรองแล้ว: สินค้า ${products.length} รายการ ออเดอร์ ${orders.length} รายการ ไฟล์อยู่ในโฟลเดอร์ Downloads`};
+
+let fileKind="";
+["impProd","impOrd","restoreAll"].forEach(id=>$("#"+id).onclick=()=>{fileKind=id;$("#fileIn").value="";$("#fileIn").click()});
+$("#fileIn").onchange=()=>{const f=$("#fileIn").files[0];if(!f)return;const r=new FileReader();
+ r.onload=()=>{const msgEl={impProd:"#pMsg",impOrd:"#clearMsg",restoreAll:"#bMsg"}[fileKind];
+  try{$(msgEl).textContent=importText(fileKind,String(r.result),f.name)}catch(e){$(msgEl).textContent="อ่านไฟล์ไม่ได้: "+e.message}};
+ r.readAsText(f,"utf-8")};
+
+function cleanProduct(p){const o={code:unq(p.code),name:unq(p.name),price:num(p.price),points:unq(p.points),promo:unq(p.promo)};
+ if(p.on===false)o.on=false;
+ if(typeof p.img==="string"&&/^data:image\/(jpeg|png|webp);base64,/.test(p.img))o.img=p.img;
+ if(Array.isArray(p.scripts))o.scripts=p.scripts.filter(s=>typeof s==="string"&&s.trim()).slice(0,5);
+ return o}
+function cleanOrder(o){const qty=Math.max(1,Math.round(num(o.qty))||1);return{d:unq(o.d),t:unq(o.t),name:unq(o.name),code:unq(o.code),pname:unq(o.pname),qty,price:num(o.price)}}
+function afterChange(){store.set("ls_products",products);store.set("ls_orders",orders);plan=[];renderProducts();buildPlan();renderOrders();renderHome()}
+function importText(kind,text,fname){
+ if(/\.json$/i.test(fname)||/^\s*[\[{]/.test(text)){const j=JSON.parse(text);
+  if(kind==="restoreAll"||j.app==="LiveStudio"){
+   if(!Array.isArray(j.products)||!Array.isArray(j.orders))throw new Error("ไม่ใช่ไฟล์สำรองของ LiveStudio");
+   const np=j.products.map(cleanProduct).filter(p=>p.code&&p.name),no=j.orders.map(cleanOrder).filter(o=>o.name&&o.code);
+   if(!confirm(`กู้คืนจากไฟล์สำรอง?\nสินค้า ${np.length} รายการ และออเดอร์ ${no.length} รายการ จะมาแทนข้อมูลที่มีอยู่ตอนนี้\n(สินค้า ${products.length} รายการ ออเดอร์ ${orders.length} รายการ)`))return "ยกเลิกการกู้คืน ข้อมูลเดิมยังอยู่ครบ";
+   products=np;orders=no;applyPlanSettings(j.plan);store.set("ls_plan",planSettings());afterChange();
+   return `กู้คืนแล้ว: สินค้า ${np.length} รายการ ออเดอร์ ${no.length} รายการ`}
+  throw new Error("ไฟล์ .json ใช้กับปุ่มกู้คืนจากไฟล์สำรองในหน้าแรก")}
+ if(kind==="restoreAll")throw new Error("ไฟล์สำรองต้องเป็น .json ที่ได้จากปุ่มสำรองทั้งหมด");
+ const rows=parseCSV(text);if(rows.length<2)throw new Error("ไฟล์ว่าง หรือไม่มีแถวข้อมูล");
+ if(kind==="impProd"){const m=colMap(rows[0],P_COLS);if(m.code<0||m.name<0)throw new Error("ต้องมีหัวคอลัมน์ รหัส และ ชื่อสินค้า");
+  let add=0,upd=0;rows.slice(1).forEach(r=>{const p=cleanProduct({code:r[m.code],name:r[m.name],price:m.price<0?0:r[m.price],points:m.points<0?"":r[m.points],promo:m.promo<0?"":r[m.promo]});
+   if(!p.code||!p.name)return;const i=products.findIndex(x=>x.code===p.code);if(i>=0){products[i]={...products[i],...p};upd++}else{products.push(p);add++}});
+  afterChange();return `นำเข้าแล้ว: เพิ่มใหม่ ${add} รายการ อัปเดต ${upd} รายการ`}
+ const m=colMap(rows[0],O_COLS);if(m.name<0||m.code<0||m.qty<0)throw new Error("ต้องมีหัวคอลัมน์ ลูกค้า รหัส และ จำนวน");
+ const key=o=>[o.d,o.t,o.name,o.code,o.qty,o.price].join("|"),have=new Set(orders.map(key));let add=0,dup=0;
+ rows.slice(1).forEach(r=>{const g=k=>m[k]<0?"":r[m[k]];const p=products.find(x=>x.code===unq(g("code")));
+  const o=cleanOrder({d:g("d"),t:g("t"),name:g("name"),code:g("code"),pname:g("pname")||(p?p.name:""),qty:g("qty"),price:m.price<0?(p?p.price:0):g("price")});
+  if(!o.name||!o.code)return;if(have.has(key(o))){dup++;return}have.add(key(o));orders.push(o);add++});
+ afterChange();return `นำเข้าออเดอร์แล้ว ${add} รายการ`+(dup?` (ข้ามรายการซ้ำ ${dup})`:"")}
+
+applyPlanSettings(store.get("ls_plan",null));
+$("#appVer").textContent=APP_VERSION;
+/* Updates. Web/phone copy: the service worker fetches the new version in the background
+   (shown on the next open). Installed Windows copy (file://): ask the web copy's version.json
+   once per start, online only, and offer the new one-file installer. */
+const verNum=v=>String(v).split(".").map(n=>+n||0),newer=(a,b)=>{const x=verNum(a),y=verNum(b);for(let i=0;i<3;i++){if((x[i]||0)!==(y[i]||0))return(x[i]||0)>(y[i]||0)}return false};
+if(location.protocol==="file:"){
+ if(UPDATE_SITE&&navigator.onLine)fetch(UPDATE_SITE+"version.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(v=>{
+  if(!v||!newer(v.version,APP_VERSION))return;const b=$("#updBox");b.hidden=false;
+  b.innerHTML=`<div><b>มีเวอร์ชันใหม่ ${esc(v.version)}</b> (ตอนนี้ใช้ ${APP_VERSION})<div class="mini">กดดาวน์โหลด แล้วเปิดไฟล์ที่ได้ สินค้าและออเดอร์เดิมไม่หาย ถ้า Edge เตือน ให้กด "เก็บไว้" (Keep) ไม่ควรอัปเดตตอนกำลังไลฟ์</div></div><a class="btn solid" href="${esc(UPDATE_SITE+v.installer)}" download>⬇ ดาวน์โหลดตัวอัปเดต</a>`}).catch(()=>{});
+}else $("#verNote").textContent="เวอร์ชันใหม่จะโหลดเองเมื่อต่อเน็ต แล้วใช้ได้ตอนเปิดครั้งถัดไป";
+renderProducts();aiStateText();buildPlan();obsFill();obsConnect();renderLive();renderHome();
+</script>
+<script>
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+</script>
+</body>
+</html>
