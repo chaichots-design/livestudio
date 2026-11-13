@@ -83,6 +83,7 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:2px}
 #toAI.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .scbtn.on kbd{color:#fff;border-color:rgba(255,255,255,.6)}
 .scbtn:disabled{opacity:.5;cursor:not-allowed}
+.aff-only{display:none!important}body.is-aff .aff-only{display:revert!important}body.is-aff .own-only{display:none!important}
 a.btn{text-decoration:none;display:inline-block}
 a.btn:not([href]){opacity:.5;pointer-events:none}
 @media (pointer:coarse){.desk-only{display:none!important}}
@@ -230,11 +231,12 @@ td.r,th.r{text-align:right}
     </div>
     <div class="row" style="margin-top:10px">
       <a class="btn primary" id="ttLive" target="_blank" rel="noopener">▶ เปิดหน้าไลฟ์ของร้าน</a>
-      <a class="btn" href="https://seller-th.tiktok.com/" target="_blank" rel="noopener">🛒 TikTok Shop (Seller Center)</a>
+      <a class="btn own-only" href="https://seller-th.tiktok.com/" target="_blank" rel="noopener">🛒 TikTok Shop (Seller Center)</a>
       <a class="btn desk-only" href="https://www.tiktok.com/studio/download" target="_blank" rel="noopener">🖥 โหลด TikTok LIVE Studio</a>
       <button class="btn" id="ttCopyBasket">📋 คัดลอกรายการตะกร้า</button>
     </div>
     <div class="mini" id="ttMsg" style="margin-top:6px"></div>
+    <div class="mini aff-only" style="margin-top:6px;padding:8px 10px;background:var(--bg);border-radius:8px">🤝 นายหน้า: เพิ่มสินค้าลงโชว์เคสในแอป TikTok ก่อน แล้วกด 📋 คัดลอกรายการตะกร้า ได้ลำดับ ร้านต้นทาง และลิงก์สินค้า ไว้เช็กตอนเพิ่มเข้าตะกร้าไลฟ์ ราคา โปร และค่าส่งเป็นไปตามที่ร้านต้นทางกำหนด ตรวจในหน้าสินค้าก่อนไลฟ์ทุกครั้ง</div>
     <details style="margin-top:6px"><summary class="mini" style="cursor:pointer">ต่อได้แค่ไหน ทำไมโปรแกรมกดในไลฟ์แทนไม่ได้</summary>
       <div class="mini" style="margin-top:4px">TikTok ไม่เปิดช่องทางทางการให้โปรแกรมอื่นเริ่มไลฟ์ ปักตะกร้า หรืออ่านคอมเมนต์ได้ ปุ่มด้านบนจึงพาไปหน้าที่ต้องใช้ ส่วนการเริ่มไลฟ์และปักตะกร้ายังต้องกดในแอป TikTok หรือ LIVE Studio เอง ระหว่างไลฟ์ คัดลอกคอมเมนต์มาวางในกล่อง "ดึงออเดอร์จากคอมเมนต์" ในแท็บไลฟ์ โปรแกรมจะหา CF ให้</div></details>
   </div>
@@ -259,6 +261,15 @@ td.r,th.r{text-align:right}
 <section id="tab-products" hidden>
   <h2>สินค้าในรอบนี้</h2>
   <p class="sub">ติ๊ก "ไลฟ์รอบนี้" เฉพาะสินค้าที่จะขาย แล้วกด ▲▼ เรียงตามลำดับที่จะพูด เลขตะกร้าจะนับตามลำดับนี้ ใส่รูปแล้วให้ AI เขียนชื่อ จุดขาย และบทพูดให้ได้ ข้อมูลเก็บไว้ในเครื่องนี้</p>
+  <div class="card" style="margin-bottom:12px">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <b style="font-family:var(--display);font-weight:500">ขายแบบไหน</b>
+      <div class="modesw" role="radiogroup" aria-label="ประเภทการขาย" id="sellerSw">
+        <button type="button" role="radio" data-seller="own">🏪 ร้านของฉันเอง</button><button type="button" role="radio" data-seller="aff">🤝 นายหน้า (Affiliate)</button>
+      </div>
+    </div>
+    <div class="mini" id="sellerHelp" style="margin-top:6px"></div>
+  </div>
   <details class="card" id="aiBox" style="margin-bottom:12px">
     <summary style="cursor:pointer"><b style="font-family:var(--display);font-weight:500">✨ ตั้งค่า AI เขียนบทจากรูป</b> <span class="mini" id="aiState"></span></summary>
     <div style="display:grid;gap:6px;margin-top:8px">
@@ -292,7 +303,8 @@ td.r,th.r{text-align:right}
   </div>
   <div class="card" style="margin-bottom:12px">
     <b style="font-family:var(--display);font-weight:500">📌 ลำดับสินค้าในตะกร้าไลฟ์</b>
-    <div class="mini">ก่อนไลฟ์ เพิ่มสินค้าเข้าตะกร้าใน TikTok ตามลำดับนี้ เลขตะกร้าจะตรงกับที่โปรแกรมพูดและขึ้นป้าย ระหว่างไลฟ์โปรแกรมจะเตือนให้ปักตะกร้าทุกครั้งที่เปลี่ยนสินค้า</div>
+    <div class="mini own-only">ก่อนไลฟ์ เพิ่มสินค้าเข้าตะกร้าใน TikTok ตามลำดับนี้ เลขตะกร้าจะตรงกับที่โปรแกรมพูดและขึ้นป้าย ระหว่างไลฟ์โปรแกรมจะเตือนให้ปักตะกร้าทุกครั้งที่เปลี่ยนสินค้า</div>
+    <ol class="mini aff-only" style="margin:4px 0 0;padding-left:18px"><li>ก่อนไลฟ์ เพิ่มสินค้าทุกตัวลง<b>โชว์เคส</b>ของคุณจากตลาดสินค้า Affiliate ในแอป TikTok (ต้องเปิดสิทธิ์นายหน้า TikTok Shop แล้ว)</li><li>ตอนตั้งไลฟ์ กดเพิ่มสินค้าเข้าตะกร้าไลฟ์ เลือกจากโชว์เคส <b>ตามลำดับนี้</b> เลขตะกร้าจะตรงกับที่โปรแกรมพูดและขึ้นป้าย</li><li>ระหว่างไลฟ์ โปรแกรมจะเตือนให้ปักหมุดสินค้าตัวที่กำลังพูดถึง</li></ol>
     <div class="order-list" id="basketList"></div>
   </div>
   <p class="mini" id="planSummary"></p>
@@ -409,9 +421,10 @@ td.r,th.r{text-align:right}
 </section>
 
 <section id="tab-orders" hidden>
-  <h2>ออเดอร์รอบนี้</h2>
-  <div class="totals"><div><span class="mini">ออเดอร์</span><b id="tCount">0</b></div><div><span class="mini">ชิ้น</span><b id="tQty">0</b></div><div><span class="mini">ยอดขาย (บาท)</span><b id="tSum">0</b></div></div>
-  <div class="card tablebox"><table><thead><tr><th>เวลา</th><th>ลูกค้า</th><th>สินค้า</th><th class="r">จำนวน</th><th class="r">รวม</th><th></th></tr></thead><tbody id="obody"></tbody></table></div>
+  <h2 id="ordTitle">ออเดอร์รอบนี้</h2>
+  <div class="totals"><div><span class="mini">ออเดอร์</span><b id="tCount">0</b></div><div><span class="mini">ชิ้น</span><b id="tQty">0</b></div><div><span class="mini">ยอดขาย (บาท)</span><b id="tSum">0</b></div><div class="aff-only"><span class="mini">ค่าคอมโดยประมาณ (บาท)</span><b id="tComm">0</b></div></div>
+  <p class="mini aff-only" style="margin:-4px 0 10px">นายหน้าจะไม่เห็นชื่อลูกค้า ใส่แค่สินค้าและจำนวนตามที่เห็นในแดชบอร์ดไลฟ์ก็พอ ค่าคอมคิดจากเปอร์เซ็นต์ในการ์ดสินค้า ยอดจริงดูในหน้ารายได้ Affiliate ของ TikTok</p>
+  <div class="card tablebox"><table><thead><tr><th>เวลา</th><th>ลูกค้า</th><th>สินค้า</th><th class="r">จำนวน</th><th class="r">รวม</th><th class="r aff-only">ค่าคอม</th><th></th></tr></thead><tbody id="obody"></tbody></table></div>
   <h2 style="margin-top:20px">ขายดีรายสินค้า</h2>
   <div class="card tablebox"><table><thead><tr><th>รหัส</th><th>สินค้า</th><th class="r">ชิ้น</th><th class="r">ยอด</th></tr></thead><tbody id="sbody"></tbody></table></div>
   <div class="row" style="margin-top:12px"><button class="btn" id="copySum">คัดลอกสรุปยอด</button><button class="btn" id="expOrd">⬇ ส่งออกไฟล์ (Excel)</button><button class="btn" id="impOrd">⬆ นำเข้าออเดอร์</button><button class="btn" id="clearOrders">ล้างออเดอร์ทั้งหมด</button><span class="mini" id="clearMsg"></span></div>
@@ -420,7 +433,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.8.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.9.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
@@ -446,6 +459,25 @@ function show(t){document.querySelectorAll("nav button").forEach(b=>b.setAttribu
  ["home","products","plan","live","orders"].forEach(x=>$("#tab-"+x).hidden=x!==t);scrollTo(0,0);
  if(t==="home")renderHome(); if(t==="plan")buildPlan(); if(t==="live"){if(!plan.length)buildPlan();renderLive()} if(t==="orders")renderOrders();}
 
+/* seller type: "own" = the owner's shop (customers may CF in comments, the shop records orders);
+   "aff" = affiliate creator selling other shops' products from their showcase: buyers check out
+   through the live basket only, so scripts, labels and the AI scene never ask for CF, products
+   carry shop / commission % / link, and the order tab estimates commission. */
+const sellerCfg=Object.assign({type:"own"},store.get("ls_seller",{}));
+const aff=()=>sellerCfg.type==="aff";
+const safeURL=u=>/^https:\/\/[^\s"<>]+$/i.test(String(u||"").trim())?String(u).trim():"";
+function setOpenLink(i){const a=document.querySelector(`[data-open="${i}"]`);if(!a)return;const u=safeURL(products[i]&&products[i].url);
+ if(u)a.href=u;else a.removeAttribute("href");a.title=u?"":"วางลิงก์ที่ขึ้นต้นด้วย https:// ก่อน"}
+function renderSeller(){document.querySelectorAll("#sellerSw button").forEach(b=>b.setAttribute("aria-checked",String(b.dataset.seller===sellerCfg.type)));
+ $("#sellerHelp").textContent=aff()
+  ?"นายหน้า: ขายสินค้าของร้านอื่นจากโชว์เคส คนดูกดตะกร้าแล้วสั่งซื้อเอง บทพูดและป้ายจะชวนกดตะกร้า (ไม่ใช้ CF) ใส่ร้านต้นทาง ค่าคอม และลิงก์สินค้าได้ในการ์ดสินค้า"
+  :"ร้านของฉันเอง: ขายสินค้าของร้านคุณ คนดูกดตะกร้าหรือพิมพ์ CF ในคอมเมนต์ได้";
+ document.body.classList.toggle("is-aff",aff());
+ $("#qName").placeholder=aff()?"ชื่อลูกค้า (ไม่ใส่ก็ได้)":"ชื่อลูกค้า";
+ $("#ordTitle").textContent=aff()?"ยอดขายรอบนี้ (นายหน้า)":"ออเดอร์รอบนี้"}
+document.querySelectorAll("#sellerSw button").forEach(b=>b.onclick=()=>{if(sellerCfg.type===b.dataset.seller)return;sellerCfg.type=b.dataset.seller;store.set("ls_seller",sellerCfg);
+ renderSeller();plan=[];renderProducts();buildPlan();renderOrders();renderHome();ttFill();if(running)pushOverlay()});
+
 /* products. p.on === false = not in this live; list order = speaking order; basket number = position among "on" products */
 const liveProducts=()=>products.filter(p=>p.on!==false);
 const basketNo=p=>liveProducts().indexOf(p)+1;
@@ -464,13 +496,18 @@ function renderProducts(){const el=$("#plist");el.innerHTML="";
     <div class="wide"><label for="n${i}">ชื่อสินค้า</label><input id="n${i}" data-k="name" data-i="${i}" value="${esc(p.name)}"></div>
     <div><label for="p${i}">ราคา (บาท)</label><input id="p${i}" type="number" data-k="price" data-i="${i}" value="${p.price}"></div>
     <div class="full"><label for="pt${i}">จุดขาย (คั่นด้วย |)</label><input id="pt${i}" data-k="points" data-i="${i}" value="${esc(p.points)}"></div>
-    <div class="full"><label for="pr${i}">โปรในไลฟ์</label><input id="pr${i}" data-k="promo" data-i="${i}" value="${esc(p.promo)}"></div>
+    <div class="full"><label for="pr${i}">โปรในไลฟ์${aff()?" (ตามที่ร้านต้นทางให้)":""}</label><input id="pr${i}" data-k="promo" data-i="${i}" value="${esc(p.promo)}"></div>
+    ${aff()?`<div class="wide"><label for="sh${i}">ร้านต้นทาง</label><input id="sh${i}" data-k="shop" data-i="${i}" value="${esc(p.shop||"")}" placeholder="ชื่อร้านที่ขายสินค้านี้"></div>
+    <div><label for="cm${i}">ค่าคอม (%)</label><input id="cm${i}" type="number" min="0" max="100" step="0.5" inputmode="decimal" data-k="comm" data-i="${i}" value="${p.comm||""}" placeholder="เช่น 10"></div>
+    <div class="full"><label for="u${i}">ลิงก์สินค้า (คัดลอกจาก TikTok)</label><div class="row" style="flex-wrap:nowrap"><input id="u${i}" type="url" data-k="url" data-i="${i}" value="${esc(p.url||"")}" placeholder="https://..."><a class="btn sm" data-open="${i}" target="_blank" rel="noopener" style="white-space:nowrap;align-self:center">เปิด</a></div></div>`:""}
    </div>
    <div class="mini" id="aim${i}" style="margin-top:6px"></div>
    ${p.scripts&&p.scripts.length?`<details style="margin-top:6px"><summary class="mini" style="cursor:pointer">บทพูดจาก AI ${p.scripts.length} แบบ (ใช้สลับกันตอนไลฟ์)</summary>${p.scripts.map(s=>`<div class="aiscript">${esc(fillScript(s,p))}</div>`).join("")}<button class="btn sm" data-noai="${i}" style="margin-top:6px">กลับไปใช้บทแบบเดิม</button></details>`:""}
    </div>
   </div>`;el.appendChild(d)});
- el.querySelectorAll("input[data-k]").forEach(inp=>inp.oninput=()=>{const p=products[inp.dataset.i];p[inp.dataset.k]=inp.dataset.k==="price"?+inp.value:inp.value;store.set("ls_products",products);plan=[];if(inp.dataset.k==="code")inp.closest(".card").querySelector(".code").textContent=inp.value});
+ el.querySelectorAll("input[data-k]").forEach(inp=>inp.oninput=()=>{const p=products[inp.dataset.i],k=inp.dataset.k;p[k]=k==="price"||k==="comm"?Math.max(0,+inp.value||0):inp.value;
+  if(k==="comm")p.comm=Math.min(100,p.comm);store.set("ls_products",products);plan=[];if(k==="code")inp.closest(".card").querySelector(".code").textContent=inp.value;if(k==="url")setOpenLink(+inp.dataset.i)});
+ el.querySelectorAll("[data-open]").forEach(a=>setOpenLink(+a.dataset.open));
  el.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{products.splice(+b.dataset.del,1);save()});
  el.querySelectorAll("[data-on]").forEach(b=>b.onchange=()=>{products[+b.dataset.on].on=b.checked;save()});
  el.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{const i=+b.dataset.mv,j=i+ +b.dataset.d;if(j<0||j>=products.length)return;[products[i],products[j]]=[products[j],products[i]];save()});
@@ -506,6 +543,10 @@ const AI_SYSTEM=`คุณเขียนบทพูดขายของสำ
 ในทุกบทให้ใช้ตัวแทนเหล่านี้แทนค่าจริง โปรแกรมจะเติมให้เอง: {CODE} รหัสสินค้า, {PRICE} ราคา, {BASKET} เลขตะกร้า และ {PROMO} โปรในไลฟ์ (ใส่ {PROMO} เฉพาะเมื่อร้านบอกว่ามีโปร)
 ทุกบทต้องจบด้วยการชวนกดตะกร้าเลข {BASKET} หรือพิมพ์ CF {CODE}
 ห้ามอ้างสิ่งที่ไม่เห็นในรูปและร้านไม่ได้บอก เช่น สรรพคุณทางการแพทย์ ผลลัพธ์ที่รับประกัน รีวิวลูกค้า ยอดขาย ส่วนลด หรือของแถม ถ้ารูปไม่ชัด ให้พูดกว้างๆ จากสิ่งที่เห็นได้`;
+const AI_SYSTEM_AFF=AI_SYSTEM.replace("ทุกบทต้องจบด้วยการชวนกดตะกร้าเลข {BASKET} หรือพิมพ์ CF {CODE}",
+`ผู้พูดเป็นนายหน้า (affiliate) ที่ขายสินค้าของร้านอื่น ไม่ใช่เจ้าของร้าน: อย่าพูดว่าเป็นสินค้าของเราหรือผลิตเอง ถ้ามีชื่อร้านต้นทางให้พูดถึงได้
+ห้ามสัญญาเรื่องการจัดส่ง การเปลี่ยนคืน หรือโปรที่ร้านไม่ได้ระบุ ให้ชวนดูรายละเอียดในหน้าสินค้าแทน
+ทุกบทต้องจบด้วยการชวนกดตะกร้าสีเหลืองเลข {BASKET} แล้วกดสั่งซื้อ ห้ามบอกให้พิมพ์ CF`).replace("ข้อมูลที่ร้านให้มา","ข้อมูลที่ให้มา");
 const AI_SCHEMA={type:"object",additionalProperties:false,required:["name","points","scripts"],
  properties:{name:{type:"string"},points:{type:"array",items:{type:"string"}},scripts:{type:"array",items:{type:"string"}}}};
 const isDefault=(k,v)=>!String(v||"").trim()||(k==="name"&&v==="สินค้าใหม่")||(k==="points"&&/^จุดเด่น 1\|/.test(v));
@@ -518,11 +559,12 @@ async function aiWrite(i,btn){const p=products[i],m=$("#aim"+i);
   sdkPromise=sdkPromise||import(SDK_URL);const mod=await sdkPromise,Anthropic=mod.default||mod.Anthropic;sdkMod=mod;
   const client=new Anthropic({apiKey:aiCfg.key,dangerouslyAllowBrowser:true});
   const info=[`ข้อมูลจากร้าน:`,`รหัสสินค้า: ${p.code}`,`ชื่อ: ${isDefault("name",p.name)?"(ยังไม่มี ให้ตั้งจากรูป)":p.name}`,`ราคา: ${p.price?p.price+" บาท":"(ยังไม่กำหนด)"}`,
-   `จุดขายที่ร้านเขียนไว้: ${isDefault("points",p.points)?"(ยังไม่มี)":p.points.split("|").join(", ")}`,`โปรในไลฟ์: ${p.promo||"(ไม่มี)"}`].join("\n");
+   `จุดขายที่ร้านเขียนไว้: ${isDefault("points",p.points)?"(ยังไม่มี)":p.points.split("|").join(", ")}`,`โปรในไลฟ์: ${p.promo||"(ไม่มี)"}`,
+   ...(aff()?[`ร้านต้นทาง: ${p.shop||"(ไม่ระบุ)"}`]:[])].join("\n");
   const r=await client.beta.messages.create({model:"claude-opus-5-5",max_tokens:16000,
    betas:["server-side-fallback-2026-07-01"],fallbacks:"default",
    output_config:{effort:"low",format:{type:"json_schema",schema:AI_SCHEMA}},
-   system:AI_SYSTEM,
+   system:aff()?AI_SYSTEM_AFF:AI_SYSTEM,
    messages:[{role:"user",content:[{type:"image",source:{type:"base64",media_type:"image/jpeg",data:p.img.split(",")[1]}},{type:"text",text:info}]}]});
   if(r.stop_reason==="refusal")throw new Error("AI ไม่เขียนให้สำหรับรูปนี้ ลองใช้รูปสินค้าที่ชัดกว่านี้");
   if(r.stop_reason==="max_tokens")throw new Error("บทยาวเกินไป ลองกดใหม่อีกครั้ง");
@@ -549,7 +591,11 @@ $("#resetProd").onclick=()=>{products=SAMPLE.map(p=>({...p}));save()};
 function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 
 /* scripts */
-const T={
+// Templates for both seller types: affiliate lines name the basket number (and source shop) and
+// never ask for CF; they also avoid promising shipping/returns/deals the source shop controls.
+const shopName=p=>p.shop?(/^ร้าน/.test(p.shop.trim())?p.shop.trim():"ร้าน "+p.shop.trim()):"";
+const fromShop=p=>p.shop?` จาก${shopName(p)}`:"";
+const T_OWN={
  open:[p=>`สวัสดีค่ะทุกคน ยินดีต้อนรับเข้าไลฟ์นะคะ วันนี้เรามีสินค้า ${liveProducts().length} รายการ ราคาพิเศษเฉพาะในไลฟ์เท่านั้น ใครเพิ่งเข้ามา กดติดตามไว้ก่อนเลยนะคะ จะได้ไม่พลาดโปร`,
        p=>`มาแล้วค่า ไลฟ์รอบนี้จัดเต็ม ${liveProducts().length} รายการ ของดีราคาไลฟ์ ใครอยากได้ตัวไหน พิมพ์ CF ตามด้วยรหัสสินค้าในคอมเมนต์ หรือกดตะกร้าตามเลขที่บอกได้เลยค่ะ`],
  hook:[p=>`ตัวต่อไปนะคะ รหัส ${p.code} ${p.name} ตัวนี้คนถามเยอะมาก`,p=>`มาดูตัวนี้กันค่ะ ${p.name} รหัส ${p.code} บอกเลยว่าคุ้ม`,p=>`ใครกำลังหา${p.name}อยู่ ตัวนี้เลยค่ะ รหัส ${p.code}`],
@@ -560,8 +606,24 @@ const T={
  human:[`ช่วงคุยสด: ทักทายคนที่เพิ่งเข้ามาโดยเรียกชื่อ\nไล่ตอบคำถามในคอมเมนต์ 3 ถึง 5 ข้อ\nย้ำออเดอร์ที่ CF เข้ามา และถามว่าอยากให้หยิบสินค้าตัวไหนมาดูใกล้ๆ`,
         `ช่วงคุยสด: ถือสินค้าที่เพิ่งพูดไปให้กล้องดูใกล้ๆ\nตอบเรื่องไซซ์ สี การส่ง ที่คนถาม\nขอบคุณคนที่กดใจหรือส่งของขวัญ`],
  close:[p=>`ใกล้หมดเวลาแล้วนะคะ ใครยังไม่ได้ CF รีบเลย โปรหมดเมื่อปิดไลฟ์ ขอบคุณทุกคนที่อยู่ด้วยกันวันนี้ แล้วเจอกันรอบหน้านะคะ`]};
-// AI scripts keep placeholders so they stay right after price edits or reordering
-function fillScript(s,p){return String(s).replace(/\{CODE\}/g,p.code).replace(/\{NAME\}/g,p.name)
+const T_AFF={
+ open:[p=>`สวัสดีค่ะทุกคน ยินดีต้อนรับเข้าไลฟ์นะคะ วันนี้คัดของดีมาให้ ${liveProducts().length} รายการ อยากได้ตัวไหน กดตะกร้าสีเหลืองตามเลขที่บอก แล้วกดสั่งซื้อได้เลยค่ะ ใครเพิ่งเข้ามา กดติดตามไว้ก่อนนะคะ`,
+       p=>`มาแล้วค่า ไลฟ์รอบนี้มี ${liveProducts().length} รายการ ทุกตัวอยู่ในตะกร้าสีเหลืองด้านล่าง เลขตะกร้าตรงกับที่บอกในไลฟ์ สงสัยตรงไหนพิมพ์ถามในคอมเมนต์ได้เลยค่ะ`],
+ hook:[p=>`ตัวต่อไปนะคะ ตะกร้าเลข ${basketNo(p)} ${p.name}${fromShop(p)}`,p=>`มาดูตัวนี้กันค่ะ ${p.name} อยู่ตะกร้าเลข ${basketNo(p)}`,p=>`ใครกำลังหา${p.name}อยู่ ตัวนี้เลยค่ะ ตะกร้าเลข ${basketNo(p)}${fromShop(p)}`],
+ point:T_OWN.point,
+ price:[p=>`ราคาตอนนี้ในตะกร้า ${fmt(p.price)} บาท`,p=>`ราคาในหน้าสินค้า ${fmt(p.price)} บาทค่ะ`],
+ promo:[p=>p.promo?`ตอนนี้ร้านมีโปร ${p.promo}`:"",p=>p.promo?`แล้วร้านยังมี ${p.promo} ด้วยนะคะ`:""],
+ cta:[p=>`สนใจกดตะกร้าสีเหลือง เลข ${basketNo(p)} แล้วกดสั่งซื้อได้เลยค่ะ ส่งตรงจาก${p.shop?shopName(p):"ร้านค้า"}`,
+      p=>`จิ้มตะกร้าเลข ${basketNo(p)} ดูรายละเอียด ราคา และค่าส่งในหน้าสินค้าได้เลยนะคะ`],
+ human:[`ช่วงคุยสด: ทักทายคนที่เพิ่งเข้ามาโดยเรียกชื่อ\nไล่ตอบคำถามในคอมเมนต์ 3 ถึง 5 ข้อ\nย้ำว่าสั่งได้ทางตะกร้าสีเหลือง และบอกเลขตะกร้าของตัวที่คนถาม`,
+        `ช่วงคุยสด: ถือสินค้าที่เพิ่งพูดไปให้กล้องดูใกล้ๆ\nตอบเฉพาะที่รู้จริง เรื่องส่งหรือเปลี่ยนคืน ให้ดูในหน้าสินค้าหรือทักร้าน\nขอบคุณคนที่กดใจหรือส่งของขวัญ`],
+ close:[p=>`ใกล้หมดเวลาแล้วนะคะ ใครยังไม่ได้กดตะกร้า ยังสั่งได้ตามเลขที่บอก ราคาและโปรเป็นไปตามที่ร้านกำหนดในหน้าสินค้า ขอบคุณทุกคนที่อยู่ด้วยกันวันนี้ แล้วเจอกันรอบหน้านะคะ`]};
+const T=new Proxy({},{get:(_,k)=>(aff()?T_AFF:T_OWN)[k]});
+// AI scripts keep placeholders so they stay right after price edits or reordering.
+// Affiliate mode drops CF requests from scripts written earlier for the own-shop mode.
+function stripCF(s){return s.replace(/\s*หรือ\s*พิมพ์\s*CF\s*\{CODE\}[^\n]*?(?=(ค่ะ|นะคะ|ได้เลย|$|\n))/g," ")
+ .replace(/พิมพ์\s*CF\s*\{CODE\}(\s*ในคอมเมนต์)?\s*/g,"กดตะกร้าเลข {BASKET} ").replace(/ {2,}/g," ").replace(/ +(\n|$)/g,"$1")}
+function fillScript(s,p){if(aff())s=stripCF(String(s));return String(s).replace(/\{CODE\}/g,p.code).replace(/\{NAME\}/g,p.name)
  .replace(/\{PRICE\}/g,p.price?`${fmt(p.price)} บาท`:"ราคาพิเศษในไลฟ์").replace(/\{BASKET\}/g,basketNo(p)||"")
  .replace(/\{PROMO\}/g,p.promo||"").replace(/[ \t]+\n/g,"\n").trim()}
 function productScript(p){if(p.scripts&&p.scripts.length)return fillScript(pick(p.scripts),p);
@@ -596,7 +658,7 @@ function buildPlan(){const dur=durMin(),every=+$("#talkEvery").value;let tl=+$("
  $("#planSummary").innerHTML=esc(`${fmtDur(dur)} · ${plan.length} ช่วง · สินค้าพูด ${rounds} รอบ ตัวละประมาณ ${base} นาที · คนคุยสดรวม ${h} นาที`)+
   (tl<+$("#talkLen").value?esc(` (ย่อคุยสดเหลือครั้งละ ${tl} นาที ให้พอดีเวลา)`):"")+
   (tight||realTotal>dur?`<br><b style="color:var(--warn)">⚠ เวลาน้อยไปสำหรับ ${P.length} สินค้า (รวมจริง ${fmtDur(realTotal)}) ลองเพิ่มเวลาเป็นอย่างน้อย ${fmtDur(Math.ceil((open+close+nHuman*2+n*2)/5)*5)} หรือเอาสินค้าบางตัวออกจากรอบนี้</b>`:"");
- $("#basketList").innerHTML=P.length?P.map((p,i)=>`<span><b>#${i+1}</b> ${esc(p.code)} ${esc(p.name)}</span>`).join(""):'<span>ยังไม่ได้เลือกสินค้า ไปติ๊ก "ไลฟ์รอบนี้" ในแท็บสินค้า</span>';
+ $("#basketList").innerHTML=P.length?P.map((p,i)=>`<span><b>#${i+1}</b> ${esc(p.code)} ${esc(p.name)}${aff()&&p.shop?` · ${esc(p.shop)}`:""}${aff()&&p.comm?` · คอม ${p.comm}%`:""}</span>`).join(""):'<span>ยังไม่ได้เลือกสินค้า ไปติ๊ก "ไลฟ์รอบนี้" ในแท็บสินค้า</span>';
  const el=$("#tl");el.innerHTML="";plan.forEach((s,i)=>{const d=document.createElement("div");d.className="seg"+(s.type==="human"?" human":"")+(i===cur&&running?" now":"");
   d.innerHTML=`<span class="t">${mm(s.start)}</span><span>${esc(s.name)}</span><span class="chip ${s.type==="human"?"human":"ai"}">${s.type==="human"?"คนพูดสด":"AI ช่วย"} · ${s.min} น.</span>`;el.appendChild(d)});
  if(cur>=plan.length)cur=0;}
@@ -621,7 +683,7 @@ function renderLive(){if(!plan.length)return;const s=plan[cur];
  $("#segChip").className="chip "+(human?"human":"ai");$("#segChip").textContent=human?"ถึงเวลาคุยสด":"AI ช่วยนำเสนอ";
  $("#prompter").textContent=s.text;$("#prompter").parentElement.classList.toggle("prompter-h",human);$("#prompter").classList.toggle("human",human);
  $("#speak").disabled=human;
- $("#pinbar").hidden=s.type!=="prod";if(s.type==="prod"){$("#pinNo").textContent="#"+basketNo(s.p);$("#pinName").textContent=`${s.p.code} ${s.p.name}`}
+ $("#pinbar").hidden=s.type!=="prod";if(s.type==="prod"){$("#pinNo").textContent="#"+basketNo(s.p);$("#pinName").textContent=`${s.p.code} ${s.p.name}`+(aff()&&s.p.shop?` (${shopName(s.p)})`:"")}
  $("#disclose").textContent=human?"ช่วงนี้ให้คนพูดเอง ไม่ใช้เสียง AI":"ใส่ข้อความบนจอไลฟ์ว่า \"ไลฟ์นี้มี AI ช่วยนำเสนอสินค้า\" และให้ตัวละคร AI กินพื้นที่ไม่เกินครึ่งจอ";
  const n=plan[cur+1];$("#nextInfo").textContent=n?`${n.name} (${n.min} นาที)`:"จบรอบ";
  tick(true);if(s.p)$("#qCode").value=s.p.code;if(running){syncScene();pushOverlay()}renderSceneBar()}
@@ -674,19 +736,22 @@ $("#rate").value=voiceCfg.rate;$("#aiAuto").checked=voiceCfg.auto;$("#aiRep").va
 $("#aiAuto").onchange=()=>{saveVoice();if(voiceCfg.auto&&running&&plan[cur].type==="prod"&&!speechSynthesis.speaking){repeatAt=segElapsed+voiceCfg.rep*60;speakText(plan[cur].text)}};
 
 /* orders */
+// commission % is copied onto each order when recorded, so later edits to the product do not rewrite history
+const commOf=o=>o.cm?o.qty*o.price*o.cm/100:0;
+const orderComm=p=>aff()&&p.comm>0?{cm:+p.comm}:{};
 function fillCodes(){$("#qCode").innerHTML=products.map(p=>`<option value="${esc(p.code)}">${esc(p.code)} ${esc(p.name)}</option>`).join("")}
 $("#qAdd").onclick=()=>{const name=$("#qName").value.trim(),code=$("#qCode").value,qty=Math.max(1,+$("#qQty").value||1);
- if(!name){$("#qMsg").textContent="ใส่ชื่อลูกค้าก่อน";return}const p=products.find(x=>x.code===code);if(!p)return;
- orders.push({d:localDate(),t:new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"}),name,code,pname:p.name,qty,price:p.price});store.set("ls_orders",orders);
- $("#qMsg").textContent=`บันทึกแล้ว: ${name} ${code} x${qty}`;$("#qName").value="";$("#qQty").value=1;$("#qName").focus()};
+ if(!name&&!aff()){$("#qMsg").textContent="ใส่ชื่อลูกค้าก่อน";return}const p=products.find(x=>x.code===code);if(!p)return;
+ orders.push(Object.assign({d:localDate(),t:new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"}),name:name||"ลูกค้า TikTok",code,pname:p.name,qty,price:p.price},orderComm(p)));store.set("ls_orders",orders);renderHome();
+ $("#qMsg").textContent=`บันทึกแล้ว: ${name||"ลูกค้า TikTok"} ${code} x${qty}`+(aff()&&p.comm?` · ค่าคอมประมาณ ${fmt(Math.round(qty*p.price*p.comm/100))} บาท`:"");$("#qName").value="";$("#qQty").value=1;$("#qName").focus()};
 function renderOrders(){const ob=$("#obody");ob.innerHTML=orders.length?"":`<tr><td colspan="6" class="mini">ยังไม่มีออเดอร์ จดได้จากแท็บไลฟ์ระหว่างไลฟ์</td></tr>`;
- orders.forEach((o,i)=>{const tr=document.createElement("tr");tr.innerHTML=`<td class="num">${o.t}</td><td>${esc(o.name)}</td><td><span class="code">${esc(o.code)}</span> ${esc(o.pname)}</td><td class="r num">${o.qty}</td><td class="r num">${fmt(o.qty*o.price)}</td><td><button class="btn" data-o="${i}" style="padding:2px 8px;font-size:12px">ลบ</button></td>`;ob.appendChild(tr)});
+ orders.forEach((o,i)=>{const tr=document.createElement("tr");tr.innerHTML=`<td class="num">${o.t}</td><td>${esc(o.name)}</td><td><span class="code">${esc(o.code)}</span> ${esc(o.pname)}</td><td class="r num">${o.qty}</td><td class="r num">${fmt(o.qty*o.price)}</td><td class="r num aff-only">${o.cm?fmt(Math.round(commOf(o))):"-"}</td><td><button class="btn" data-o="${i}" style="padding:2px 8px;font-size:12px">ลบ</button></td>`;ob.appendChild(tr)});
  ob.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{orders.splice(+b.dataset.o,1);store.set("ls_orders",orders);renderOrders()});
  const q=orders.reduce((a,o)=>a+o.qty,0),sum=orders.reduce((a,o)=>a+o.qty*o.price,0);
- $("#tCount").textContent=fmt(orders.length);$("#tQty").textContent=fmt(q);$("#tSum").textContent=fmt(sum);
+ $("#tCount").textContent=fmt(orders.length);$("#tQty").textContent=fmt(q);$("#tSum").textContent=fmt(sum);$("#tComm").textContent=fmt(Math.round(orders.reduce((a,o)=>a+commOf(o),0)));
  const by={};orders.forEach(o=>{by[o.code]=by[o.code]||{n:o.pname,q:0,s:0};by[o.code].q+=o.qty;by[o.code].s+=o.qty*o.price});
  const rows=Object.entries(by).sort((a,b)=>b[1].s-a[1].s);$("#sbody").innerHTML=rows.map(([c,v])=>`<tr><td><span class="code">${esc(c)}</span></td><td>${esc(v.n)}</td><td class="r num">${v.q}</td><td class="r num">${fmt(v.s)}</td></tr>`).join("")||`<tr><td colspan="4" class="mini">ยังไม่มีข้อมูล</td></tr>`;}
-$("#copySum").onclick=()=>{const txt=`สรุปไลฟ์ ${new Date().toLocaleDateString("th-TH")}\nออเดอร์ ${orders.length} · ยอด ${$("#tSum").textContent} บาท\n`+orders.map(o=>`${o.name} ${o.code} x${o.qty} = ${fmt(o.qty*o.price)}`).join("\n");
+$("#copySum").onclick=()=>{const txt=`สรุปไลฟ์ ${new Date().toLocaleDateString("th-TH")}\nออเดอร์ ${orders.length} · ยอด ${$("#tSum").textContent} บาท${aff()?` · ค่าคอมประมาณ ${$("#tComm").textContent} บาท`:""}\n`+orders.map(o=>`${o.name} ${o.code} x${o.qty} = ${fmt(o.qty*o.price)}`).join("\n");
  navigator.clipboard.writeText(txt).then(()=>$("#clearMsg").textContent="คัดลอกแล้ว").catch(()=>$("#clearMsg").textContent="คัดลอกไม่ได้ในหน้านี้")};
 let armed=false;$("#clearOrders").onclick=()=>{if(!armed){armed=true;$("#clearOrders").textContent="กดอีกครั้งเพื่อยืนยันล้าง";setTimeout(()=>{armed=false;$("#clearOrders").textContent="ล้างออเดอร์ทั้งหมด"},3000);return}
  orders=[];store.set("ls_orders",orders);armed=false;$("#clearOrders").textContent="ล้างออเดอร์ทั้งหมด";renderOrders()};
@@ -695,6 +760,7 @@ let armed=false;$("#clearOrders").onclick=()=>{if(!armed){armed=true;$("#clearOr
    prod segments -> clip scene; open/human/close and pause/stop -> live-talk scene.
    The talk scene always stays in the loop (see CLAUDE.md hard rule). */
 const obsCfg=Object.assign({host:"localhost",port:4455,pass:"",clip:"คลิปสินค้า",talk:"พูดขายของ",on:false,ov:true,ovPos:"top",mode:"auto"},store.get("ls_obs",{}));
+if(obsCfg.mode!=="manual")obsCfg.mode="auto";
 // mode "auto": scene follows the plan (a manual press lasts until the next segment).
 // mode "manual": the host picks camera / AI scene; the app only returns to camera on pause/stop.
 let sceneNow="";
@@ -732,7 +798,7 @@ function syncScene(){if(plan.length&&obsCfg.mode!=="manual")setScene(planScene()
 /* scene bar: camera / AI buttons, auto vs manual. Shortcuts C and A use the physical key
    (e.code), so they work with the Thai keyboard layout too. */
 function renderSceneBar(){const cam=$("#toCam"),ai=$("#toAI");if(!cam)return;const man=obsCfg.mode==="manual";
- document.querySelectorAll(".modesw button").forEach(b=>b.setAttribute("aria-checked",String(b.dataset.mode===obsCfg.mode)));
+ document.querySelectorAll(".modesw button[data-mode]").forEach(b=>b.setAttribute("aria-checked",String(b.dataset.mode===obsCfg.mode)));
  cam.disabled=ai.disabled=!obsReady;
  cam.classList.toggle("on",obsReady&&sceneNow===obsCfg.talk);ai.classList.toggle("on",obsReady&&sceneNow===obsCfg.clip);
  const rec=planScene();cam.classList.toggle("rec",man&&running&&rec===obsCfg.talk&&sceneNow!==rec);ai.classList.toggle("rec",man&&running&&rec===obsCfg.clip&&sceneNow!==rec);
@@ -743,7 +809,7 @@ function renderSceneBar(){const cam=$("#toCam"),ai=$("#toAI");if(!cam)return;con
  if(!man&&obsReady)$("#sceneHint").textContent+=matchMedia("(pointer:coarse)").matches?"":" · คีย์ลัด C = กล้อง, A = ฉาก AI"}
 function pickScene(which){if(!obsReady)return;setScene(which==="ai"?obsCfg.clip:obsCfg.talk);if(which==="ai")pushShowcase(true)}
 $("#toCam").onclick=()=>pickScene("cam");$("#toAI").onclick=()=>pickScene("ai");
-document.querySelectorAll(".modesw button").forEach(b=>b.onclick=()=>{obsCfg.mode=b.dataset.mode;store.set("ls_obs",obsCfg);
+document.querySelectorAll(".modesw button[data-mode]").forEach(b=>b.onclick=()=>{obsCfg.mode=b.dataset.mode;store.set("ls_obs",obsCfg);
  if(obsCfg.mode==="auto"&&running)syncScene();renderSceneBar()});
 document.addEventListener("keydown",e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.repeat)return;const t=e.target;
  if(t&&(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||t.isContentEditable))return;
@@ -753,9 +819,9 @@ document.addEventListener("keydown",e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.rep
    with the current segment, and overlay.html re-renders on hashchange. */
 const OV_NAME="LiveStudio ป้ายสินค้า";
 function overlayData(){const d={s:"idle",pos:obsCfg.ovPos};if(!running||!plan.length||!obsCfg.ov)return d;
- const s=plan[cur];d.s=s.type;
- if(s.type==="prod")Object.assign(d,{c:s.p.code,n:s.p.name,p:s.p.price,pr:s.p.promo,b:basketNo(s.p)});
- else for(let i=cur;i>=0;i--)if(plan[i].type==="prod"){d.last={c:plan[i].p.code,n:plan[i].p.name};break}
+ const s=plan[cur];d.s=s.type;if(aff())d.af=1;
+ if(s.type==="prod")Object.assign(d,{c:s.p.code,n:s.p.name,p:s.p.price,pr:s.p.promo,b:basketNo(s.p)},aff()&&s.p.shop?{sh:shopName(s.p)}:{});
+ else for(let i=cur;i>=0;i--)if(plan[i].type==="prod"){d.last={c:plan[i].p.code,n:plan[i].p.name,b:basketNo(plan[i].p)};break}
  return d}
 function overlayURL(d){return new URL("overlay.html",location.href).href.split("#")[0]+"#"+encodeURIComponent(JSON.stringify(d))}
 let ovMissing=false;
@@ -772,7 +838,7 @@ function showcaseData(){if(!running||!plan.length)return{s:"idle"};
  let s=plan[cur];if(s.type!=="prod"){let j=cur;while(j>=0&&plan[j].type!=="prod")j--;if(j<0){j=cur;while(j<plan.length&&plan[j].type!=="prod")j++}
   if(j<0||j>=plan.length)return{s:s.type};s=plan[j]}
  const p=s.p;
- return{s:"prod",c:p.code,n:p.name,p:p.price,pr:p.promo,b:basketNo(p),pts:(p.points||"").split("|").map(x=>x.trim()).filter(Boolean),img:p.img||""}}
+ return Object.assign({s:"prod",c:p.code,n:p.name,p:p.price,pr:p.promo,b:basketNo(p),pts:(p.points||"").split("|").map(x=>x.trim()).filter(Boolean),img:p.img||""},aff()?{af:1,sh:shopName(p)}:{})}
 function showcaseURL(d){return new URL("showcase.html",location.href).href.split("#")[0]+"#"+encodeURIComponent(JSON.stringify(d))}
 let scMissing=false,scLast="";
 async function pushShowcase(force){if(!obsReady||scMissing)return;const url=showcaseURL(showcaseData());if(url===scLast&&!force)return;scLast=url;
@@ -871,7 +937,7 @@ function copyText(txt){if(navigator.clipboard&&window.isSecureContext!==false)re
 function copyOld(txt){const t=document.createElement("textarea");t.value=txt;t.style.position="fixed";t.style.opacity="0";document.body.appendChild(t);t.select();
  const ok=document.execCommand("copy");t.remove();return ok?Promise.resolve():Promise.reject()}
 $("#ttCopyBasket").onclick=()=>{const P=liveProducts();if(!P.length){$("#ttMsg").textContent="ยังไม่ได้เลือกสินค้าสำหรับรอบนี้";return}
- copyText(P.map((p,i)=>`#${i+1} ${p.code} ${p.name} ${fmt(p.price)} บาท`).join("\n"))
+ copyText(P.map((p,i)=>`#${i+1} ${p.code} ${p.name} ${fmt(p.price)} บาท`+(aff()?(p.shop?` · ${shopName(p)}`:"")+(safeURL(p.url)?` · ${safeURL(p.url)}`:""):"")).join("\n"))
   .then(()=>$("#ttMsg").textContent=`คัดลอก ${P.length} รายการแล้ว เพิ่มสินค้าเข้าตะกร้าไลฟ์ใน TikTok ตามลำดับนี้`).catch(()=>$("#ttMsg").textContent="คัดลอกไม่ได้ ดูรายการได้ที่แท็บตารางรอบ")};
 
 let cfFound=[];
@@ -890,7 +956,7 @@ $("#cfFind").onclick=()=>{const {out,unknown}=parseCF($("#cfText").value),today=
  $("#cfAdd").hidden=!cfFound.length;
  $("#cfMsg").textContent=(cfFound.length?`พบ ${cfFound.length} ออเดอร์ ติ๊กเฉพาะที่ถูกต้องแล้วกดบันทึก`:"ไม่พบข้อความ CF ตามด้วยรหัสสินค้า")+(unknown?` · มี ${unknown} รายการที่รหัสไม่ตรงกับสินค้า`:"")};
 $("#cfAdd").onclick=()=>{const t=new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"}),d=localDate();let n=0;
- $("#cfList").querySelectorAll("[data-cf]").forEach(c=>{if(!c.checked)return;const o=cfFound[+c.dataset.cf];orders.push({d,t,name:o.name,code:o.code,pname:o.pname,qty:o.qty,price:o.price});n++});
+ $("#cfList").querySelectorAll("[data-cf]").forEach(c=>{if(!c.checked)return;const o=cfFound[+c.dataset.cf];const pp=products.find(x=>x.code===o.code);orders.push(Object.assign({d,t,name:o.name,code:o.code,pname:o.pname,qty:o.qty,price:o.price},pp?orderComm(pp):{}));n++});
  if(!n){$("#cfMsg").textContent="ยังไม่ได้ติ๊กออเดอร์";return}
  store.set("ls_orders",orders);renderOrders();renderHome();cfFound=[];$("#cfList").innerHTML="";$("#cfAdd").hidden=true;$("#cfText").value="";
  $("#cfMsg").textContent=`บันทึกแล้ว ${n} ออเดอร์ ดูได้ที่แท็บออเดอร์`};
@@ -929,15 +995,15 @@ function colMap(head,spec){const h=head.map(x=>unq(x).toLowerCase()),m={};
  for(const k in spec){m[k]=h.findIndex(x=>spec[k].includes(x))}return m}
 const num=v=>{const n=parseFloat(String(v).replace(/[^\d.\-]/g,""));return isFinite(n)?n:0};
 
-const P_COLS={code:["รหัส","code"],name:["ชื่อสินค้า","ชื่อ","name"],price:["ราคา","ราคา (บาท)","price"],points:["จุดขาย","points"],promo:["โปร","โปรในไลฟ์","promo"]};
-const O_COLS={d:["วันที่","date"],t:["เวลา","time"],name:["ลูกค้า","ชื่อลูกค้า","customer"],code:["รหัส","code"],pname:["สินค้า","ชื่อสินค้า","product"],qty:["จำนวน","qty"],price:["ราคาต่อชิ้น","ราคา","price"]};
+const P_COLS={code:["รหัส","code"],name:["ชื่อสินค้า","ชื่อ","name"],price:["ราคา","ราคา (บาท)","price"],points:["จุดขาย","points"],promo:["โปร","โปรในไลฟ์","promo"],shop:["ร้านต้นทาง","shop"],comm:["ค่าคอม (%)","ค่าคอม","commission"],url:["ลิงก์สินค้า","ลิงก์","url","link"]};
+const O_COLS={d:["วันที่","date"],t:["เวลา","time"],name:["ลูกค้า","ชื่อลูกค้า","customer"],code:["รหัส","code"],pname:["สินค้า","ชื่อสินค้า","product"],qty:["จำนวน","qty"],price:["ราคาต่อชิ้น","ราคา","price"],cm:["ค่าคอม (%)","commission"]};
 
-$("#expProd").onclick=()=>{download(`livestudio-สินค้า-${localDate()}.csv`,toCSV([["รหัส","ชื่อสินค้า","ราคา","จุดขาย","โปรในไลฟ์"],...products.map(p=>[p.code,p.name,p.price,p.points,p.promo])]),"text/csv;charset=utf-8");
+$("#expProd").onclick=()=>{download(`livestudio-สินค้า-${localDate()}.csv`,toCSV([["รหัส","ชื่อสินค้า","ราคา","จุดขาย","โปรในไลฟ์","ร้านต้นทาง","ค่าคอม (%)","ลิงก์สินค้า"],...products.map(p=>[p.code,p.name,p.price,p.points,p.promo,p.shop||"",p.comm||"",p.url||""])]),"text/csv;charset=utf-8");
  $("#pMsg").textContent=`ส่งออกสินค้า ${products.length} รายการแล้ว ไฟล์อยู่ในโฟลเดอร์ Downloads`};
 $("#expOrd").onclick=()=>{if(!orders.length){$("#clearMsg").textContent="ยังไม่มีออเดอร์ให้ส่งออก";return}
- download(`livestudio-ออเดอร์-${localDate()}.csv`,toCSV([["วันที่","เวลา","ลูกค้า","รหัส","สินค้า","จำนวน","ราคาต่อชิ้น","รวม"],...orders.map(o=>[o.d||"",o.t,o.name,o.code,o.pname,o.qty,o.price,o.qty*o.price])]),"text/csv;charset=utf-8");
+ download(`livestudio-ออเดอร์-${localDate()}.csv`,toCSV([["วันที่","เวลา","ลูกค้า","รหัส","สินค้า","จำนวน","ราคาต่อชิ้น","รวม","ค่าคอม (%)","ค่าคอม (บาท)"],...orders.map(o=>[o.d||"",o.t,o.name,o.code,o.pname,o.qty,o.price,o.qty*o.price,o.cm||"",o.cm?Math.round(commOf(o)*100)/100:""])]),"text/csv;charset=utf-8");
  $("#clearMsg").textContent=`ส่งออกออเดอร์ ${orders.length} รายการแล้ว ไฟล์อยู่ในโฟลเดอร์ Downloads`};
-$("#backupAll").onclick=()=>{download(`livestudio-สำรอง-${localDate()}.json`,JSON.stringify({app:"LiveStudio",format:1,exported:new Date().toISOString(),products,orders,plan:planSettings()},null,1),"application/json");
+$("#backupAll").onclick=()=>{download(`livestudio-สำรอง-${localDate()}.json`,JSON.stringify({app:"LiveStudio",format:1,exported:new Date().toISOString(),products,orders,plan:planSettings(),seller:sellerCfg.type},null,1),"application/json");
  $("#bMsg").textContent=`สำรองแล้ว: สินค้า ${products.length} รายการ ออเดอร์ ${orders.length} รายการ ไฟล์อยู่ในโฟลเดอร์ Downloads`};
 
 let fileKind="";
@@ -948,11 +1014,13 @@ $("#fileIn").onchange=()=>{const f=$("#fileIn").files[0];if(!f)return;const r=ne
  r.readAsText(f,"utf-8")};
 
 function cleanProduct(p){const o={code:unq(p.code),name:unq(p.name),price:num(p.price),points:unq(p.points),promo:unq(p.promo)};
+ if(p.shop)o.shop=unq(p.shop);if(num(p.comm)>0)o.comm=Math.min(100,num(p.comm));if(safeURL(unq(p.url)))o.url=safeURL(unq(p.url));
  if(p.on===false)o.on=false;
  if(typeof p.img==="string"&&/^data:image\/(jpeg|png|webp);base64,/.test(p.img))o.img=p.img;
  if(Array.isArray(p.scripts))o.scripts=p.scripts.filter(s=>typeof s==="string"&&s.trim()).slice(0,5);
  return o}
-function cleanOrder(o){const qty=Math.max(1,Math.round(num(o.qty))||1);return{d:unq(o.d),t:unq(o.t),name:unq(o.name),code:unq(o.code),pname:unq(o.pname),qty,price:num(o.price)}}
+function cleanOrder(o){const qty=Math.max(1,Math.round(num(o.qty))||1),r={d:unq(o.d),t:unq(o.t),name:unq(o.name),code:unq(o.code),pname:unq(o.pname),qty,price:num(o.price)};
+ if(num(o.cm)>0)r.cm=Math.min(100,num(o.cm));return r}
 function afterChange(){store.set("ls_products",products);store.set("ls_orders",orders);plan=[];renderProducts();buildPlan();renderOrders();renderHome()}
 function importText(kind,text,fname){
  if(/\.json$/i.test(fname)||/^\s*[\[{]/.test(text)){const j=JSON.parse(text);
@@ -960,19 +1028,19 @@ function importText(kind,text,fname){
    if(!Array.isArray(j.products)||!Array.isArray(j.orders))throw new Error("ไม่ใช่ไฟล์สำรองของ LiveStudio");
    const np=j.products.map(cleanProduct).filter(p=>p.code&&p.name),no=j.orders.map(cleanOrder).filter(o=>o.name&&o.code);
    if(!confirm(`กู้คืนจากไฟล์สำรอง?\nสินค้า ${np.length} รายการ และออเดอร์ ${no.length} รายการ จะมาแทนข้อมูลที่มีอยู่ตอนนี้\n(สินค้า ${products.length} รายการ ออเดอร์ ${orders.length} รายการ)`))return "ยกเลิกการกู้คืน ข้อมูลเดิมยังอยู่ครบ";
-   products=np;orders=no;applyPlanSettings(j.plan);store.set("ls_plan",planSettings());afterChange();
+   products=np;orders=no;applyPlanSettings(j.plan);store.set("ls_plan",planSettings());if(j.seller==="aff"||j.seller==="own"){sellerCfg.type=j.seller;store.set("ls_seller",sellerCfg);renderSeller()}afterChange();
    return `กู้คืนแล้ว: สินค้า ${np.length} รายการ ออเดอร์ ${no.length} รายการ`}
   throw new Error("ไฟล์ .json ใช้กับปุ่มกู้คืนจากไฟล์สำรองในหน้าแรก")}
  if(kind==="restoreAll")throw new Error("ไฟล์สำรองต้องเป็น .json ที่ได้จากปุ่มสำรองทั้งหมด");
  const rows=parseCSV(text);if(rows.length<2)throw new Error("ไฟล์ว่าง หรือไม่มีแถวข้อมูล");
  if(kind==="impProd"){const m=colMap(rows[0],P_COLS);if(m.code<0||m.name<0)throw new Error("ต้องมีหัวคอลัมน์ รหัส และ ชื่อสินค้า");
-  let add=0,upd=0;rows.slice(1).forEach(r=>{const p=cleanProduct({code:r[m.code],name:r[m.name],price:m.price<0?0:r[m.price],points:m.points<0?"":r[m.points],promo:m.promo<0?"":r[m.promo]});
+  let add=0,upd=0;rows.slice(1).forEach(r=>{const p=cleanProduct({code:r[m.code],name:r[m.name],price:m.price<0?0:r[m.price],points:m.points<0?"":r[m.points],promo:m.promo<0?"":r[m.promo],shop:m.shop<0?"":r[m.shop],comm:m.comm<0?"":r[m.comm],url:m.url<0?"":r[m.url]});
    if(!p.code||!p.name)return;const i=products.findIndex(x=>x.code===p.code);if(i>=0){products[i]={...products[i],...p};upd++}else{products.push(p);add++}});
   afterChange();return `นำเข้าแล้ว: เพิ่มใหม่ ${add} รายการ อัปเดต ${upd} รายการ`}
  const m=colMap(rows[0],O_COLS);if(m.name<0||m.code<0||m.qty<0)throw new Error("ต้องมีหัวคอลัมน์ ลูกค้า รหัส และ จำนวน");
  const key=o=>[o.d,o.t,o.name,o.code,o.qty,o.price].join("|"),have=new Set(orders.map(key));let add=0,dup=0;
  rows.slice(1).forEach(r=>{const g=k=>m[k]<0?"":r[m[k]];const p=products.find(x=>x.code===unq(g("code")));
-  const o=cleanOrder({d:g("d"),t:g("t"),name:g("name"),code:g("code"),pname:g("pname")||(p?p.name:""),qty:g("qty"),price:m.price<0?(p?p.price:0):g("price")});
+  const o=cleanOrder({d:g("d"),t:g("t"),name:g("name"),code:g("code"),pname:g("pname")||(p?p.name:""),qty:g("qty"),price:m.price<0?(p?p.price:0):g("price"),cm:g("cm")});
   if(!o.name||!o.code)return;if(have.has(key(o))){dup++;return}have.add(key(o));orders.push(o);add++});
  afterChange();return `นำเข้าออเดอร์แล้ว ${add} รายการ`+(dup?` (ข้ามรายการซ้ำ ${dup})`:"")}
 
@@ -989,7 +1057,7 @@ if(location.protocol==="file:"){
   if(!v||!newer(v.version,APP_VERSION))return;const b=$("#updBox");b.hidden=false;
   b.innerHTML=`<div><b>มีเวอร์ชันใหม่ ${esc(v.version)}</b> (ตอนนี้ใช้ ${APP_VERSION})<div class="mini">กดดาวน์โหลด แล้วเปิดไฟล์ที่ได้ สินค้าและออเดอร์เดิมไม่หาย ถ้า Edge เตือน ให้กด "เก็บไว้" (Keep) ไม่ควรอัปเดตตอนกำลังไลฟ์</div></div><a class="btn primary" href="${esc(UPDATE_SITE+v.installer)}" download>⬇ ดาวน์โหลดตัวอัปเดต</a>`}).catch(()=>{});
 }else $("#verNote").textContent="เวอร์ชันใหม่จะโหลดเองเมื่อต่อเน็ต แล้วใช้ได้ตอนเปิดครั้งถัดไป";
-renderProducts();aiStateText();buildPlan();obsFill();ttFill();renderSceneBar();obsConnect();renderLive();renderHome();
+renderProducts();aiStateText();buildPlan();renderSeller();obsFill();ttFill();renderSceneBar();obsConnect();renderLive();renderHome();
 </script>
 <script>
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){navigator.serviceWorker.register("sw.js").catch(()=>{})}

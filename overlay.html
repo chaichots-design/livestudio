@@ -50,13 +50,13 @@ function card(d){
   const ai='<span class="tag">มี AI ช่วยนำเสนอ</span>';
   if(d.s==="prod")return`<div class="card in"><div class="top-row"><span class="code">${esc(d.c)}</span>${ai}</div>
     <div class="name">${esc(d.n)}</div><div class="price-row"><span class="price">${baht(d.p)}</span>${d.pr?`<span class="promo">${esc(d.pr)}</span>`:""}</div>
-    <div class="cta">${d.b?`กดตะกร้า #${esc(d.b)} หรือพิมพ์ CF ${esc(d.c)}`:`พิมพ์ CF ${esc(d.c)} ในคอมเมนต์`}</div></div>`;
+    <div class="cta">${d.af?`กดตะกร้า #${esc(d.b)} สั่งซื้อได้เลย`:d.b?`กดตะกร้า #${esc(d.b)} หรือพิมพ์ CF ${esc(d.c)}`:`พิมพ์ CF ${esc(d.c)} ในคอมเมนต์`}</div>${d.sh?`<div class="sub">จาก${esc(d.sh)}</div>`:""}</div>`;
   if(d.s==="human")return`<div class="card talk in"><div class="top-row"><span class="tag live">● คุยสด</span></div>
-    <div class="name">ถามมาได้เลย ตอบสดทุกคำถาม</div>${d.last?`<div class="sub">เพิ่งพูดถึง ${esc(d.last.c)} ${esc(d.last.n)}</div><div class="cta">พิมพ์ CF ${esc(d.last.c)} ในคอมเมนต์</div>`:""}</div>`;
+    <div class="name">ถามมาได้เลย ตอบสดทุกคำถาม</div>${d.last?`<div class="sub">เพิ่งพูดถึง ${esc(d.last.c)} ${esc(d.last.n)}</div><div class="cta">${d.af?`กดตะกร้า #${esc(d.last.b)} สั่งซื้อได้เลย`:`พิมพ์ CF ${esc(d.last.c)} ในคอมเมนต์`}</div>`:""}</div>`;
   if(d.s==="open")return`<div class="card in"><div class="top-row"><span class="tag live">● LIVE</span></div>
-    <div class="name">ยินดีต้อนรับเข้าไลฟ์</div><div class="sub">ราคาพิเศษเฉพาะในไลฟ์ กดติดตามไว้ไม่พลาดโปร</div><div class="cta">อยากได้ตัวไหน พิมพ์ CF ตามด้วยรหัส</div></div>`;
+    <div class="name">ยินดีต้อนรับเข้าไลฟ์</div><div class="sub">ราคาพิเศษเฉพาะในไลฟ์ กดติดตามไว้ไม่พลาดโปร</div><div class="cta">${d.af?"อยากได้ตัวไหน กดตะกร้าสีเหลืองตามเลข":"อยากได้ตัวไหน พิมพ์ CF ตามด้วยรหัส"}</div></div>`;
   if(d.s==="close")return`<div class="card in"><div class="top-row"><span class="tag live">● ใกล้ปิดไลฟ์</span></div>
-    <div class="name">รีบ CF ก่อนโปรหมด</div><div class="sub">โปรราคาไลฟ์หมดเมื่อปิดไลฟ์ ขอบคุณทุกคนที่อยู่ด้วยกันค่ะ</div></div>`;
+    <div class="name">${d.af?"ยังกดตะกร้าสั่งได้":"รีบ CF ก่อนโปรหมด"}</div><div class="sub">${d.af?"ขอบคุณทุกคนที่อยู่ด้วยกันค่ะ":"โปรราคาไลฟ์หมดเมื่อปิดไลฟ์ ขอบคุณทุกคนที่อยู่ด้วยกันค่ะ"}</div></div>`;
   return"";}
 function render(){const d=data(),key=JSON.stringify(d);if(key===lastKey)return;lastKey=key;
   const w=document.getElementById("wrap");w.className="wrap "+(d.pos==="bottom"?"bottom":"top");

@@ -67,18 +67,18 @@ const DEMO={s:"prod",c:"A1",n:"เซรั่มวิตามินซี 30m
 let lastKey="",ptTimer=null;
 function data(){const h=location.hash.slice(1);if(!h)return Object.assign({demo:true},DEMO);try{return JSON.parse(decodeURIComponent(h))}catch(e){return{s:"idle"}}}
 function view(d){
-  if(d.s!=="prod"){const t=d.s==="close"?["ขอบคุณที่อยู่ด้วยกัน","โปรราคาไลฟ์หมดเมื่อปิดไลฟ์"]:d.s==="idle"?["ไลฟ์กำลังจะเริ่ม","กดติดตามไว้ ไม่พลาดโปรในไลฟ์"]:["ช่วงคุยสด","ถามมาได้เลย ตอบสดทุกคำถาม"];
+  if(d.s!=="prod"){const t=d.s==="close"?["ขอบคุณที่อยู่ด้วยกัน",d.af?"ยังกดตะกร้าสั่งได้ตามเลขที่บอก":"โปรราคาไลฟ์หมดเมื่อปิดไลฟ์"]:d.s==="idle"?["ไลฟ์กำลังจะเริ่ม","กดติดตามไว้ ไม่พลาดโปรในไลฟ์"]:["ช่วงคุยสด","ถามมาได้เลย ตอบสดทุกคำถาม"];
     return`<div class="bg"></div><div class="idle in"><span class="tag live">● LIVE</span><b>${t[0]}</b><span>${t[1]}</span></div>`}
   const img=d.img?`<img src="${esc(d.img)}" alt="">`:"";
   const pts=(d.pts||[]).filter(Boolean).slice(0,5);
   return`<div class="bg">${img}</div><div class="stage in">
     <div class="photo"><div class="frame">${img||`<div class="ph">${esc(d.c)}</div>`}<span class="code">${esc(d.c)}</span></div></div>
     <div class="info">
-      <div class="tags"><span class="tag live">● LIVE</span><span class="tag">มี AI ช่วยนำเสนอ</span></div>
+      <div class="tags"><span class="tag live">● LIVE</span><span class="tag">มี AI ช่วยนำเสนอ</span>${d.sh?`<span class="tag">${esc(d.sh)}</span>`:""}</div>
       <h1 class="name">${esc(d.n)}</h1>
       <div class="price-row"><span class="price">${baht(d.p)}</span>${d.pr?`<span class="promo">${esc(d.pr)}</span>`:""}</div>
       ${pts.length?`<div class="pts">${pts.map((p,i)=>`<div class="pt${i===0?" on":""}">${esc(p)}</div>`).join("")}</div>`:""}
-      <div class="cta">${d.b?`กดตะกร้า #${esc(d.b)} หรือพิมพ์ CF ${esc(d.c)}`:`พิมพ์ CF ${esc(d.c)} ในคอมเมนต์`}</div>
+      <div class="cta">${d.af?`กดตะกร้า #${esc(d.b)} สั่งซื้อได้เลย`:d.b?`กดตะกร้า #${esc(d.b)} หรือพิมพ์ CF ${esc(d.c)}`:`พิมพ์ CF ${esc(d.c)} ในคอมเมนต์`}</div>
     </div></div>`}
 function cyclePoints(){clearInterval(ptTimer);const els=[...document.querySelectorAll(".pt")];if(els.length<2)return;let i=0;
   ptTimer=setInterval(()=>{const a=els[i];i=(i+1)%els.length;const b=els[i];
