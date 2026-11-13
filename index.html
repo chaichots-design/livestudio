@@ -87,6 +87,14 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:2px}
 a.btn{text-decoration:none;display:inline-block}
 a.btn:not([href]){opacity:.5;pointer-events:none}
 @media (pointer:coarse){.desk-only{display:none!important}}
+.hist th,.hist td{white-space:nowrap}
+.bills{display:grid;gap:8px}
+.bill{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg)}
+.bill .items{font-size:13px;color:var(--muted);margin:2px 0}
+.roundsum{border-color:var(--accent);border-width:2px}
+.rsgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.rsgrid div{background:var(--bg);border-radius:8px;padding:6px 8px}
+.rsgrid b{display:block;font-size:18px}
 .cflist{display:grid;gap:4px;margin-top:6px;max-height:220px;overflow-y:auto}
 .cflist label{display:flex;gap:8px;align-items:center;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
 .cflist label input{width:auto}
@@ -113,7 +121,8 @@ a.btn:not([href]){opacity:.5;pointer-events:none}
 .clock{font-family:var(--mono);font-size:34px;line-height:1.1}
 .bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:8px 0}
 .bar i{display:block;height:100%;background:var(--accent);width:0}
-.prompter{font-size:21px;line-height:1.75;min-height:220px;white-space:pre-wrap}
+.fsz{display:inline-flex;gap:4px;margin-left:auto}
+.prompter{font-size:var(--pf,21px);line-height:1.75;min-height:220px;white-space:pre-wrap}
 .prompter.human{background:var(--talk-soft)}
 .segtitle{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
 .disclose{font-size:13px;color:var(--muted);margin-top:8px}
@@ -324,7 +333,8 @@ td.r,th.r{text-align:right}
   <div class="livegrid">
     <div>
       <div class="card">
-        <div class="segtitle"><span id="segChip" class="chip ai">AI นำเสนอ</span><b id="segName" style="font-family:var(--display);font-weight:500;font-size:18px"></b></div>
+        <div class="segtitle"><span id="segChip" class="chip ai">AI นำเสนอ</span><b id="segName" style="font-family:var(--display);font-weight:500;font-size:18px;flex:1"></b>
+          <span class="fsz" role="group" aria-label="ขนาดตัวอักษรบท"><button class="btn sm" id="fsDown" type="button" aria-label="ตัวอักษรเล็กลง">ก-</button><button class="btn sm" id="fsUp" type="button" aria-label="ตัวอักษรใหญ่ขึ้น">ก+</button></span></div>
         <div class="pinbar" id="pinbar" hidden>📌 ปักตะกร้าตอนนี้ <b id="pinNo"></b> <span id="pinName" class="mini" style="color:var(--ink)"></span></div>
         <div class="prompter" id="prompter"></div>
         <p class="disclose" id="disclose"></p>
@@ -351,6 +361,11 @@ td.r,th.r{text-align:right}
       </div>
     </div>
     <div class="side">
+      <div class="card roundsum" id="roundSum" hidden>
+        <div class="row" style="justify-content:space-between"><b style="font-family:var(--display);font-weight:500">🎉 สรุปไลฟ์รอบนี้</b><button class="btn sm" id="rsClose" type="button" aria-label="ปิดสรุป">✕</button></div>
+        <div id="rsBody" style="margin-top:6px"></div>
+        <div class="row" style="margin-top:8px"><button class="btn sm" id="rsCopy" type="button">คัดลอกสรุป</button><button class="btn sm" data-goto="orders" type="button">ดูออเดอร์และประวัติ</button><span class="mini" id="rsMsg"></span></div>
+      </div>
       <div class="card">
         <div class="mini">เวลาที่ผ่านไป</div>
         <div class="clock num" id="clock">00:00:00</div>
@@ -435,15 +450,24 @@ td.r,th.r{text-align:right}
   <div class="totals"><div><span class="mini">ออเดอร์</span><b id="tCount">0</b></div><div><span class="mini">ชิ้น</span><b id="tQty">0</b></div><div><span class="mini">ยอดขาย (บาท)</span><b id="tSum">0</b></div><div class="aff-only"><span class="mini">ค่าคอมโดยประมาณ (บาท)</span><b id="tComm">0</b></div></div>
   <p class="mini aff-only" style="margin:-4px 0 10px">นายหน้าจะไม่เห็นชื่อลูกค้า ใส่แค่สินค้าและจำนวนตามที่เห็นในแดชบอร์ดไลฟ์ก็พอ ค่าคอมคิดจากเปอร์เซ็นต์ในการ์ดสินค้า ยอดจริงดูในหน้ารายได้ Affiliate ของ TikTok</p>
   <div class="card tablebox"><table><thead><tr><th>เวลา</th><th>ลูกค้า</th><th>สินค้า</th><th class="r">จำนวน</th><th class="r">รวม</th><th class="r aff-only">ค่าคอม</th><th></th></tr></thead><tbody id="obody"></tbody></table></div>
+  <div class="card own-only" style="margin-top:14px">
+    <div class="row" style="justify-content:space-between"><b style="font-family:var(--display);font-weight:500">🧾 บิลแยกตามลูกค้า</b><span class="mini" id="billMsg"></span></div>
+    <div class="mini" style="margin:2px 0 8px">กด "คัดลอกบิล" แล้ววางในแชทส่งให้ลูกค้าได้เลย</div>
+    <div class="bills" id="bills"></div>
+  </div>
   <h2 style="margin-top:20px">ขายดีรายสินค้า</h2>
   <div class="card tablebox"><table><thead><tr><th>รหัส</th><th>สินค้า</th><th class="r">ชิ้น</th><th class="r">ยอด</th></tr></thead><tbody id="sbody"></tbody></table></div>
   <div class="row" style="margin-top:12px"><button class="btn" id="copySum">คัดลอกสรุปยอด</button><button class="btn" id="expOrd">⬇ ส่งออกไฟล์ (Excel)</button><button class="btn" id="impOrd">⬆ นำเข้าออเดอร์</button><button class="btn" id="clearOrders">ล้างออเดอร์ทั้งหมด</button><span class="mini" id="clearMsg"></span></div>
+  <h2 style="margin-top:24px">📈 ประวัติไลฟ์</h2>
+  <p class="mini" style="margin:-6px 0 8px">บันทึกเองทุกครั้งที่จบรอบ (หมดเวลารอบ หรือกดรีเซ็ตรอบหลังไลฟ์ไปแล้วอย่างน้อย 1 นาที) เก็บไว้ 60 รอบล่าสุด</p>
+  <div class="card tablebox"><table class="hist"><thead><tr><th>วันที่</th><th>เริ่ม</th><th class="r">ยาว</th><th class="r">ออเดอร์</th><th class="r">ยอด</th><th class="r aff-only">ค่าคอม</th><th>ขายดี</th><th></th></tr></thead><tbody id="hbody"></tbody></table></div>
+  <div class="row" style="margin-top:8px"><button class="btn" id="expHist">⬇ ส่งออกประวัติ (Excel)</button><span class="mini" id="histMsg"></span></div>
 </section>
 </main>
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.10.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.11.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
@@ -756,15 +780,15 @@ function tick(noAdv){const total=plan.reduce((a,s)=>a+s.min,0)*60;
  if(hold){if(!holdBeeped){beep();holdBeeped=true}return}
  if(voiceCfg.auto&&s.type==="prod"&&repeatAt>0&&segElapsed>=repeatAt&&left>45&&!speechSynthesis.speaking){
   repeatAt+=voiceCfg.rep*60;s.text=scriptFor(s);$("#prompter").textContent=s.text;speakText(s.text)}
- if(left<=0&&$("#autoNext").checked){if(cur<plan.length-1)go(1);else stop()}}
+ if(left<=0&&$("#autoNext").checked){if(cur<plan.length-1)go(1);else{stop();finishRound()}}}
 function loop(){const now=Date.now(),dt=(now-last)/1000;last=now;elapsed+=dt;segElapsed+=dt;tick()}
 let repeatAt=0,holdBeeped=false;
 function segStarted(){holdBeeped=false;repeatAt=voiceCfg.rep>0?voiceCfg.rep*60:0;const i=cur;
  if(running&&voiceCfg.auto&&plan[cur].type==="prod")setTimeout(()=>{if(running&&cur===i)speakText(plan[i].text)},1500)}
-function start(){if(!plan.length)buildPlan();running=true;last=Date.now();timer=setInterval(loop,500);$("#onair").textContent="ON AIR";$("#onair").classList.add("live");$("#startBtn").textContent="รีเซ็ตรอบ";
+function start(){if(!plan.length)buildPlan();if(elapsed===0&&!roundStart){roundStart=Date.now();roundStartHM=new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"});$("#roundSum").hidden=true}running=true;last=Date.now();timer=setInterval(loop,500);$("#onair").textContent="ON AIR";$("#onair").classList.add("live");$("#startBtn").textContent="รีเซ็ตรอบ";
  try{navigator.wakeLock&&navigator.wakeLock.request("screen").then(w=>wake=w).catch(()=>{})}catch(e){}}
 function stop(){running=false;clearInterval(timer);try{speechSynthesis.cancel()}catch(e){}setScene(obsCfg.talk);pushOverlay();$("#onair").textContent="OFF AIR";$("#onair").classList.remove("live");try{wake&&wake.release()}catch(e){}}
-$("#startBtn").onclick=()=>{if(running||elapsed>0){stop();elapsed=0;segElapsed=0;cur=0;$("#startBtn").textContent="เริ่มรอบ";$("#pauseBtn").textContent="พัก";renderLive();return}start();renderLive();segStarted()};
+$("#startBtn").onclick=()=>{if(running||elapsed>0){finishRound();stop();elapsed=0;segElapsed=0;cur=0;$("#startBtn").textContent="เริ่มรอบ";$("#pauseBtn").textContent="พัก";renderLive();return}start();renderLive();segStarted()};
 $("#pauseBtn").onclick=()=>{if(running){stop();$("#pauseBtn").textContent="ไลฟ์ต่อ"}else if(elapsed>0){start();$("#pauseBtn").textContent="พัก";renderLive()}};
 function go(d){cur=Math.max(0,Math.min(plan.length-1,cur+d));segElapsed=0;try{speechSynthesis.cancel()}catch(e){}renderLive();segStarted();
  if(plan[cur].type==="human")beep()}
@@ -792,20 +816,69 @@ $("#rate").value=voiceCfg.rate;$("#aiAuto").checked=voiceCfg.auto;$("#aiRep").va
 ["#voiceSel","#rate","#aiRep"].forEach(s=>$(s).onchange=saveVoice);
 $("#aiAuto").onchange=()=>{saveVoice();if(voiceCfg.auto&&running&&plan[cur].type==="prod"&&!speechSynthesis.speaking){repeatAt=segElapsed+voiceCfg.rep*60;speakText(plan[cur].text)}};
 
+/* script text size (ls_ui.pf, px) */
+const uiCfg=Object.assign({pf:21},store.get("ls_ui",{}));
+function applyFs(){uiCfg.pf=Math.min(48,Math.max(15,Math.round(+uiCfg.pf||21)));document.documentElement.style.setProperty("--pf",uiCfg.pf+"px");store.set("ls_ui",uiCfg);
+ $("#fsDown").disabled=uiCfg.pf<=15;$("#fsUp").disabled=uiCfg.pf>=48}
+$("#fsDown").onclick=()=>{uiCfg.pf-=3;applyFs()};$("#fsUp").onclick=()=>{uiCfg.pf+=3;applyFs()};
+
+/* rounds: a round starts on "เริ่มรอบ" from zero and ends when the last segment runs out or on
+   "รีเซ็ตรอบ". Orders carry ts (ms); a round's orders = ts since the round started. Summary card
+   + ls_history (newest last, HIST_MAX kept). Pausing does not end a round. */
+const HIST_MAX=60;let liveHist=store.get("ls_history",[]);if(!Array.isArray(liveHist))liveHist=[];
+let roundStart=0,roundStartHM="";
+function summarize(list){const by={};list.forEach(o=>{by[o.code]=by[o.code]||{c:o.code,n:o.pname,q:0,s:0};by[o.code].q+=o.qty;by[o.code].s+=o.qty*o.price});
+ return{n:list.length,q:list.reduce((a,o)=>a+o.qty,0),s:list.reduce((a,o)=>a+o.qty*o.price,0),cm:Math.round(list.reduce((a,o)=>a+commOf(o),0)),
+  top:Object.values(by).sort((a,b)=>b.s-a.s).slice(0,3)}}
+function finishRound(){if(!roundStart)return;const startTs=roundStart;roundStart=0;
+ if(elapsed<60)return;
+ const rec={d:localDate(),st:roundStartHM,plan:durMin(),real:Math.round(elapsed/60),aff:aff()?1:0,...summarize(orders.filter(o=>o.ts&&o.ts>=startTs))};
+ liveHist.push(rec);if(liveHist.length>HIST_MAX)liveHist=liveHist.slice(-HIST_MAX);store.set("ls_history",liveHist);
+ showRoundSum(rec);renderOrders()}
+function roundText(r){return `สรุปไลฟ์ ${r.d} เริ่ม ${r.st} · ยาว ${fmtDur(r.real||1)}\nออเดอร์ ${r.n} · ${r.q} ชิ้น · ยอด ${fmt(r.s)} บาท`+(r.aff?` · ค่าคอมประมาณ ${fmt(r.cm)} บาท`:"")+
+ (r.top.length?"\nขายดี: "+r.top.map((x,i)=>`${i+1}) ${x.c} ${x.n} ${x.q} ชิ้น`).join("  "):"")}
+function showRoundSum(r){$("#rsBody").innerHTML=`<div class="rsgrid"><div><span class="mini">ไลฟ์ไป</span><b>${esc(fmtDur(r.real||1))}</b></div><div><span class="mini">ออเดอร์</span><b>${fmt(r.n)}</b></div>`+
+  `<div><span class="mini">ชิ้น</span><b>${fmt(r.q)}</b></div><div><span class="mini">ยอดขาย (บาท)</span><b>${fmt(r.s)}</b></div>${r.aff?`<div><span class="mini">ค่าคอมประมาณ</span><b>${fmt(r.cm)}</b></div>`:""}</div>`+
+  (r.top.length?`<div class="mini" style="margin-top:6px">ขายดี: ${r.top.map((x,i)=>`${i+1}) ${esc(x.c)} ${esc(x.n)} ${x.q} ชิ้น`).join(" · ")}</div>`:`<div class="mini" style="margin-top:6px">รอบนี้ยังไม่มีออเดอร์ที่จดในโปรแกรม</div>`)+
+  `<div class="mini" style="margin-top:4px">อย่าลืมกด "สำรองทั้งหมด" ในหน้าแรกหลังจบไลฟ์</div>`;
+ $("#rsCopy").onclick=()=>copyText(roundText(r)).then(()=>$("#rsMsg").textContent="คัดลอกแล้ว").catch(()=>$("#rsMsg").textContent="คัดลอกไม่ได้");
+ $("#rsMsg").textContent="";$("#roundSum").hidden=false}
+$("#rsClose").onclick=()=>{$("#roundSum").hidden=true};
+function renderHistory(){const hb=$("#hbody");if(!hb)return;
+ hb.innerHTML=liveHist.length?liveHist.map((r,i)=>({r,i})).reverse().map(({r,i})=>`<tr><td class="num">${esc(r.d)}</td><td class="num">${esc(r.st||"")}</td><td class="r num">${esc(fmtDur(r.real||0))}</td><td class="r num">${fmt(r.n)}</td><td class="r num">${fmt(r.s)}</td><td class="r num aff-only">${r.aff?fmt(r.cm):"-"}</td>`+
+  `<td class="mini">${(r.top||[]).map(x=>esc(x.c)+" "+x.q).join(", ")||"-"}</td><td><button class="btn" data-hd="${i}" style="padding:2px 8px;font-size:12px" aria-label="ลบรอบนี้จากประวัติ">ลบ</button></td></tr>`).join("")
+  :`<tr><td colspan="8" class="mini">ยังไม่มีประวัติ จบไลฟ์รอบแรกแล้วจะขึ้นที่นี่</td></tr>`;
+ hb.querySelectorAll("[data-hd]").forEach(b=>b.onclick=()=>{liveHist.splice(+b.dataset.hd,1);store.set("ls_history",liveHist);renderHistory()})}
+$("#expHist").onclick=()=>{if(!liveHist.length){$("#histMsg").textContent="ยังไม่มีประวัติให้ส่งออก";return}
+ download(`livestudio-ประวัติไลฟ์-${localDate()}.csv`,toCSV([["วันที่","เวลาเริ่ม","ตั้งไว้ (นาที)","ไลฟ์จริง (นาที)","ออเดอร์","ชิ้น","ยอดขาย","ค่าคอมประมาณ","ขายดี"],
+  ...liveHist.map(r=>[r.d,r.st,r.plan,r.real,r.n,r.q,r.s,r.aff?r.cm:"",(r.top||[]).map(x=>`${x.c} ${x.n} ${x.q}`).join(" / ")])]),"text/csv;charset=utf-8");
+ $("#histMsg").textContent=`ส่งออก ${liveHist.length} รอบแล้ว ไฟล์อยู่ในโฟลเดอร์ Downloads`};
+
+/* bills per customer (own shop): group the order list by customer name */
+function billText(name,list){const total=list.reduce((a,o)=>a+o.qty*o.price,0);
+ return `สรุปออเดอร์ คุณ${name}\n`+list.map(o=>`- ${o.code} ${o.pname} x${o.qty} = ${fmt(o.qty*o.price)} บาท`).join("\n")+`\nรวม ${fmt(total)} บาท\nขอบคุณที่สั่งซื้อนะคะ`}
+function renderBills(){const el=$("#bills");if(!el)return;const by=new Map();orders.forEach(o=>{const k=o.name||"ลูกค้า";if(!by.has(k))by.set(k,[]);by.get(k).push(o)});
+ const rows=[...by.entries()];
+ el.innerHTML=rows.length?rows.map(([n,l],i)=>`<div class="bill"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><b>${esc(n)}</b><span class="num"><b>${fmt(l.reduce((a,o)=>a+o.qty*o.price,0))}</b> บาท</span></div>`+
+  `<div class="items">${l.map(o=>`${esc(o.code)} x${o.qty}`).join(" · ")}</div><button class="btn sm" data-bill="${i}" type="button">คัดลอกบิล</button></div>`).join("")
+  :`<div class="mini">ยังไม่มีออเดอร์</div>`;
+ el.querySelectorAll("[data-bill]").forEach(b=>b.onclick=()=>{const [n,l]=rows[+b.dataset.bill];
+  copyText(billText(n,l)).then(()=>$("#billMsg").textContent=`คัดลอกบิลคุณ${n}แล้ว`).catch(()=>$("#billMsg").textContent="คัดลอกไม่ได้")})}
+
 /* orders */
-// commission % is copied onto each order when recorded, so later edits to the product do not rewrite history
+// commission % is copied onto each order when recorded, so later edits to the product do not rewrite liveHist
 const commOf=o=>o.cm?o.qty*o.price*o.cm/100:0;
 const orderComm=p=>aff()&&p.comm>0?{cm:+p.comm}:{};
 function fillCodes(){$("#qCode").innerHTML=products.map(p=>`<option value="${esc(p.code)}">${esc(p.code)} ${esc(p.name)}</option>`).join("")}
 $("#qAdd").onclick=()=>{const name=$("#qName").value.trim(),code=$("#qCode").value,qty=Math.max(1,+$("#qQty").value||1);
  if(!name&&!aff()){$("#qMsg").textContent="ใส่ชื่อลูกค้าก่อน";return}const p=products.find(x=>x.code===code);if(!p)return;
- orders.push(Object.assign({d:localDate(),t:new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"}),name:name||"ลูกค้า TikTok",code,pname:p.name,qty,price:p.price},orderComm(p)));store.set("ls_orders",orders);renderHome();
+ orders.push(Object.assign({d:localDate(),t:new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"}),ts:Date.now(),name:name||"ลูกค้า TikTok",code,pname:p.name,qty,price:p.price},orderComm(p)));store.set("ls_orders",orders);renderHome();
  $("#qMsg").textContent=`บันทึกแล้ว: ${name||"ลูกค้า TikTok"} ${code} x${qty}`+(aff()&&p.comm?` · ค่าคอมประมาณ ${fmt(Math.round(qty*p.price*p.comm/100))} บาท`:"");$("#qName").value="";$("#qQty").value=1;$("#qName").focus()};
 function renderOrders(){const ob=$("#obody");ob.innerHTML=orders.length?"":`<tr><td colspan="6" class="mini">ยังไม่มีออเดอร์ จดได้จากแท็บไลฟ์ระหว่างไลฟ์</td></tr>`;
  orders.forEach((o,i)=>{const tr=document.createElement("tr");tr.innerHTML=`<td class="num">${o.t}</td><td>${esc(o.name)}</td><td><span class="code">${esc(o.code)}</span> ${esc(o.pname)}</td><td class="r num">${o.qty}</td><td class="r num">${fmt(o.qty*o.price)}</td><td class="r num aff-only">${o.cm?fmt(Math.round(commOf(o))):"-"}</td><td><button class="btn" data-o="${i}" style="padding:2px 8px;font-size:12px">ลบ</button></td>`;ob.appendChild(tr)});
  ob.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{orders.splice(+b.dataset.o,1);store.set("ls_orders",orders);renderOrders()});
  const q=orders.reduce((a,o)=>a+o.qty,0),sum=orders.reduce((a,o)=>a+o.qty*o.price,0);
- $("#tCount").textContent=fmt(orders.length);$("#tQty").textContent=fmt(q);$("#tSum").textContent=fmt(sum);$("#tComm").textContent=fmt(Math.round(orders.reduce((a,o)=>a+commOf(o),0)));
+ renderBills();renderHistory();$("#tCount").textContent=fmt(orders.length);$("#tQty").textContent=fmt(q);$("#tSum").textContent=fmt(sum);$("#tComm").textContent=fmt(Math.round(orders.reduce((a,o)=>a+commOf(o),0)));
  const by={};orders.forEach(o=>{by[o.code]=by[o.code]||{n:o.pname,q:0,s:0};by[o.code].q+=o.qty;by[o.code].s+=o.qty*o.price});
  const rows=Object.entries(by).sort((a,b)=>b[1].s-a[1].s);$("#sbody").innerHTML=rows.map(([c,v])=>`<tr><td><span class="code">${esc(c)}</span></td><td>${esc(v.n)}</td><td class="r num">${v.q}</td><td class="r num">${fmt(v.s)}</td></tr>`).join("")||`<tr><td colspan="4" class="mini">ยังไม่มีข้อมูล</td></tr>`;}
 $("#copySum").onclick=()=>{const txt=`สรุปไลฟ์ ${new Date().toLocaleDateString("th-TH")}\nออเดอร์ ${orders.length} · ยอด ${$("#tSum").textContent} บาท${aff()?` · ค่าคอมประมาณ ${$("#tComm").textContent} บาท`:""}\n`+orders.map(o=>`${o.name} ${o.code} x${o.qty} = ${fmt(o.qty*o.price)}`).join("\n");
@@ -1013,7 +1086,7 @@ $("#cfFind").onclick=()=>{const {out,unknown}=parseCF($("#cfText").value),today=
  $("#cfAdd").hidden=!cfFound.length;
  $("#cfMsg").textContent=(cfFound.length?`พบ ${cfFound.length} ออเดอร์ ติ๊กเฉพาะที่ถูกต้องแล้วกดบันทึก`:"ไม่พบข้อความ CF ตามด้วยรหัสสินค้า")+(unknown?` · มี ${unknown} รายการที่รหัสไม่ตรงกับสินค้า`:"")};
 $("#cfAdd").onclick=()=>{const t=new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"}),d=localDate();let n=0;
- $("#cfList").querySelectorAll("[data-cf]").forEach(c=>{if(!c.checked)return;const o=cfFound[+c.dataset.cf];const pp=products.find(x=>x.code===o.code);orders.push(Object.assign({d,t,name:o.name,code:o.code,pname:o.pname,qty:o.qty,price:o.price},pp?orderComm(pp):{}));n++});
+ $("#cfList").querySelectorAll("[data-cf]").forEach(c=>{if(!c.checked)return;const o=cfFound[+c.dataset.cf];const pp=products.find(x=>x.code===o.code);orders.push(Object.assign({d,t,ts:Date.now(),name:o.name,code:o.code,pname:o.pname,qty:o.qty,price:o.price},pp?orderComm(pp):{}));n++});
  if(!n){$("#cfMsg").textContent="ยังไม่ได้ติ๊กออเดอร์";return}
  store.set("ls_orders",orders);renderOrders();renderHome();cfFound=[];$("#cfList").innerHTML="";$("#cfAdd").hidden=true;$("#cfText").value="";
  $("#cfMsg").textContent=`บันทึกแล้ว ${n} ออเดอร์ ดูได้ที่แท็บออเดอร์`};
@@ -1060,7 +1133,7 @@ $("#expProd").onclick=()=>{download(`livestudio-สินค้า-${localDate()
 $("#expOrd").onclick=()=>{if(!orders.length){$("#clearMsg").textContent="ยังไม่มีออเดอร์ให้ส่งออก";return}
  download(`livestudio-ออเดอร์-${localDate()}.csv`,toCSV([["วันที่","เวลา","ลูกค้า","รหัส","สินค้า","จำนวน","ราคาต่อชิ้น","รวม","ค่าคอม (%)","ค่าคอม (บาท)"],...orders.map(o=>[o.d||"",o.t,o.name,o.code,o.pname,o.qty,o.price,o.qty*o.price,o.cm||"",o.cm?Math.round(commOf(o)*100)/100:""])]),"text/csv;charset=utf-8");
  $("#clearMsg").textContent=`ส่งออกออเดอร์ ${orders.length} รายการแล้ว ไฟล์อยู่ในโฟลเดอร์ Downloads`};
-$("#backupAll").onclick=()=>{download(`livestudio-สำรอง-${localDate()}.json`,JSON.stringify({app:"LiveStudio",format:1,exported:new Date().toISOString(),products,orders,plan:planSettings(),seller:sellerCfg.type},null,1),"application/json");
+$("#backupAll").onclick=()=>{download(`livestudio-สำรอง-${localDate()}.json`,JSON.stringify({app:"LiveStudio",format:1,exported:new Date().toISOString(),products,orders,plan:planSettings(),seller:sellerCfg.type,history:liveHist},null,1),"application/json");
  $("#bMsg").textContent=`สำรองแล้ว: สินค้า ${products.length} รายการ ออเดอร์ ${orders.length} รายการ ไฟล์อยู่ในโฟลเดอร์ Downloads`};
 
 let fileKind="";
@@ -1077,7 +1150,7 @@ function cleanProduct(p){const o={code:unq(p.code),name:unq(p.name),price:num(p.
  if(Array.isArray(p.scripts))o.scripts=p.scripts.filter(s=>typeof s==="string"&&s.trim()).slice(0,5);
  return o}
 function cleanOrder(o){const qty=Math.max(1,Math.round(num(o.qty))||1),r={d:unq(o.d),t:unq(o.t),name:unq(o.name),code:unq(o.code),pname:unq(o.pname),qty,price:num(o.price)};
- if(num(o.cm)>0)r.cm=Math.min(100,num(o.cm));return r}
+ if(num(o.cm)>0)r.cm=Math.min(100,num(o.cm));if(num(o.ts)>0)r.ts=num(o.ts);return r}
 function afterChange(){store.set("ls_products",products);store.set("ls_orders",orders);plan=[];renderProducts();buildPlan();renderOrders();renderHome()}
 function importText(kind,text,fname){
  if(/\.json$/i.test(fname)||/^\s*[\[{]/.test(text)){const j=JSON.parse(text);
@@ -1085,7 +1158,7 @@ function importText(kind,text,fname){
    if(!Array.isArray(j.products)||!Array.isArray(j.orders))throw new Error("ไม่ใช่ไฟล์สำรองของ LiveStudio");
    const np=j.products.map(cleanProduct).filter(p=>p.code&&p.name),no=j.orders.map(cleanOrder).filter(o=>o.name&&o.code);
    if(!confirm(`กู้คืนจากไฟล์สำรอง?\nสินค้า ${np.length} รายการ และออเดอร์ ${no.length} รายการ จะมาแทนข้อมูลที่มีอยู่ตอนนี้\n(สินค้า ${products.length} รายการ ออเดอร์ ${orders.length} รายการ)`))return "ยกเลิกการกู้คืน ข้อมูลเดิมยังอยู่ครบ";
-   products=np;orders=no;applyPlanSettings(j.plan);store.set("ls_plan",planSettings());if(j.seller==="aff"||j.seller==="own"){sellerCfg.type=j.seller;store.set("ls_seller",sellerCfg);renderSeller()}afterChange();
+   products=np;orders=no;applyPlanSettings(j.plan);store.set("ls_plan",planSettings());if(Array.isArray(j.history)){liveHist=j.history.filter(h=>h&&h.d).slice(-HIST_MAX);store.set("ls_history",liveHist)}if(j.seller==="aff"||j.seller==="own"){sellerCfg.type=j.seller;store.set("ls_seller",sellerCfg);renderSeller()}afterChange();
    return `กู้คืนแล้ว: สินค้า ${np.length} รายการ ออเดอร์ ${no.length} รายการ`}
   throw new Error("ไฟล์ .json ใช้กับปุ่มกู้คืนจากไฟล์สำรองในหน้าแรก")}
  if(kind==="restoreAll")throw new Error("ไฟล์สำรองต้องเป็น .json ที่ได้จากปุ่มสำรองทั้งหมด");
@@ -1114,7 +1187,7 @@ if(location.protocol==="file:"){
   if(!v||!newer(v.version,APP_VERSION))return;const b=$("#updBox");b.hidden=false;
   b.innerHTML=`<div><b>มีเวอร์ชันใหม่ ${esc(v.version)}</b> (ตอนนี้ใช้ ${APP_VERSION})<div class="mini">กดดาวน์โหลด แล้วเปิดไฟล์ที่ได้ สินค้าและออเดอร์เดิมไม่หาย ถ้า Edge เตือน ให้กด "เก็บไว้" (Keep) ไม่ควรอัปเดตตอนกำลังไลฟ์</div></div><a class="btn primary" href="${esc(UPDATE_SITE+v.installer)}" download>⬇ ดาวน์โหลดตัวอัปเดต</a>`}).catch(()=>{});
 }else $("#verNote").textContent="เวอร์ชันใหม่จะโหลดเองเมื่อต่อเน็ต แล้วใช้ได้ตอนเปิดครั้งถัดไป";
-renderProducts();aiStateText();buildPlan();renderSeller();obsFill();ttFill();renderSceneBar();obsConnect();renderLive();renderHome();
+renderProducts();aiStateText();buildPlan();applyFs();renderSeller();obsFill();ttFill();renderSceneBar();obsConnect();renderLive();renderHome();
 </script>
 <script>
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){navigator.serviceWorker.register("sw.js").catch(()=>{})}
