@@ -353,6 +353,12 @@ td.r,th.r{text-align:right}
         </details>
         <div class="mini" id="obsStatus" style="margin-top:6px">ปิดอยู่</div>
         <div style="border-top:1px solid var(--line);margin-top:10px;padding-top:10px">
+          <div class="mini" style="margin-bottom:4px">จัดฉากใน OBS ให้พร้อมในคลิกเดียว</div>
+          <button class="btn primary" id="scSetup" style="width:100%">🪄 จัดฉาก OBS ให้พร้อม</button>
+          <button class="btn" id="scPreview" style="width:100%;margin-top:6px">ดูตัวอย่างฉากสินค้า AI</button>
+          <div class="mini" id="scMsg" style="margin-top:4px;white-space:pre-line">สร้างซีนสินค้า (รูปสินค้า ราคา จุดขาย เลขตะกร้า เปลี่ยนเองตามรอบ) และซีนพูดสด (กล้อง + ป้าย) ให้ครบ</div>
+        </div>
+        <div style="border-top:1px solid var(--line);margin-top:10px;padding-top:10px">
           <div class="mini" style="margin-bottom:4px">ป้ายสินค้าบนจอไลฟ์ (overlay)</div>
           <label style="display:flex;gap:6px;align-items:center;font-size:13px"><input type="checkbox" id="ovOn" style="width:auto"> แสดงป้ายสินค้า ราคา และ CF ตามรอบ</label>
           <div class="row" style="margin-top:6px;flex-wrap:nowrap">
@@ -389,7 +395,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.6.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.7.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
@@ -703,9 +709,75 @@ function overlayData(){const d={s:"idle",pos:obsCfg.ovPos};if(!running||!plan.le
  return d}
 function overlayURL(d){return new URL("overlay.html",location.href).href.split("#")[0]+"#"+encodeURIComponent(JSON.stringify(d))}
 let ovMissing=false;
-async function pushOverlay(){if(!obsReady||ovMissing)return;const r=await obsReq("SetInputSettings",{inputName:OV_NAME,inputSettings:{url:overlayURL(overlayData())},overlay:true});
+async function pushOverlay(){pushShowcase();if(!obsReady||ovMissing)return;const r=await obsReq("SetInputSettings",{inputName:OV_NAME,inputSettings:{url:overlayURL(overlayData())},overlay:true});
  if(r&&r.requestStatus&&!r.requestStatus.result&&r.requestStatus.code===600){ovMissing=true;$("#ovMsg").textContent="ยังไม่ได้ติดตั้งป้ายใน OBS กด \"ติดตั้งป้ายลงใน OBS\""}}
 const ok=r=>r&&r.requestStatus&&r.requestStatus.result;
+
+/* AI product scene: showcase.html as a full-canvas Browser Source (SC_NAME) in the clip scene.
+   Not a virtual presenter: product photo + text, always tagged "มี AI ช่วยนำเสนอ". */
+const SC_NAME="LiveStudio ฉากสินค้า AI",CAM_NAME="LiveStudio กล้อง";
+function showcaseData(){if(!running||!plan.length)return{s:"idle"};const s=plan[cur];
+ if(s.type!=="prod")return{s:s.type};const p=s.p;
+ return{s:"prod",c:p.code,n:p.name,p:p.price,pr:p.promo,b:basketNo(p),pts:(p.points||"").split("|").map(x=>x.trim()).filter(Boolean),img:p.img||""}}
+function showcaseURL(d){return new URL("showcase.html",location.href).href.split("#")[0]+"#"+encodeURIComponent(JSON.stringify(d))}
+let scMissing=false,scLast="";
+async function pushShowcase(force){if(!obsReady||scMissing)return;const url=showcaseURL(showcaseData());if(url===scLast&&!force)return;scLast=url;
+ const r=await obsReq("SetInputSettings",{inputName:SC_NAME,inputSettings:{url},overlay:true});
+ if(r&&r.requestStatus&&!r.requestStatus.result&&r.requestStatus.code===600)scMissing=true}
+$("#scPreview").onclick=()=>{const p=liveProducts()[0];
+ const d=running&&plan.length&&plan[cur].type==="prod"?showcaseData():(p?{s:"prod",c:p.code,n:p.name,p:p.price,pr:p.promo,b:1,pts:(p.points||"").split("|").filter(Boolean),img:p.img||""}:{});
+ window.open(showcaseURL(d),"ls_showcase","width=405,height=720")};
+const CAM_KINDS={windows:["dshow_input"],macos:["av_capture_input_v2","av_capture_input","macos-avcapture"],linux:["v4l2_input"]};
+const isCamKind=k=>/dshow_input|av_capture|avcapture|v4l2_input/.test(k||"");
+async function sceneItems(scene){const r=await obsReq("GetSceneItemList",{sceneName:scene});return ok(r)?(r.responseData.sceneItems||[]):null}
+async function fitItem(scene,id,w,h){await obsReq("SetSceneItemTransform",{sceneName:scene,sceneItemId:id,sceneItemTransform:{positionX:0,positionY:0,alignment:5,
+ boundsType:"OBS_BOUNDS_SCALE_OUTER",boundsAlignment:0,boundsWidth:w,boundsHeight:h}})}
+async function ensureBrowser(name,scene,url,w,h,inputs){
+ const settings={url,width:w,height:h,css:"body{background-color:rgba(0,0,0,0);margin:0;overflow:hidden}",shutdown:false,restart_when_active:false};
+ if(inputs.includes(name)){if(!ok(await obsReq("SetInputSettings",{inputName:name,inputSettings:settings,overlay:true})))return false}
+ else{const r=await obsReq("CreateInput",{sceneName:scene,inputName:name,inputKind:"browser_source",inputSettings:settings,sceneItemEnabled:true});if(!ok(r))return false}
+ const items=await sceneItems(scene);if(items&&!items.some(i=>i.sourceName===name)){if(!ok(await obsReq("CreateSceneItem",{sceneName:scene,sourceName:name,sceneItemEnabled:true})))return false}
+ return true}
+async function itemId(scene,name){const r=await obsReq("GetSceneItemId",{sceneName:scene,sourceName:name});return ok(r)?r.responseData.sceneItemId:null}
+$("#scSetup").onclick=async()=>{const m=$("#scMsg"),log=[],say=t=>{log.push(t);m.textContent=log.join("\n")};m.style.color="";
+ if(!obsReady){m.textContent="ต้องต่อ OBS ให้ได้ก่อน: เปิด OBS > Tools > WebSocket Server Settings ติ๊ก Enable แล้วใส่รหัสใน \"ตั้งค่า OBS\" ด้านบน";
+  if(!obsCfg.on){obsCfg.on=true;store.set("ls_obs",obsCfg);obsFill();obsConnect()}return}
+ $("#scSetup").disabled=true;
+ try{
+  // 1. the two scenes
+  const sl=await obsReq("GetSceneList"),have=ok(sl)?sl.responseData.scenes.map(s=>s.sceneName):[];
+  for(const sc of [obsCfg.clip,obsCfg.talk]){if(have.includes(sc))continue;
+   if(!ok(await obsReq("CreateScene",{sceneName:sc}))){say(`✗ สร้างซีน "${sc}" ไม่ได้`);return}say(`✓ สร้างซีน "${sc}"`)}
+  const vs=await obsReq("GetVideoSettings"),w=ok(vs)?vs.responseData.baseWidth:1080,h=ok(vs)?vs.responseData.baseHeight:1920;
+  const il=await obsReq("GetInputList"),inputs=ok(il)?(il.responseData.inputs||[]).map(i=>i.inputName):[];
+  // 2. AI product scene (bottom of the clip scene, full canvas)
+  if(!await ensureBrowser(SC_NAME,obsCfg.clip,showcaseURL(showcaseData()),w,h,inputs)){say("✗ สร้างฉากสินค้า AI ไม่ได้");return}
+  const scId=await itemId(obsCfg.clip,SC_NAME);if(scId!=null){await fitItem(obsCfg.clip,scId,w,h);await obsReq("SetSceneItemIndex",{sceneName:obsCfg.clip,sceneItemId:scId,sceneItemIndex:0})}
+  scMissing=false;scLast="";say(`✓ ฉากสินค้า AI ในซีน "${obsCfg.clip}" (${w}x${h})`);
+  // 3. camera in the talk scene (kept if one is already there)
+  const talkItems=await sceneItems(obsCfg.talk)||[],cam=talkItems.find(i=>isCamKind(i.inputKind));
+  if(cam)say(`✓ ซีน "${obsCfg.talk}" มีกล้องอยู่แล้ว (${cam.sourceName})`);
+  else{const ver=await obsReq("GetVersion"),plat=ok(ver)?ver.responseData.platform:"windows",kl=await obsReq("GetInputKindList"),
+    kinds=ok(kl)?kl.responseData.inputKinds:[],kind=(CAM_KINDS[plat]||CAM_KINDS.windows).find(k=>kinds.includes(k));
+   if(!kind)say("✗ OBS เครื่องนี้ไม่มีตัวเลือกกล้อง เพิ่มกล้องเองใน OBS: Sources > + > Video Capture Device");
+   else{let made=inputs.includes(CAM_NAME);
+    if(!made)made=ok(await obsReq("CreateInput",{sceneName:obsCfg.talk,inputName:CAM_NAME,inputKind:kind,inputSettings:{},sceneItemEnabled:true}));
+    else await obsReq("CreateSceneItem",{sceneName:obsCfg.talk,sourceName:CAM_NAME,sceneItemEnabled:true});
+    if(!made)say("✗ เพิ่มกล้องไม่ได้ เพิ่มเองใน OBS: Sources > + > Video Capture Device");
+    else{let dev=null;
+     for(const prop of ["video_device_id","device","device_id"]){const pr=await obsReq("GetInputPropertiesListPropertyItems",{inputName:CAM_NAME,propertyName:prop});
+      const items=ok(pr)?(pr.responseData.propertyItems||[]).filter(x=>x.itemEnabled!==false&&x.itemValue):[];
+      if(items.length){dev=items[0];await obsReq("SetInputSettings",{inputName:CAM_NAME,inputSettings:{[prop]:dev.itemValue},overlay:true});break}}
+     const camId=await itemId(obsCfg.talk,CAM_NAME);if(camId!=null){await fitItem(obsCfg.talk,camId,w,h);await obsReq("SetSceneItemIndex",{sceneName:obsCfg.talk,sceneItemId:camId,sceneItemIndex:0})}
+     say(dev?`✓ กล้อง "${dev.itemName}" ในซีน "${obsCfg.talk}" (เปลี่ยนกล้องได้ใน OBS: ดับเบิลคลิก "${CAM_NAME}")`:`⚠ เพิ่ม "${CAM_NAME}" แล้ว แต่ไม่เจอกล้อง เสียบกล้องหรือต่อมือถือเป็นกล้อง แล้วดับเบิลคลิก "${CAM_NAME}" ใน OBS เพื่อเลือก`)}}}
+  // 4. label overlay: on the camera scene only (the AI scene already shows the same details)
+  if(!await ensureBrowser(OV_NAME,obsCfg.talk,overlayURL(overlayData()),w,h,inputs)){say("✗ เพิ่มป้ายสินค้าไม่ได้");return}
+  const ovClip=await itemId(obsCfg.clip,OV_NAME);if(ovClip!=null)await obsReq("SetSceneItemEnabled",{sceneName:obsCfg.clip,sceneItemId:ovClip,sceneItemEnabled:false});
+  ovMissing=false;say(`✓ ป้ายสินค้าในซีน "${obsCfg.talk}"`);
+  if(!obsCfg.on){obsCfg.on=true;store.set("ls_obs",obsCfg);obsFill()}
+  say("เสร็จแล้ว กดเริ่มรอบ แล้ว OBS จะสลับ: ช่วงสินค้า = ฉาก AI · ช่วงคุยสด เปิด และปิดไลฟ์ = กล้อง");m.style.color="var(--talk)";
+  checkScenes();renderHome()}
+ finally{$("#scSetup").disabled=false}};
 $("#ovInstall").onclick=async()=>{const m=$("#ovMsg");
  if(!obsReady){m.textContent="ต้องต่อ OBS ให้ได้ก่อน (ติ๊กสลับซีน แล้วใส่รหัสในตั้งค่า OBS)";return}
  m.textContent="กำลังติดตั้งป้าย...";
