@@ -89,6 +89,12 @@ a.btn:not([href]){opacity:.5;pointer-events:none}
 @media (pointer:coarse){.desk-only{display:none!important}}
 .hist th,.hist td{white-space:nowrap}
 .bills{display:grid;gap:8px}
+.bill.paid{border-color:var(--talk);opacity:.8}
+.paidtick{color:var(--talk);font-weight:700}
+.stockchip,.pinstock{font-size:12px;padding:1px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.stockchip.low,.pinstock.low{background:var(--warn-soft);border-color:var(--warn);color:var(--ink)}
+.stockchip.out,.pinstock.out{background:#fde8ec;border-color:var(--accent);color:var(--accent);font-weight:600}
+.order-list span.soldout{text-decoration:line-through;opacity:.6}
 .bill{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg)}
 .bill .items{font-size:13px;color:var(--muted);margin:2px 0}
 .roundsum{border-color:var(--accent);border-width:2px}
@@ -335,7 +341,7 @@ td.r,th.r{text-align:right}
       <div class="card">
         <div class="segtitle"><span id="segChip" class="chip ai">AI นำเสนอ</span><b id="segName" style="font-family:var(--display);font-weight:500;font-size:18px;flex:1"></b>
           <span class="fsz" role="group" aria-label="ขนาดตัวอักษรบท"><button class="btn sm" id="fsDown" type="button" aria-label="ตัวอักษรเล็กลง">ก-</button><button class="btn sm" id="fsUp" type="button" aria-label="ตัวอักษรใหญ่ขึ้น">ก+</button></span></div>
-        <div class="pinbar" id="pinbar" hidden>📌 ปักตะกร้าตอนนี้ <b id="pinNo"></b> <span id="pinName" class="mini" style="color:var(--ink)"></span></div>
+        <div class="pinbar" id="pinbar" hidden>📌 ปักตะกร้าตอนนี้ <b id="pinNo"></b> <span id="pinName" class="mini" style="color:var(--ink)"></span> <span id="pinStock"></span></div>
         <div class="prompter" id="prompter"></div>
         <p class="disclose" id="disclose"></p>
       </div>
@@ -447,7 +453,7 @@ td.r,th.r{text-align:right}
 
 <section id="tab-orders" hidden>
   <h2 id="ordTitle">ออเดอร์รอบนี้</h2>
-  <div class="totals"><div><span class="mini">ออเดอร์</span><b id="tCount">0</b></div><div><span class="mini">ชิ้น</span><b id="tQty">0</b></div><div><span class="mini">ยอดขาย (บาท)</span><b id="tSum">0</b></div><div class="aff-only"><span class="mini">ค่าคอมโดยประมาณ (บาท)</span><b id="tComm">0</b></div></div>
+  <div class="totals"><div><span class="mini">ออเดอร์</span><b id="tCount">0</b></div><div><span class="mini">ชิ้น</span><b id="tQty">0</b></div><div><span class="mini">ยอดขาย (บาท)</span><b id="tSum">0</b></div><div class="aff-only"><span class="mini">ค่าคอมโดยประมาณ (บาท)</span><b id="tComm">0</b></div><div class="own-only"><span class="mini">ค้างจ่าย (บาท)</span><b id="tUnpaid">0</b></div></div>
   <p class="mini aff-only" style="margin:-4px 0 10px">นายหน้าจะไม่เห็นชื่อลูกค้า ใส่แค่สินค้าและจำนวนตามที่เห็นในแดชบอร์ดไลฟ์ก็พอ ค่าคอมคิดจากเปอร์เซ็นต์ในการ์ดสินค้า ยอดจริงดูในหน้ารายได้ Affiliate ของ TikTok</p>
   <div class="card tablebox"><table><thead><tr><th>เวลา</th><th>ลูกค้า</th><th>สินค้า</th><th class="r">จำนวน</th><th class="r">รวม</th><th class="r aff-only">ค่าคอม</th><th></th></tr></thead><tbody id="obody"></tbody></table></div>
   <div class="card own-only" style="margin-top:14px">
@@ -467,7 +473,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.11.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.12.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
@@ -518,7 +524,7 @@ const basketNo=p=>liveProducts().indexOf(p)+1;
 function renderProducts(){const el=$("#plist");el.innerHTML="";
  products.forEach((p,i)=>{const d=document.createElement("div"),on=p.on!==false,n=basketNo(p);d.className="card"+(on?"":" off");
   d.innerHTML=`<div class="prodhead"><div class="row" style="gap:8px">
-    <label class="pick"><input type="checkbox" data-on="${i}" ${on?"checked":""}> ไลฟ์รอบนี้</label><span class="code">${esc(p.code)}</span>${on?`<span class="basket">ตะกร้า #${n}</span>`:""}</div>
+    <label class="pick"><input type="checkbox" data-on="${i}" ${on?"checked":""}> ไลฟ์รอบนี้</label><span class="code">${esc(p.code)}</span>${on?`<span class="basket">ตะกร้า #${n}</span>`:""}${!aff()&&hasStock(p)?`<span class="stockchip${p.stock<=0?" out":p.stock<=LOW_STOCK?" low":""}" data-stockchip="${i}">${stockLabel(p)}</span>`:""}</div>
    <div class="row" style="gap:4px;flex-wrap:nowrap"><button class="btn sm" data-mv="${i}" data-d="-1" aria-label="เลื่อนขึ้น" ${i?"":"disabled"}>▲</button><button class="btn sm" data-mv="${i}" data-d="1" aria-label="เลื่อนลง" ${i<products.length-1?"":"disabled"}>▼</button><button class="btn sm" data-del="${i}">ลบ</button></div></div>
   <div class="prodbody">
    <div class="photo">${p.img?`<img src="${esc(p.img)}" alt="รูป ${esc(p.name)}">`:`<div class="ph">📷<br>ยังไม่มีรูป</div>`}
@@ -531,6 +537,7 @@ function renderProducts(){const el=$("#plist");el.innerHTML="";
     <div><label for="p${i}">ราคา (บาท)</label><input id="p${i}" type="number" data-k="price" data-i="${i}" value="${p.price}"></div>
     <div class="full"><label for="pt${i}">จุดขาย (คั่นด้วย |)</label><input id="pt${i}" data-k="points" data-i="${i}" value="${esc(p.points)}"></div>
     <div class="full"><label for="pr${i}">โปรในไลฟ์${aff()?" (ตามที่ร้านต้นทางให้)":""}</label><input id="pr${i}" data-k="promo" data-i="${i}" value="${esc(p.promo)}"></div>
+    ${aff()?"":`<div><label for="st${i}">สต็อก (ชิ้น)</label><input id="st${i}" type="number" min="0" step="1" inputmode="numeric" data-k="stock" data-i="${i}" value="${hasStock(p)?p.stock:""}" placeholder="ไม่นับ"></div>`}
     ${aff()?`<div class="wide"><label for="sh${i}">ร้านต้นทาง</label><input id="sh${i}" data-k="shop" data-i="${i}" value="${esc(p.shop||"")}" placeholder="ชื่อร้านที่ขายสินค้านี้"></div>
     <div><label for="cm${i}">ค่าคอม (%)</label><input id="cm${i}" type="number" min="0" max="100" step="0.5" inputmode="decimal" data-k="comm" data-i="${i}" value="${p.comm||""}" placeholder="เช่น 10"></div>
     <div class="full"><label for="u${i}">ลิงก์สินค้า (คัดลอกจาก TikTok)</label><div class="row" style="flex-wrap:nowrap"><input id="u${i}" type="url" data-k="url" data-i="${i}" value="${esc(p.url||"")}" placeholder="https://..."><a class="btn sm" data-open="${i}" target="_blank" rel="noopener" style="white-space:nowrap;align-self:center">เปิด</a></div></div>`:""}
@@ -539,9 +546,12 @@ function renderProducts(){const el=$("#plist");el.innerHTML="";
    ${p.scripts&&p.scripts.length?`<details style="margin-top:6px"><summary class="mini" style="cursor:pointer">บทพูดจาก AI ${p.scripts.length} แบบ (ใช้สลับกันตอนไลฟ์)</summary>${p.scripts.map(s=>`<div class="aiscript">${esc(fillScript(s,p))}</div>`).join("")}<button class="btn sm" data-noai="${i}" style="margin-top:6px">กลับไปใช้บทแบบเดิม</button></details>`:""}
    </div>
   </div>`;el.appendChild(d)});
- el.querySelectorAll("input[data-k]").forEach(inp=>inp.oninput=()=>{const p=products[inp.dataset.i],k=inp.dataset.k;p[k]=k==="price"||k==="comm"?Math.max(0,+inp.value||0):inp.value;
+ el.querySelectorAll("input[data-k]").forEach(inp=>inp.oninput=()=>{const p=products[inp.dataset.i],k=inp.dataset.k;
+  if(k==="stock"){if(inp.value.trim()==="")delete p.stock;else p.stock=Math.max(0,Math.round(+inp.value||0));store.set("ls_products",products);stockChanged(p);return}
+  p[k]=k==="price"||k==="comm"?Math.max(0,+inp.value||0):inp.value;
   if(k==="comm")p.comm=Math.min(100,p.comm);store.set("ls_products",products);plan=[];if(k==="code")inp.closest(".card").querySelector(".code").textContent=inp.value;if(k==="url")setOpenLink(+inp.dataset.i)});
  el.querySelectorAll("[data-open]").forEach(a=>setOpenLink(+a.dataset.open));
+ el.querySelectorAll('input[data-k="stock"]').forEach(inp=>inp.onchange=()=>{const i=+inp.dataset.i,had=!!document.querySelector(`[data-stockchip="${i}"]`);if(had!==hasStock(products[i]))renderProducts()});
  el.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{products.splice(+b.dataset.del,1);save()});
  el.querySelectorAll("[data-on]").forEach(b=>b.onchange=()=>{products[+b.dataset.on].on=b.checked;save()});
  el.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{const i=+b.dataset.mv,j=i+ +b.dataset.d;if(j<0||j>=products.length)return;[products[i],products[j]]=[products[j],products[i]];save()});
@@ -667,6 +677,8 @@ function scriptFor(s){if(s.type==="open")return pick(T.open)();if(s.type==="clos
 
 /* plan */
 let plan=[];
+function renderBasket(){const P=liveProducts();
+ $("#basketList").innerHTML=P.length?P.map((p,i)=>`<span${!aff()&&hasStock(p)&&p.stock<=0?' class="soldout"':""}><b>#${i+1}</b> ${esc(p.code)} ${esc(p.name)}${aff()&&p.shop?` · ${esc(p.shop)}`:""}${aff()&&p.comm?` · คอม ${p.comm}%`:""}${!aff()&&hasStock(p)?` · ${stockLabel(p)}`:""}</span>`).join(""):'<span>ยังไม่ได้เลือกสินค้า ไปติ๊ก "ไลฟ์รอบนี้" ในแท็บสินค้า</span>'}
 /* Live length in minutes: a preset, or "กำหนดเอง" (custom: hours + minutes, 40..600 in total).
    Optional start time (HH:MM) shows clock times in the plan, the end time and a countdown;
    typing an end time sets the length. Each segment's minutes can be set by hand (planOv). */
@@ -711,7 +723,7 @@ function buildPlan(){const dur=durMin(),every=+$("#talkEvery").value;let tl=+$("
   (tight||realTotal>dur?`<br><b style="color:var(--warn)">⚠ เวลาไม่พอ (รวมจริง ${fmtDur(realTotal)} จากที่ตั้งไว้ ${fmtDur(dur)}) ${nOv?"ลองลดเวลาที่แก้เองลง หรือ":"ลอง"}เพิ่มเวลาเป็นอย่างน้อย ${fmtDur(Math.ceil((fixedSum+freeH.length*2+freeP.length*2)/5)*5)} หรือเอาสินค้าบางตัวออกจากรอบนี้</b>`
    :realTotal<dur?`<br><b style="color:var(--warn)">⚠ ทุกช่วงถูกแก้เวลาเอง รวมได้ ${fmtDur(realTotal)} สั้นกว่าที่ตั้งไว้ ${fmtDur(dur)}</b>`:"");
  const rb=$("#ovReset");if(rb)rb.onclick=()=>{planOv={};planChanged()};
- $("#basketList").innerHTML=P.length?P.map((p,i)=>`<span><b>#${i+1}</b> ${esc(p.code)} ${esc(p.name)}${aff()&&p.shop?` · ${esc(p.shop)}`:""}${aff()&&p.comm?` · คอม ${p.comm}%`:""}</span>`).join(""):'<span>ยังไม่ได้เลือกสินค้า ไปติ๊ก "ไลฟ์รอบนี้" ในแท็บสินค้า</span>';
+ renderBasket();
  const el=$("#tl");el.innerHTML="";plan.forEach((s,i)=>{const d=document.createElement("div");d.className="seg"+(s.type==="human"?" human":"")+(i===cur&&running?" now":"")+(s.fixed?" fixed":"");
   d.innerHTML=`<span class="t">${clockAt(s.start)}</span><span>${esc(s.name)}</span><span class="segright"><span class="chip ${s.type==="human"?"human":"ai"}">${s.type==="human"?"คนพูดสด":"AI ช่วย"}</span>`+
    `<input class="segmin" type="number" min="${s.type==="human"?2:1}" max="180" inputmode="numeric" value="${s.min}" data-key="${esc(s.key)}" aria-label="นาทีของช่วง ${esc(s.name)}" ${running?"disabled":""}><span class="mini">น.</span>`+
@@ -764,7 +776,7 @@ function renderLive(){if(!plan.length)return;const s=plan[cur];
  $("#segChip").className="chip "+(human?"human":"ai");$("#segChip").textContent=human?"ถึงเวลาคุยสด":"AI ช่วยนำเสนอ";
  $("#prompter").textContent=s.text;$("#prompter").parentElement.classList.toggle("prompter-h",human);$("#prompter").classList.toggle("human",human);
  $("#speak").disabled=human;
- $("#pinbar").hidden=s.type!=="prod";if(s.type==="prod"){$("#pinNo").textContent="#"+basketNo(s.p);$("#pinName").textContent=`${s.p.code} ${s.p.name}`+(aff()&&s.p.shop?` (${shopName(s.p)})`:"")}
+ $("#pinbar").hidden=s.type!=="prod";if(s.type==="prod"){$("#pinNo").textContent="#"+basketNo(s.p);$("#pinName").textContent=`${s.p.code} ${s.p.name}`+(aff()&&s.p.shop?` (${shopName(s.p)})`:"");renderPinStock(s.p)}
  $("#disclose").textContent=human?"ช่วงนี้ให้คนพูดเอง ไม่ใช้เสียง AI":"ใส่ข้อความบนจอไลฟ์ว่า \"ไลฟ์นี้มี AI ช่วยนำเสนอสินค้า\" และให้ตัวละคร AI กินพื้นที่ไม่เกินครึ่งจอ";
  const n=plan[cur+1];$("#nextInfo").textContent=n?`${n.name} (${n.min} นาที)`:"จบรอบ";
  tick(true);if(s.p)$("#qCode").value=s.p.code;if(running){syncScene();pushOverlay()}renderSceneBar()}
@@ -858,27 +870,52 @@ $("#expHist").onclick=()=>{if(!liveHist.length){$("#histMsg").textContent="ย�
 function billText(name,list){const total=list.reduce((a,o)=>a+o.qty*o.price,0);
  return `สรุปออเดอร์ คุณ${name}\n`+list.map(o=>`- ${o.code} ${o.pname} x${o.qty} = ${fmt(o.qty*o.price)} บาท`).join("\n")+`\nรวม ${fmt(total)} บาท\nขอบคุณที่สั่งซื้อนะคะ`}
 function renderBills(){const el=$("#bills");if(!el)return;const by=new Map();orders.forEach(o=>{const k=o.name||"ลูกค้า";if(!by.has(k))by.set(k,[]);by.get(k).push(o)});
- const rows=[...by.entries()];
- el.innerHTML=rows.length?rows.map(([n,l],i)=>`<div class="bill"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><b>${esc(n)}</b><span class="num"><b>${fmt(l.reduce((a,o)=>a+o.qty*o.price,0))}</b> บาท</span></div>`+
-  `<div class="items">${l.map(o=>`${esc(o.code)} x${o.qty}`).join(" · ")}</div><button class="btn sm" data-bill="${i}" type="button">คัดลอกบิล</button></div>`).join("")
+ const rows=[...by.entries()].sort((a,b)=>(a[1].every(o=>o.paid)?1:0)-(b[1].every(o=>o.paid)?1:0));
+ const unpaid=rows.filter(([,l])=>!l.every(o=>o.paid));
+ $("#billMsg").textContent=rows.length?(unpaid.length?`ค้างจ่าย ${unpaid.length} คน`:"จ่ายครบทุกคนแล้ว ✓"):"";
+ el.innerHTML=rows.length?rows.map(([n,l],i)=>{const paid=l.every(o=>o.paid);return `<div class="bill${paid?" paid":""}"><div class="row" style="justify-content:space-between;flex-wrap:nowrap"><b>${esc(n)}</b><span class="num"><b>${fmt(l.reduce((a,o)=>a+o.qty*o.price,0))}</b> บาท</span></div>`+
+  `<div class="items">${l.map(o=>`${esc(o.code)} x${o.qty}`).join(" · ")}</div><div class="row" style="gap:6px"><button class="btn sm" data-bill="${i}" type="button">คัดลอกบิล</button>`+
+  `<button class="btn sm${paid?" talk":""}" data-paid="${i}" type="button" aria-pressed="${paid}">${paid?"✓ จ่ายแล้ว":"ทำเครื่องหมายว่าจ่ายแล้ว"}</button></div></div>`}).join("")
   :`<div class="mini">ยังไม่มีออเดอร์</div>`;
+ el.querySelectorAll("[data-paid]").forEach(b=>b.onclick=()=>{const [,l]=rows[+b.dataset.paid],v=!l.every(o=>o.paid);l.forEach(o=>{if(v)o.paid=1;else delete o.paid});store.set("ls_orders",orders);renderOrders()});
  el.querySelectorAll("[data-bill]").forEach(b=>b.onclick=()=>{const [n,l]=rows[+b.dataset.bill];
   copyText(billText(n,l)).then(()=>$("#billMsg").textContent=`คัดลอกบิลคุณ${n}แล้ว`).catch(()=>$("#billMsg").textContent="คัดลอกไม่ได้")})}
 
 /* orders */
+/* stock (own shop only): p.stock = pieces left, absent = not tracked. Recording an order takes
+   the pieces off (the order gets sk:1), deleting such an order puts them back; clearing all orders
+   does not (those were sold). The live pin bar, label and AI scene show what is left; the label and
+   AI scene only when it is low (<= LOW_STOCK) or sold out, and only from this real count. */
+const LOW_STOCK=10;
+const hasStock=p=>!!p&&typeof p.stock==="number"&&isFinite(p.stock);
+const stockLabel=p=>p.stock<=0?"หมดแล้ว":`เหลือ ${fmt(p.stock)} ชิ้น`;
+function takeStock(p,qty){if(aff()||!hasStock(p))return{};const before=p.stock,taken=Math.min(qty,Math.max(0,before));p.stock=Math.max(0,p.stock-qty);store.set("ls_products",products);stockChanged(p);return{sk:taken,over:qty>before?before:null,tracked:1}}
+function returnStock(o){const p=products.find(x=>x.code===o.code);if(!o.sk||!hasStock(p))return;p.stock+=o.sk;store.set("ls_products",products);stockChanged(p)}
+function stockChanged(p){const i=products.indexOf(p),chip=document.querySelector(`[data-stockchip="${i}"]`),inp=document.getElementById("st"+i);
+ if(inp&&document.activeElement!==inp)inp.value=hasStock(p)?p.stock:"";
+ if(chip&&hasStock(p)){chip.textContent=stockLabel(p);chip.className="stockchip"+(p.stock<=0?" out":p.stock<=LOW_STOCK?" low":"")}
+
+ renderBasket();if(plan.length&&plan[cur]&&plan[cur].p===p)renderPinStock(p);if(running)pushOverlay()}
+function renderPinStock(p){const el=$("#pinStock");if(!el)return;
+ if(aff()||!p||!hasStock(p)){el.textContent="";el.className="";return}
+ el.textContent=p.stock<=0?"❌ หมดแล้ว กด \"ถัดไป\" เพื่อข้าม":`เหลือ ${fmt(p.stock)} ชิ้น`;el.className="pinstock"+(p.stock<=0?" out":p.stock<=LOW_STOCK?" low":"")}
+const liveStock=p=>!aff()&&hasStock(p)&&p.stock<=LOW_STOCK?{st:Math.max(0,p.stock)}:{};
+
 // commission % is copied onto each order when recorded, so later edits to the product do not rewrite liveHist
 const commOf=o=>o.cm?o.qty*o.price*o.cm/100:0;
 const orderComm=p=>aff()&&p.comm>0?{cm:+p.comm}:{};
 function fillCodes(){$("#qCode").innerHTML=products.map(p=>`<option value="${esc(p.code)}">${esc(p.code)} ${esc(p.name)}</option>`).join("")}
 $("#qAdd").onclick=()=>{const name=$("#qName").value.trim(),code=$("#qCode").value,qty=Math.max(1,+$("#qQty").value||1);
  if(!name&&!aff()){$("#qMsg").textContent="ใส่ชื่อลูกค้าก่อน";return}const p=products.find(x=>x.code===code);if(!p)return;
- orders.push(Object.assign({d:localDate(),t:new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"}),ts:Date.now(),name:name||"ลูกค้า TikTok",code,pname:p.name,qty,price:p.price},orderComm(p)));store.set("ls_orders",orders);renderHome();
- $("#qMsg").textContent=`บันทึกแล้ว: ${name||"ลูกค้า TikTok"} ${code} x${qty}`+(aff()&&p.comm?` · ค่าคอมประมาณ ${fmt(Math.round(qty*p.price*p.comm/100))} บาท`:"");$("#qName").value="";$("#qQty").value=1;$("#qName").focus()};
+ const sk=takeStock(p,qty);
+ orders.push(Object.assign({d:localDate(),t:new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"}),ts:Date.now(),name:name||"ลูกค้า TikTok",code,pname:p.name,qty,price:p.price},orderComm(p),sk.sk?{sk:sk.sk}:{}));store.set("ls_orders",orders);renderHome();
+ $("#qMsg").textContent=`บันทึกแล้ว: ${name||"ลูกค้า TikTok"} ${code} x${qty}`+(aff()&&p.comm?` · ค่าคอมประมาณ ${fmt(Math.round(qty*p.price*p.comm/100))} บาท`:"")+
+  (sk.over!=null?` · ⚠ สต็อกมีแค่ ${sk.over} ชิ้น ขายเกินสต็อก`:sk.tracked?` · ${stockLabel(p)}`:"");$("#qName").value="";$("#qQty").value=1;$("#qName").focus()};
 function renderOrders(){const ob=$("#obody");ob.innerHTML=orders.length?"":`<tr><td colspan="6" class="mini">ยังไม่มีออเดอร์ จดได้จากแท็บไลฟ์ระหว่างไลฟ์</td></tr>`;
- orders.forEach((o,i)=>{const tr=document.createElement("tr");tr.innerHTML=`<td class="num">${o.t}</td><td>${esc(o.name)}</td><td><span class="code">${esc(o.code)}</span> ${esc(o.pname)}</td><td class="r num">${o.qty}</td><td class="r num">${fmt(o.qty*o.price)}</td><td class="r num aff-only">${o.cm?fmt(Math.round(commOf(o))):"-"}</td><td><button class="btn" data-o="${i}" style="padding:2px 8px;font-size:12px">ลบ</button></td>`;ob.appendChild(tr)});
- ob.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{orders.splice(+b.dataset.o,1);store.set("ls_orders",orders);renderOrders()});
+ orders.forEach((o,i)=>{const tr=document.createElement("tr");tr.innerHTML=`<td class="num">${o.t}</td><td>${esc(o.name)}${o.paid&&!aff()?' <span class="paidtick" title="จ่ายแล้ว">✓</span>':""}</td><td><span class="code">${esc(o.code)}</span> ${esc(o.pname)}</td><td class="r num">${o.qty}</td><td class="r num">${fmt(o.qty*o.price)}</td><td class="r num aff-only">${o.cm?fmt(Math.round(commOf(o))):"-"}</td><td><button class="btn" data-o="${i}" style="padding:2px 8px;font-size:12px">ลบ</button></td>`;ob.appendChild(tr)});
+ ob.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{const [o]=orders.splice(+b.dataset.o,1);returnStock(o);store.set("ls_orders",orders);renderOrders();renderHome()});
  const q=orders.reduce((a,o)=>a+o.qty,0),sum=orders.reduce((a,o)=>a+o.qty*o.price,0);
- renderBills();renderHistory();$("#tCount").textContent=fmt(orders.length);$("#tQty").textContent=fmt(q);$("#tSum").textContent=fmt(sum);$("#tComm").textContent=fmt(Math.round(orders.reduce((a,o)=>a+commOf(o),0)));
+ renderBills();renderHistory();$("#tCount").textContent=fmt(orders.length);$("#tQty").textContent=fmt(q);$("#tSum").textContent=fmt(sum);$("#tComm").textContent=fmt(Math.round(orders.reduce((a,o)=>a+commOf(o),0)));$("#tUnpaid").textContent=fmt(orders.filter(o=>!o.paid).reduce((a,o)=>a+o.qty*o.price,0));
  const by={};orders.forEach(o=>{by[o.code]=by[o.code]||{n:o.pname,q:0,s:0};by[o.code].q+=o.qty;by[o.code].s+=o.qty*o.price});
  const rows=Object.entries(by).sort((a,b)=>b[1].s-a[1].s);$("#sbody").innerHTML=rows.map(([c,v])=>`<tr><td><span class="code">${esc(c)}</span></td><td>${esc(v.n)}</td><td class="r num">${v.q}</td><td class="r num">${fmt(v.s)}</td></tr>`).join("")||`<tr><td colspan="4" class="mini">ยังไม่มีข้อมูล</td></tr>`;}
 $("#copySum").onclick=()=>{const txt=`สรุปไลฟ์ ${new Date().toLocaleDateString("th-TH")}\nออเดอร์ ${orders.length} · ยอด ${$("#tSum").textContent} บาท${aff()?` · ค่าคอมประมาณ ${$("#tComm").textContent} บาท`:""}\n`+orders.map(o=>`${o.name} ${o.code} x${o.qty} = ${fmt(o.qty*o.price)}`).join("\n");
@@ -950,7 +987,7 @@ document.addEventListener("keydown",e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.rep
 const OV_NAME="LiveStudio ป้ายสินค้า";
 function overlayData(){const d={s:"idle",pos:obsCfg.ovPos};if(!running||!plan.length||!obsCfg.ov)return d;
  const s=plan[cur];d.s=s.type;if(aff())d.af=1;
- if(s.type==="prod")Object.assign(d,{c:s.p.code,n:s.p.name,p:s.p.price,pr:s.p.promo,b:basketNo(s.p)},aff()&&s.p.shop?{sh:shopName(s.p)}:{});
+ if(s.type==="prod")Object.assign(d,{c:s.p.code,n:s.p.name,p:s.p.price,pr:s.p.promo,b:basketNo(s.p)},aff()&&s.p.shop?{sh:shopName(s.p)}:{},liveStock(s.p));
  else for(let i=cur;i>=0;i--)if(plan[i].type==="prod"){d.last={c:plan[i].p.code,n:plan[i].p.name,b:basketNo(plan[i].p)};break}
  return d}
 function overlayURL(d){return new URL("overlay.html",location.href).href.split("#")[0]+"#"+encodeURIComponent(JSON.stringify(d))}
@@ -968,7 +1005,7 @@ function showcaseData(){if(!running||!plan.length)return{s:"idle"};
  let s=plan[cur];if(s.type!=="prod"){let j=cur;while(j>=0&&plan[j].type!=="prod")j--;if(j<0){j=cur;while(j<plan.length&&plan[j].type!=="prod")j++}
   if(j<0||j>=plan.length)return{s:s.type};s=plan[j]}
  const p=s.p;
- return Object.assign({s:"prod",c:p.code,n:p.name,p:p.price,pr:p.promo,b:basketNo(p),pts:(p.points||"").split("|").map(x=>x.trim()).filter(Boolean),img:p.img||""},aff()?{af:1,sh:shopName(p)}:{})}
+ return Object.assign({s:"prod",c:p.code,n:p.name,p:p.price,pr:p.promo,b:basketNo(p),pts:(p.points||"").split("|").map(x=>x.trim()).filter(Boolean),img:p.img||""},aff()?{af:1,sh:shopName(p)}:{},liveStock(p))}
 function showcaseURL(d){return new URL("showcase.html",location.href).href.split("#")[0]+"#"+encodeURIComponent(JSON.stringify(d))}
 let scMissing=false,scLast="";
 async function pushShowcase(force){if(!obsReady||scMissing)return;const url=showcaseURL(showcaseData());if(url===scLast&&!force)return;scLast=url;
@@ -1086,7 +1123,7 @@ $("#cfFind").onclick=()=>{const {out,unknown}=parseCF($("#cfText").value),today=
  $("#cfAdd").hidden=!cfFound.length;
  $("#cfMsg").textContent=(cfFound.length?`พบ ${cfFound.length} ออเดอร์ ติ๊กเฉพาะที่ถูกต้องแล้วกดบันทึก`:"ไม่พบข้อความ CF ตามด้วยรหัสสินค้า")+(unknown?` · มี ${unknown} รายการที่รหัสไม่ตรงกับสินค้า`:"")};
 $("#cfAdd").onclick=()=>{const t=new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"}),d=localDate();let n=0;
- $("#cfList").querySelectorAll("[data-cf]").forEach(c=>{if(!c.checked)return;const o=cfFound[+c.dataset.cf];const pp=products.find(x=>x.code===o.code);orders.push(Object.assign({d,t,ts:Date.now(),name:o.name,code:o.code,pname:o.pname,qty:o.qty,price:o.price},pp?orderComm(pp):{}));n++});
+ $("#cfList").querySelectorAll("[data-cf]").forEach(c=>{if(!c.checked)return;const o=cfFound[+c.dataset.cf];const pp=products.find(x=>x.code===o.code);const sk=pp?takeStock(pp,o.qty):{};orders.push(Object.assign({d,t,ts:Date.now(),name:o.name,code:o.code,pname:o.pname,qty:o.qty,price:o.price},pp?orderComm(pp):{},sk.sk?{sk:sk.sk}:{}));n++});
  if(!n){$("#cfMsg").textContent="ยังไม่ได้ติ๊กออเดอร์";return}
  store.set("ls_orders",orders);renderOrders();renderHome();cfFound=[];$("#cfList").innerHTML="";$("#cfAdd").hidden=true;$("#cfText").value="";
  $("#cfMsg").textContent=`บันทึกแล้ว ${n} ออเดอร์ ดูได้ที่แท็บออเดอร์`};
@@ -1125,13 +1162,13 @@ function colMap(head,spec){const h=head.map(x=>unq(x).toLowerCase()),m={};
  for(const k in spec){m[k]=h.findIndex(x=>spec[k].includes(x))}return m}
 const num=v=>{const n=parseFloat(String(v).replace(/[^\d.\-]/g,""));return isFinite(n)?n:0};
 
-const P_COLS={code:["รหัส","code"],name:["ชื่อสินค้า","ชื่อ","name"],price:["ราคา","ราคา (บาท)","price"],points:["จุดขาย","points"],promo:["โปร","โปรในไลฟ์","promo"],shop:["ร้านต้นทาง","shop"],comm:["ค่าคอม (%)","ค่าคอม","commission"],url:["ลิงก์สินค้า","ลิงก์","url","link"]};
-const O_COLS={d:["วันที่","date"],t:["เวลา","time"],name:["ลูกค้า","ชื่อลูกค้า","customer"],code:["รหัส","code"],pname:["สินค้า","ชื่อสินค้า","product"],qty:["จำนวน","qty"],price:["ราคาต่อชิ้น","ราคา","price"],cm:["ค่าคอม (%)","commission"]};
+const P_COLS={code:["รหัส","code"],name:["ชื่อสินค้า","ชื่อ","name"],price:["ราคา","ราคา (บาท)","price"],points:["จุดขาย","points"],promo:["โปร","โปรในไลฟ์","promo"],shop:["ร้านต้นทาง","shop"],comm:["ค่าคอม (%)","ค่าคอม","commission"],url:["ลิงก์สินค้า","ลิงก์","url","link"],stock:["สต็อก","สต็อก (ชิ้น)","stock"]};
+const O_COLS={d:["วันที่","date"],t:["เวลา","time"],name:["ลูกค้า","ชื่อลูกค้า","customer"],code:["รหัส","code"],pname:["สินค้า","ชื่อสินค้า","product"],qty:["จำนวน","qty"],price:["ราคาต่อชิ้น","ราคา","price"],cm:["ค่าคอม (%)","commission"],paid:["จ่ายแล้ว","paid"]};
 
-$("#expProd").onclick=()=>{download(`livestudio-สินค้า-${localDate()}.csv`,toCSV([["รหัส","ชื่อสินค้า","ราคา","จุดขาย","โปรในไลฟ์","ร้านต้นทาง","ค่าคอม (%)","ลิงก์สินค้า"],...products.map(p=>[p.code,p.name,p.price,p.points,p.promo,p.shop||"",p.comm||"",p.url||""])]),"text/csv;charset=utf-8");
+$("#expProd").onclick=()=>{download(`livestudio-สินค้า-${localDate()}.csv`,toCSV([["รหัส","ชื่อสินค้า","ราคา","จุดขาย","โปรในไลฟ์","ร้านต้นทาง","ค่าคอม (%)","ลิงก์สินค้า","สต็อก"],...products.map(p=>[p.code,p.name,p.price,p.points,p.promo,p.shop||"",p.comm||"",p.url||"",hasStock(p)?p.stock:""])]),"text/csv;charset=utf-8");
  $("#pMsg").textContent=`ส่งออกสินค้า ${products.length} รายการแล้ว ไฟล์อยู่ในโฟลเดอร์ Downloads`};
 $("#expOrd").onclick=()=>{if(!orders.length){$("#clearMsg").textContent="ยังไม่มีออเดอร์ให้ส่งออก";return}
- download(`livestudio-ออเดอร์-${localDate()}.csv`,toCSV([["วันที่","เวลา","ลูกค้า","รหัส","สินค้า","จำนวน","ราคาต่อชิ้น","รวม","ค่าคอม (%)","ค่าคอม (บาท)"],...orders.map(o=>[o.d||"",o.t,o.name,o.code,o.pname,o.qty,o.price,o.qty*o.price,o.cm||"",o.cm?Math.round(commOf(o)*100)/100:""])]),"text/csv;charset=utf-8");
+ download(`livestudio-ออเดอร์-${localDate()}.csv`,toCSV([["วันที่","เวลา","ลูกค้า","รหัส","สินค้า","จำนวน","ราคาต่อชิ้น","รวม","ค่าคอม (%)","ค่าคอม (บาท)","จ่ายแล้ว"],...orders.map(o=>[o.d||"",o.t,o.name,o.code,o.pname,o.qty,o.price,o.qty*o.price,o.cm||"",o.cm?Math.round(commOf(o)*100)/100:"",o.paid?"ใช่":""])]),"text/csv;charset=utf-8");
  $("#clearMsg").textContent=`ส่งออกออเดอร์ ${orders.length} รายการแล้ว ไฟล์อยู่ในโฟลเดอร์ Downloads`};
 $("#backupAll").onclick=()=>{download(`livestudio-สำรอง-${localDate()}.json`,JSON.stringify({app:"LiveStudio",format:1,exported:new Date().toISOString(),products,orders,plan:planSettings(),seller:sellerCfg.type,history:liveHist},null,1),"application/json");
  $("#bMsg").textContent=`สำรองแล้ว: สินค้า ${products.length} รายการ ออเดอร์ ${orders.length} รายการ ไฟล์อยู่ในโฟลเดอร์ Downloads`};
@@ -1144,13 +1181,13 @@ $("#fileIn").onchange=()=>{const f=$("#fileIn").files[0];if(!f)return;const r=ne
  r.readAsText(f,"utf-8")};
 
 function cleanProduct(p){const o={code:unq(p.code),name:unq(p.name),price:num(p.price),points:unq(p.points),promo:unq(p.promo)};
- if(p.shop)o.shop=unq(p.shop);if(num(p.comm)>0)o.comm=Math.min(100,num(p.comm));if(safeURL(unq(p.url)))o.url=safeURL(unq(p.url));
+ if(p.shop)o.shop=unq(p.shop);if(num(p.comm)>0)o.comm=Math.min(100,num(p.comm));if(safeURL(unq(p.url)))o.url=safeURL(unq(p.url));if(p.stock!=null&&String(p.stock).trim()!==""&&isFinite(num(p.stock)))o.stock=Math.max(0,Math.round(num(p.stock)));
  if(p.on===false)o.on=false;
  if(typeof p.img==="string"&&/^data:image\/(jpeg|png|webp);base64,/.test(p.img))o.img=p.img;
  if(Array.isArray(p.scripts))o.scripts=p.scripts.filter(s=>typeof s==="string"&&s.trim()).slice(0,5);
  return o}
 function cleanOrder(o){const qty=Math.max(1,Math.round(num(o.qty))||1),r={d:unq(o.d),t:unq(o.t),name:unq(o.name),code:unq(o.code),pname:unq(o.pname),qty,price:num(o.price)};
- if(num(o.cm)>0)r.cm=Math.min(100,num(o.cm));if(num(o.ts)>0)r.ts=num(o.ts);return r}
+ if(num(o.cm)>0)r.cm=Math.min(100,num(o.cm));if(num(o.ts)>0)r.ts=num(o.ts);if(o.paid===1||o.paid===true||/^(ใช่|1|true|yes|y|✓)$/i.test(String(o.paid||"").trim()))r.paid=1;if(num(o.sk)>0)r.sk=Math.round(num(o.sk));return r}
 function afterChange(){store.set("ls_products",products);store.set("ls_orders",orders);plan=[];renderProducts();buildPlan();renderOrders();renderHome()}
 function importText(kind,text,fname){
  if(/\.json$/i.test(fname)||/^\s*[\[{]/.test(text)){const j=JSON.parse(text);
@@ -1164,13 +1201,13 @@ function importText(kind,text,fname){
  if(kind==="restoreAll")throw new Error("ไฟล์สำรองต้องเป็น .json ที่ได้จากปุ่มสำรองทั้งหมด");
  const rows=parseCSV(text);if(rows.length<2)throw new Error("ไฟล์ว่าง หรือไม่มีแถวข้อมูล");
  if(kind==="impProd"){const m=colMap(rows[0],P_COLS);if(m.code<0||m.name<0)throw new Error("ต้องมีหัวคอลัมน์ รหัส และ ชื่อสินค้า");
-  let add=0,upd=0;rows.slice(1).forEach(r=>{const p=cleanProduct({code:r[m.code],name:r[m.name],price:m.price<0?0:r[m.price],points:m.points<0?"":r[m.points],promo:m.promo<0?"":r[m.promo],shop:m.shop<0?"":r[m.shop],comm:m.comm<0?"":r[m.comm],url:m.url<0?"":r[m.url]});
+  let add=0,upd=0;rows.slice(1).forEach(r=>{const p=cleanProduct({code:r[m.code],name:r[m.name],price:m.price<0?0:r[m.price],points:m.points<0?"":r[m.points],promo:m.promo<0?"":r[m.promo],shop:m.shop<0?"":r[m.shop],comm:m.comm<0?"":r[m.comm],url:m.url<0?"":r[m.url],stock:m.stock<0?"":r[m.stock]});
    if(!p.code||!p.name)return;const i=products.findIndex(x=>x.code===p.code);if(i>=0){products[i]={...products[i],...p};upd++}else{products.push(p);add++}});
   afterChange();return `นำเข้าแล้ว: เพิ่มใหม่ ${add} รายการ อัปเดต ${upd} รายการ`}
  const m=colMap(rows[0],O_COLS);if(m.name<0||m.code<0||m.qty<0)throw new Error("ต้องมีหัวคอลัมน์ ลูกค้า รหัส และ จำนวน");
  const key=o=>[o.d,o.t,o.name,o.code,o.qty,o.price].join("|"),have=new Set(orders.map(key));let add=0,dup=0;
  rows.slice(1).forEach(r=>{const g=k=>m[k]<0?"":r[m[k]];const p=products.find(x=>x.code===unq(g("code")));
-  const o=cleanOrder({d:g("d"),t:g("t"),name:g("name"),code:g("code"),pname:g("pname")||(p?p.name:""),qty:g("qty"),price:m.price<0?(p?p.price:0):g("price"),cm:g("cm")});
+  const o=cleanOrder({d:g("d"),t:g("t"),name:g("name"),code:g("code"),pname:g("pname")||(p?p.name:""),qty:g("qty"),price:m.price<0?(p?p.price:0):g("price"),cm:g("cm"),paid:g("paid")});
   if(!o.name||!o.code)return;if(have.has(key(o))){dup++;return}have.add(key(o));orders.push(o);add++});
  afterChange();return `นำเข้าออเดอร์แล้ว ${add} รายการ`+(dup?` (ข้ามรายการซ้ำ ${dup})`:"")}
 

@@ -56,6 +56,7 @@ body{font-family:"Kanit","IBM Plex Sans Thai","Leelawadee UI",sans-serif;color:#
 .in{animation:in .6s cubic-bezier(.2,.8,.2,1) both}
 @keyframes in{from{transform:translateY(calc(var(--u)*6)) scale(.97)}to{transform:none}}
 .demo{position:fixed;right:8px;bottom:8px;font:12px system-ui;color:#fff;background:rgba(0,0,0,.55);padding:4px 8px;border-radius:6px}
+.tag.low{background:#ffd84d;border-color:#ffd84d;color:#3a2500}.tag.out{background:#fff;border-color:#fff;color:var(--pink)}
 </style>
 </head>
 <body>
@@ -74,11 +75,11 @@ function view(d){
   return`<div class="bg">${img}</div><div class="stage in">
     <div class="photo"><div class="frame">${img||`<div class="ph">${esc(d.c)}</div>`}<span class="code">${esc(d.c)}</span></div></div>
     <div class="info">
-      <div class="tags"><span class="tag live">● LIVE</span><span class="tag">มี AI ช่วยนำเสนอ</span>${d.sh?`<span class="tag">${esc(d.sh)}</span>`:""}</div>
+      <div class="tags"><span class="tag live">● LIVE</span><span class="tag">มี AI ช่วยนำเสนอ</span>${d.st!=null?`<span class="tag ${d.st>0?"low":"out"}">${d.st>0?`เหลือ ${esc(d.st)} ชิ้น`:"หมดแล้ว"}</span>`:""}${d.sh?`<span class="tag">${esc(d.sh)}</span>`:""}</div>
       <h1 class="name">${esc(d.n)}</h1>
       <div class="price-row"><span class="price">${baht(d.p)}</span>${d.pr?`<span class="promo">${esc(d.pr)}</span>`:""}</div>
       ${pts.length?`<div class="pts">${pts.map((p,i)=>`<div class="pt${i===0?" on":""}">${esc(p)}</div>`).join("")}</div>`:""}
-      <div class="cta">${d.af?`กดตะกร้า #${esc(d.b)} สั่งซื้อได้เลย`:d.b?`กดตะกร้า #${esc(d.b)} หรือพิมพ์ CF ${esc(d.c)}`:`พิมพ์ CF ${esc(d.c)} ในคอมเมนต์`}</div>
+      <div class="cta">${d.st===0?"สินค้าหมดแล้ว ขอบคุณที่สนใจค่ะ":d.af?`กดตะกร้า #${esc(d.b)} สั่งซื้อได้เลย`:d.b?`กดตะกร้า #${esc(d.b)} หรือพิมพ์ CF ${esc(d.c)}`:`พิมพ์ CF ${esc(d.c)} ในคอมเมนต์`}</div>
     </div></div>`}
 function cyclePoints(){clearInterval(ptTimer);const els=[...document.querySelectorAll(".pt")];if(els.length<2)return;let i=0;
   ptTimer=setInterval(()=>{const a=els[i];i=(i+1)%els.length;const b=els[i];

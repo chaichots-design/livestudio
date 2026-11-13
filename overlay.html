@@ -36,6 +36,7 @@ body{font-family:"Kanit","IBM Plex Sans Thai","Leelawadee UI",sans-serif;color:v
 .in{animation:in .55s cubic-bezier(.2,.8,.2,1) both}
 @keyframes in{from{transform:translateX(calc(var(--u)*-110))}to{transform:none}}
 .demo{position:fixed;right:8px;bottom:8px;font:12px system-ui;color:#fff;background:rgba(0,0,0,.55);padding:4px 8px;border-radius:6px}
+.tag.low{color:#fff;background:#e09b1a}.tag.out{color:#fff;background:var(--pink)}
 </style>
 </head>
 <body>
@@ -48,9 +49,9 @@ let lastKey="";
 function data(){const h=location.hash.slice(1);if(!h)return Object.assign({demo:true},DEMO);try{return JSON.parse(decodeURIComponent(h))}catch(e){return{s:"idle"}}}
 function card(d){
   const ai='<span class="tag">มี AI ช่วยนำเสนอ</span>';
-  if(d.s==="prod")return`<div class="card in"><div class="top-row"><span class="code">${esc(d.c)}</span>${ai}</div>
+  if(d.s==="prod")return`<div class="card in"><div class="top-row"><span class="code">${esc(d.c)}</span>${ai}${d.st!=null?`<span class="tag ${d.st>0?"low":"out"}">${d.st>0?`เหลือ ${esc(d.st)} ชิ้น`:"หมดแล้ว"}</span>`:""}</div>
     <div class="name">${esc(d.n)}</div><div class="price-row"><span class="price">${baht(d.p)}</span>${d.pr?`<span class="promo">${esc(d.pr)}</span>`:""}</div>
-    <div class="cta">${d.af?`กดตะกร้า #${esc(d.b)} สั่งซื้อได้เลย`:d.b?`กดตะกร้า #${esc(d.b)} หรือพิมพ์ CF ${esc(d.c)}`:`พิมพ์ CF ${esc(d.c)} ในคอมเมนต์`}</div>${d.sh?`<div class="sub">จาก${esc(d.sh)}</div>`:""}</div>`;
+    <div class="cta">${d.st===0?"สินค้าหมดแล้ว ขอบคุณที่สนใจค่ะ":d.af?`กดตะกร้า #${esc(d.b)} สั่งซื้อได้เลย`:d.b?`กดตะกร้า #${esc(d.b)} หรือพิมพ์ CF ${esc(d.c)}`:`พิมพ์ CF ${esc(d.c)} ในคอมเมนต์`}</div>${d.sh?`<div class="sub">จาก${esc(d.sh)}</div>`:""}</div>`;
   if(d.s==="human")return`<div class="card talk in"><div class="top-row"><span class="tag live">● คุยสด</span></div>
     <div class="name">ถามมาได้เลย ตอบสดทุกคำถาม</div>${d.last?`<div class="sub">เพิ่งพูดถึง ${esc(d.last.c)} ${esc(d.last.n)}</div><div class="cta">${d.af?`กดตะกร้า #${esc(d.last.b)} สั่งซื้อได้เลย`:`พิมพ์ CF ${esc(d.last.c)} ในคอมเมนต์`}</div>`:""}</div>`;
   if(d.s==="open")return`<div class="card in"><div class="top-row"><span class="tag live">● LIVE</span></div>
