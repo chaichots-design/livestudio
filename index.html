@@ -110,11 +110,13 @@ a.btn:not([href]){opacity:.5;pointer-events:none}
 .glsteps.live li.ok::before{content:"✓";background:var(--talk);color:#fff}
 .glsteps.live li.next{border-color:var(--accent);background:var(--warn-soft)}
 .glsteps.live li.ok .gtx{color:var(--muted)}
-.glsteps.live .gtx{flex:1;min-width:0}
+.glsteps.live li{flex-wrap:wrap}
+.glsteps.live .gtx{flex:1 1 170px;min-width:0}
 .glsteps.live .gbtn{padding:2px 8px;font-size:12px;white-space:nowrap;text-decoration:none}
 .glsteps.live label{display:flex;gap:6px;align-items:center;margin:0;font-size:12px;color:var(--muted);white-space:nowrap;cursor:pointer}
 .glsteps.live label input{width:auto}
 .obscam{margin-top:8px}
+body:not(.has-helper) .hl-only{display:none!important}
 .slgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:6px;margin-top:8px}
 .slgrid div{background:var(--bg);border-radius:8px;padding:6px 8px}
 .slgrid span{display:block;font-size:11px;color:var(--muted)}
@@ -481,6 +483,7 @@ td.r,th.r{text-align:right}
         <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:nowrap"><b style="font-family:var(--display);font-weight:500">🔴 ขึ้นไลฟ์ TikTok</b><span class="livestate" id="glState" hidden></span></div>
         <button class="btn primary golivebtn" id="goBtn" type="button">🔴 เริ่มไลฟ์</button>
         <div class="mini" id="goNote" style="margin-top:4px;text-align:center"></div>
+        <label class="hl-only" style="display:flex;gap:6px;align-items:center;justify-content:center;margin:4px 0 0;font-size:12px;color:var(--muted)"><input type="checkbox" id="autoLaunch" style="width:auto">กดเริ่มไลฟ์แล้วเปิด TikTok LIVE Studio (และ OBS) ให้เอง</label>
         <select id="glMode" aria-label="ไลฟ์ด้วยอะไร" style="margin-top:8px">
           <option value="phone">ไลฟ์จากมือถือ (แอป TikTok)</option>
           <option value="inapp">คอม: LIVE Studio + จอไลฟ์ในโปรแกรม (ไม่ต้องมี OBS)</option>
@@ -496,6 +499,7 @@ td.r,th.r{text-align:right}
           <div class="glcam">📷 <b>กล้อง:</b> โปรแกรมเปิดเว็บแคม (หรือมือถือที่ต่อเป็นกล้อง) ใน <b>"จอไลฟ์"</b> เอง แล้วสลับกล้องกับฉากสินค้า AI ให้ตามตาราง เหมือน OBS แต่อยู่ในโปรแกรมนี้ ให้ TikTok LIVE Studio จับภาพหน้าต่างนี้ขึ้นไลฟ์</div>
           <ol class="glsteps live" data-steps="inapp"></ol>
           <div class="row" style="flex-wrap:nowrap;margin-top:4px"><button class="btn primary" id="stOpenBtn" type="button" style="flex:1">🖥 เปิดจอไลฟ์</button><button class="btn" id="stFocusBtn" type="button" hidden>ไปที่จอไลฟ์</button></div>
+          <button class="btn hl-only" type="button" data-launch="tiktok-studio" style="width:100%;margin-top:6px">🚀 เปิด TikTok LIVE Studio</button>
           <label for="stCamSel" style="margin-top:6px">📷 กล้องในจอไลฟ์</label>
           <div class="row" style="flex-wrap:nowrap"><select id="stCamSel" style="flex:1;min-width:0"><option value="">(เปิดจอไลฟ์ก่อน)</option></select><label style="display:flex;gap:4px;align-items:center;margin:0;white-space:nowrap;font-size:12px"><input type="checkbox" id="stMirror" style="width:auto">กลับซ้ายขวา</label></div>
           <div class="mini" id="stMsg" style="margin-top:4px">อย่าย่อ (minimize) หรือปิดหน้าต่างจอไลฟ์ระหว่างไลฟ์ วางไว้ข้างหลังได้ ภาพในจอไลฟ์ไม่มีปุ่มอะไร คนดูเห็นเฉพาะกล้อง ฉากสินค้า และป้าย</div>
@@ -504,6 +508,7 @@ td.r,th.r{text-align:right}
         <div class="glpane" data-gl="studio" hidden>
           <div class="glcam">📷 <b>กล้อง:</b> เว็บแคม (หรือมือถือที่ต่อเป็นกล้อง) อยู่ใน OBS แล้ว OBS ส่งภาพทั้งหมดให้ LIVE Studio เป็น "OBS Virtual Camera"</div>
           <ol class="glsteps live" data-steps="studio"></ol>
+          <div class="row hl-only" style="flex-wrap:nowrap;margin-bottom:6px"><button class="btn" type="button" data-launch="obs" style="flex:1">▶ เปิด OBS</button><button class="btn" type="button" data-launch="tiktok-studio" style="flex:1">🚀 เปิด LIVE Studio</button></div>
           <button class="btn primary" id="vcamBtn" type="button" style="width:100%">🎥 เปิดกล้อง OBS ให้ LIVE Studio</button>
           <a class="btn desk-only" href="https://www.tiktok.com/studio/download" target="_blank" rel="noopener" style="width:100%;text-align:center;margin-top:6px;box-sizing:border-box">🖥 โหลด TikTok LIVE Studio</a>
         </div>
@@ -511,6 +516,7 @@ td.r,th.r{text-align:right}
           <div class="glcam">📷 <b>กล้อง:</b> เว็บแคม (หรือมือถือที่ต่อเป็นกล้อง) อยู่ใน OBS แล้ว OBS ส่งภาพขึ้น TikTok เองด้วย Stream key</div>
           <ol class="glsteps live" data-steps="key"></ol>
           <div class="mini">Server URL กับ Stream key มีเฉพาะบัญชีที่ TikTok เปิดให้ ดูได้ตอนตั้งค่าไลฟ์ผ่านซอฟต์แวร์ (LIVE Center)</div>
+          <button class="btn hl-only" type="button" data-launch="obs" style="width:100%;margin-bottom:6px">▶ เปิด OBS</button>
           <label for="skServer">Server URL</label><input id="skServer" placeholder="rtmp://..." autocomplete="off" spellcheck="false">
           <label for="skKey" style="margin-top:6px">Stream key</label><input id="skKey" type="password" autocomplete="off" spellcheck="false" placeholder="วางเฉพาะตอนตั้งค่า">
           <div class="mini" style="margin-top:4px">🔒 key ไม่ถูกเก็บในโปรแกรมนี้ (OBS เก็บเอง) อย่าให้ใครเห็น ใครได้ key ไปจะไลฟ์ในชื่อคุณได้ ส่วนมาก TikTok ให้ key ใหม่ทุกครั้งที่ไลฟ์</div>
@@ -674,7 +680,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.20.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.21.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
@@ -1060,7 +1066,7 @@ let obsCamOk=false,obsCamProp="",obsCamLoaded=false;
 function glStepList(){const fixObs=()=>ckFix("obs"),setup=()=>{$("#scSetup").click();document.querySelector("#scSetup").scrollIntoView({behavior:"smooth",block:"center"})};
  const start=elapsed>0&&!running?{tx:"พักอยู่ กด <b>ไลฟ์ต่อ</b> (หรือกด P)",ok:false,btn:["ไลฟ์ต่อ",()=>$("#pauseBtn").click()]}:
   {tx:"กด <b>🔴 เริ่มไลฟ์</b> ด้านบน โปรแกรมนับ 3-2-1 แล้วเริ่มรอบ",ok:running,btn:["🔴 เริ่มไลฟ์",()=>$("#goBtn").click()]};
- const obs={tx:"เปิด OBS แล้วต่อกับโปรแกรมนี้",ok:obsReady,btn:["ไปตั้งค่า",fixObs]};
+ const obs={tx:"เปิด OBS แล้วต่อกับโปรแกรมนี้",ok:obsReady,btn:hasHelper?["▶ เปิด OBS",()=>{launchApp("obs");if(!obsCfg.on){obsCfg.on=true;store.set("ls_obs",obsCfg);obsFill()}setTimeout(obsConnect,6000)}]:["ไปตั้งค่า",fixObs]};
  const scene={tx:"จัดฉาก + ใส่กล้องใน OBS",ok:obsReady&&obsScenesOk&&obsCamOk,btn:["🪄 จัดฉาก",setup]};
  if(glCfg.mode==="phone")return[
   {tx:"จัดมุมกล้อง ให้หน้าและสินค้าอยู่เหนือแถบคอมเมนต์",ok:camTested,btn:["📷 ทดสอบ",()=>$("#camTest").click()]},
@@ -1069,11 +1075,11 @@ function glStepList(){const fixObs=()=>ckFix("obs"),setup=()=>{$("#scSetup").cli
   start];
  if(glCfg.mode==="inapp")return[
   {tx:"เปิด <b>จอไลฟ์</b> ในโปรแกรม (กล้อง + ฉากสินค้า AI + ป้าย)",ok:stLive()&&stCamOk,btn:["🖥 เปิดจอไลฟ์",()=>stOpen()]},
-  {tx:"ใน TikTok LIVE Studio เพิ่มแหล่งภาพแบบ <b>จับภาพหน้าต่าง</b> เลือก <b>LiveStudio จอไลฟ์</b> (ทำครั้งแรกครั้งเดียว)",tick:"gl_win"},
+  {tx:"ใน TikTok LIVE Studio เพิ่มแหล่งภาพแบบ <b>จับภาพหน้าต่าง</b> เลือก <b>LiveStudio จอไลฟ์</b> (ทำครั้งแรกครั้งเดียว)",tick:"gl_win",btn:hasHelper?["🚀 เปิด LIVE Studio",()=>launchApp("tiktok-studio")]:null},
   {tx:"กด <b>🔴 เริ่มไลฟ์</b> ด้านบน แล้วกด <b>Go LIVE</b> ใน LIVE Studio",ok:running,btn:["🔴 เริ่มไลฟ์",()=>$("#goBtn").click()]}];
  if(glCfg.mode==="studio")return[obs,scene,
   {tx:"เปิดกล้อง OBS (Virtual Camera)",ok:glVcam,btn:["🎥 เปิด",()=>$("#vcamBtn").click()]},
-  {tx:"ใน TikTok LIVE Studio เพิ่มแหล่งภาพ <b>กล้อง</b> เลือก <b>OBS Virtual Camera</b> แล้วกด <b>Go LIVE</b>",tick:"gl_studio"},
+  {tx:"ใน TikTok LIVE Studio เพิ่มแหล่งภาพ <b>กล้อง</b> เลือก <b>OBS Virtual Camera</b> แล้วกด <b>Go LIVE</b>",tick:"gl_studio",btn:hasHelper?["🚀 เปิด LIVE Studio",()=>launchApp("tiktok-studio")]:null},
   start];
  return[obs,scene,
   {tx:"วาง Server URL + Stream key แล้วกด <b>บันทึกลง OBS</b>",ok:glKeySet,btn:["ไปที่ช่อง",()=>{$("#skServer").focus();$("#skServer").scrollIntoView({behavior:"smooth",block:"center"})}]},
@@ -1152,6 +1158,18 @@ $("#camMirror").onchange=()=>$("#camStage").classList.toggle("mirror",$("#camMir
 $("#camClose").onclick=()=>$("#camDlg").close();
 $("#camDlg").addEventListener("close",camStop);
 
+/* helper link "livestudio:" (registered by the Windows installer, see installer/helper.ps1):
+   opens TikTok LIVE Studio or OBS, or brings it to the front. Only on the installed Windows copy
+   (file://); the web/phone copy hides these buttons. Edge asks once before opening; ticking
+   "always allow" stops the question. */
+const hasHelper=location.protocol==="file:"&&/Windows/i.test(navigator.userAgent);
+document.body.classList.toggle("has-helper",hasHelper);
+const launchCfg=Object.assign({auto:true},store.get("ls_launch",{}));
+function launchApp(which){if(!hasHelper)return false;const a=document.createElement("a");a.href="livestudio:"+which;document.body.appendChild(a);a.click();a.remove();
+ const n=$("#goNote");if(n)n.textContent=(which==="obs"?"กำลังเปิด OBS...":"กำลังเปิด TikTok LIVE Studio...")+" (ครั้งแรก Edge จะถาม ให้ติ๊ก \"อนุญาตเสมอ\" แล้วกด เปิด)";return true}
+document.querySelectorAll("[data-launch]").forEach(b=>b.onclick=()=>{launchApp(b.dataset.launch);if(b.dataset.launch==="obs"&&!obsCfg.on){obsCfg.on=true;store.set("ls_obs",obsCfg);obsFill()}if(b.dataset.launch==="obs")setTimeout(obsConnect,6000)});
+$("#autoLaunch").checked=launchCfg.auto;$("#autoLaunch").onchange=()=>{launchCfg.auto=$("#autoLaunch").checked;store.set("ls_launch",launchCfg)};
+
 /* in-app live screen (studio.html): replaces OBS for TikTok LIVE Studio (window capture).
    The popup gets the scene + overlay/showcase hashes by postMessage (works on file:// too) and
    reports camera state back. Scene follows the same rules as OBS (setScene/pickScene). */
@@ -1194,11 +1212,14 @@ const waitFor=(fn,ms)=>new Promise(res=>{const t0=Date.now(),iv=setInterval(()=>
 async function goLive(){const note=$("#goNote"),m=glCfg.mode;note.textContent="";
  if(!liveProducts().length){note.textContent="ยังไม่ได้เลือกสินค้าสำหรับรอบนี้ (แท็บ 1. สินค้า)";return}
  if(m==="phone"){if(!confirm("กด \"เริ่ม LIVE\" ในแอป TikTok แล้วใช่ไหม?\n\nกดตกลง แล้วโปรแกรมจะนับ 3-2-1 และเริ่มรอบ"))return}
- else if(m==="inapp"){if(!stLive()&&!stOpen())return;note.textContent="กำลังเปิดกล้องในจอไลฟ์...";
+ else if(m==="inapp"){if(!stLive()&&!stOpen())return;if(launchCfg.auto&&hasHelper)setTimeout(()=>launchApp("tiktok-studio"),400);note.textContent="กำลังเปิดกล้องในจอไลฟ์...";
   if(!await waitFor(()=>stCamOk,10000)){note.textContent="จอไลฟ์ยังเปิดกล้องไม่ได้ ดูข้อความในหน้าต่างจอไลฟ์ แล้วกดเริ่มไลฟ์อีกครั้ง";return}
-  note.textContent="✓ จอไลฟ์พร้อม (กล้องเปิดแล้ว)";
+  note.textContent="✓ จอไลฟ์พร้อม (กล้องเปิดแล้ว)"+(launchCfg.auto&&hasHelper?" · เปิด TikTok LIVE Studio ให้แล้ว":"");
   if(!confirm("จอไลฟ์พร้อมแล้ว\n\nใน TikTok LIVE Studio กด \"Go LIVE\" แล้วใช่ไหม?\n(ครั้งแรก: เพิ่มแหล่งภาพแบบจับภาพหน้าต่าง เลือก \"LiveStudio จอไลฟ์\")\n\nกดตกลง แล้วโปรแกรมจะนับ 3-2-1 และเริ่มรอบ"))return}
- else{if(!obsReady){note.textContent="ยังไม่ได้ต่อ OBS เปิด OBS ก่อน หรือเลือกโหมด \"จอไลฟ์ในโปรแกรม (ไม่ต้องมี OBS)\"";return}
+ else{if(!obsReady&&launchCfg.auto&&hasHelper){launchApp("obs");if(!obsCfg.on){obsCfg.on=true;store.set("ls_obs",obsCfg);obsFill()}
+   note.textContent="กำลังเปิด OBS แล้วต่อให้เอง...";for(let i=0;i<6&&!obsReady;i++){await new Promise(r=>setTimeout(r,4000));if(!obsReady)obsConnect()}await waitFor(()=>obsReady,3000)}
+  if(!obsReady){note.textContent="ยังไม่ได้ต่อ OBS เปิด OBS ก่อน หรือเลือกโหมด \"จอไลฟ์ในโปรแกรม (ไม่ต้องมี OBS)\"";return}
+  if(m==="studio"&&launchCfg.auto&&hasHelper)launchApp("tiktok-studio");
   if(!obsScenesOk||!obsCamOk){note.textContent="กำลังจัดฉากและใส่กล้องใน OBS...";$("#scSetup").click();await waitFor(()=>obsScenesOk&&obsCamOk,8000)}
   if(m==="studio"){if(!glVcam){await obsReq("StartVirtualCam");await glPoll()}
    if(!glVcam){note.textContent="เปิดกล้อง OBS (Virtual Camera) ไม่ได้ ต้องใช้ OBS 28 ขึ้นไป";return}
