@@ -115,6 +115,20 @@ a.btn:not([href]){opacity:.5;pointer-events:none}
 .glsteps.live label{display:flex;gap:6px;align-items:center;margin:0;font-size:12px;color:var(--muted);white-space:nowrap;cursor:pointer}
 .glsteps.live label input{width:auto}
 .obscam{margin-top:8px}
+.golivebtn{width:100%;margin-top:8px;font-size:18px;padding:12px;border-radius:999px;font-family:var(--display);font-weight:500}
+.golivebtn.end{background:var(--surface);color:var(--accent);border:2px solid var(--accent)}
+#cdBox{position:fixed;inset:0;z-index:50;background:rgba(10,10,14,.82);display:grid;place-items:center}
+#cdBox[hidden]{display:none}
+.cdin{text-align:center;color:#fff}
+.cdlab{font-family:var(--display);font-size:20px;opacity:.9}
+.cdnum{font-family:var(--display);font-weight:600;font-size:160px;line-height:1.1;background:linear-gradient(135deg,#ff5c7c,#b5179e);-webkit-background-clip:text;background-clip:text;color:transparent;animation:cdpop 1s ease-out infinite}
+.cdsub{font-size:14px;opacity:.85;margin:4px 0 14px;max-width:320px}
+@keyframes cdpop{0%{transform:scale(1.35);opacity:.2}30%{transform:scale(1);opacity:1}100%{transform:scale(.92);opacity:.9}}
+@media (prefers-reduced-motion:reduce){.cdnum{animation:none}}
+#affDlg{border:0;border-radius:14px;padding:0;max-width:min(96vw,520px);width:100%;background:var(--surface);color:var(--ink)}
+#affDlg::backdrop{background:rgba(0,0,0,.55)}
+.afflist{display:grid;gap:4px}.afflist div{display:flex;gap:8px;align-items:center;font-size:13px;padding:5px 6px;background:var(--bg);border-radius:6px}
+.afflist span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #camDlg{border:0;border-radius:14px;padding:0;max-width:min(96vw,460px);width:100%;background:var(--surface);color:var(--ink)}
 #camDlg::backdrop{background:rgba(0,0,0,.6)}
 .camwrap{padding:14px}
@@ -293,6 +307,7 @@ td.r,th.r{text-align:right}
       <a class="btn own-only" href="https://seller-th.tiktok.com/" target="_blank" rel="noopener">🛒 TikTok Shop (Seller Center)</a>
       <a class="btn desk-only" href="https://www.tiktok.com/studio/download" target="_blank" rel="noopener">🖥 โหลด TikTok LIVE Studio</a>
       <button class="btn" id="ttCopyBasket">📋 คัดลอกรายการตะกร้า</button>
+      <button class="btn" type="button" data-aff>🤝 ส่วนนายหน้า TikTok</button>
     </div>
     <div class="mini" id="ttMsg" style="margin-top:6px"></div>
     <div class="mini aff-only" style="margin-top:6px;padding:8px 10px;background:var(--bg);border-radius:8px">🤝 นายหน้า: เพิ่มสินค้าลงโชว์เคสในแอป TikTok ก่อน แล้วกด 📋 คัดลอกรายการตะกร้า ได้ลำดับ ร้านต้นทาง และลิงก์สินค้า ไว้เช็กตอนเพิ่มเข้าตะกร้าไลฟ์ ราคา โปร และค่าส่งเป็นไปตามที่ร้านต้นทางกำหนด ตรวจในหน้าสินค้าก่อนไลฟ์ทุกครั้ง</div>
@@ -315,7 +330,7 @@ td.r,th.r{text-align:right}
     <div><b>ช่วงสีเขียวต้องเป็นคนพูดสด</b><div class="mini" style="margin-top:2px">กฎ TikTok Shop ไม่ให้ใช้เสียง AI หรือคลิปเก่าแทนการพูดสดทั้งรอบ โปรแกรมจึงเว้นช่วงให้คุณเข้ามาทักทายและตอบคอมเมนต์เป็นระยะ ถ้าใช้ตัวละคร AI อย่าให้เกินครึ่งจอ และแจ้งคนดูว่ามี AI ช่วยนำเสนอ</div></div>
   </div>
   <div class="rulecard" id="updBox" hidden style="justify-content:space-between;flex-wrap:wrap"></div>
-  <p class="mini" style="text-align:center;margin-top:14px"><a id="manualLink" target="_blank" rel="noopener" style="color:var(--accent);font-weight:500">📘 คู่มือการใช้งาน (PDF)</a> · <a id="quickLink" target="_blank" rel="noopener" style="color:var(--accent);font-weight:500">📷 คู่มือเปิดกล้อง + ต่อ TikTok</a> · LiveStudio เวอร์ชัน <b id="appVer"></b> · <span id="verNote">มีเวอร์ชันใหม่ ให้เปิดไฟล์ติดตั้งตัวใหม่ทับได้เลย สินค้าและออเดอร์เดิมไม่หาย</span></p>
+  <p class="mini" style="text-align:center;margin-top:14px"><a id="manualLink" target="_blank" rel="noopener" style="color:var(--accent);font-weight:500">📘 คู่มือการใช้งาน (PDF)</a> · <a id="quickLink" target="_blank" rel="noopener" style="color:var(--accent);font-weight:500">📷 คู่มือเปิดกล้อง + เริ่มไลฟ์</a> · LiveStudio เวอร์ชัน <b id="appVer"></b> · <span id="verNote">มีเวอร์ชันใหม่ ให้เปิดไฟล์ติดตั้งตัวใหม่ทับได้เลย สินค้าและออเดอร์เดิมไม่หาย</span></p>
 </section>
 
 <section id="tab-products" hidden>
@@ -329,6 +344,7 @@ td.r,th.r{text-align:right}
       </div>
     </div>
     <div class="mini" id="sellerHelp" style="margin-top:6px"></div>
+    <button class="btn sm" type="button" data-aff style="margin-top:6px">🤝 ส่วนนายหน้า TikTok (หาสินค้า ค่าคอม โชว์เคส)</button>
   </div>
   <details class="card" id="aiBox" style="margin-bottom:12px">
     <summary style="cursor:pointer"><b style="font-family:var(--display);font-weight:500">✨ ตั้งค่า AI เขียนบทจากรูป</b> <span class="mini" id="aiState"></span></summary>
@@ -434,8 +450,11 @@ td.r,th.r{text-align:right}
       </details>
       <div class="card golive" id="goLive">
         <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:nowrap"><b style="font-family:var(--display);font-weight:500">🔴 ขึ้นไลฟ์ TikTok</b><span class="livestate" id="glState" hidden></span></div>
-        <select id="glMode" aria-label="ไลฟ์ด้วยอะไร" style="margin-top:6px">
+        <button class="btn primary golivebtn" id="goBtn" type="button">🔴 เริ่มไลฟ์</button>
+        <div class="mini" id="goNote" style="margin-top:4px;text-align:center"></div>
+        <select id="glMode" aria-label="ไลฟ์ด้วยอะไร" style="margin-top:8px">
           <option value="phone">ไลฟ์จากมือถือ (แอป TikTok)</option>
+          <option value="inapp">คอม: LIVE Studio + จอไลฟ์ในโปรแกรม (ไม่ต้องมี OBS)</option>
           <option value="studio">คอม: TikTok LIVE Studio + OBS</option>
           <option value="key">คอม: OBS ส่งตรง (Stream key)</option>
         </select>
@@ -443,6 +462,15 @@ td.r,th.r{text-align:right}
           <div class="glcam">📷 <b>กล้อง:</b> ใช้กล้องมือถือผ่านแอป TikTok (แอปเปิดกล้องเองตอนกด LIVE) โปรแกรมนี้ใช้ดูบท จับเวลา และจดออเดอร์ เปิดในอีกเครื่องหรือแบ่งจอ</div>
           <ol class="glsteps live" data-steps="phone"></ol>
           <div class="mini">ชื่อเมนูในแอป TikTok อาจต่างไปตามรุ่น</div>
+        </div>
+        <div class="glpane" data-gl="inapp" hidden>
+          <div class="glcam">📷 <b>กล้อง:</b> โปรแกรมเปิดเว็บแคม (หรือมือถือที่ต่อเป็นกล้อง) ใน <b>"จอไลฟ์"</b> เอง แล้วสลับกล้องกับฉากสินค้า AI ให้ตามตาราง เหมือน OBS แต่อยู่ในโปรแกรมนี้ ให้ TikTok LIVE Studio จับภาพหน้าต่างนี้ขึ้นไลฟ์</div>
+          <ol class="glsteps live" data-steps="inapp"></ol>
+          <div class="row" style="flex-wrap:nowrap;margin-top:4px"><button class="btn primary" id="stOpenBtn" type="button" style="flex:1">🖥 เปิดจอไลฟ์</button><button class="btn" id="stFocusBtn" type="button" hidden>ไปที่จอไลฟ์</button></div>
+          <label for="stCamSel" style="margin-top:6px">📷 กล้องในจอไลฟ์</label>
+          <div class="row" style="flex-wrap:nowrap"><select id="stCamSel" style="flex:1;min-width:0"><option value="">(เปิดจอไลฟ์ก่อน)</option></select><label style="display:flex;gap:4px;align-items:center;margin:0;white-space:nowrap;font-size:12px"><input type="checkbox" id="stMirror" style="width:auto">กลับซ้ายขวา</label></div>
+          <div class="mini" id="stMsg" style="margin-top:4px">อย่าย่อ (minimize) หรือปิดหน้าต่างจอไลฟ์ระหว่างไลฟ์ วางไว้ข้างหลังได้ ภาพในจอไลฟ์ไม่มีปุ่มอะไร คนดูเห็นเฉพาะกล้อง ฉากสินค้า และป้าย</div>
+          <a class="btn desk-only" href="https://www.tiktok.com/studio/download" target="_blank" rel="noopener" style="width:100%;text-align:center;margin-top:6px;box-sizing:border-box">🖥 โหลด TikTok LIVE Studio</a>
         </div>
         <div class="glpane" data-gl="studio" hidden>
           <div class="glcam">📷 <b>กล้อง:</b> เว็บแคม (หรือมือถือที่ต่อเป็นกล้อง) อยู่ใน OBS แล้ว OBS ส่งภาพทั้งหมดให้ LIVE Studio เป็น "OBS Virtual Camera"</div>
@@ -571,6 +599,25 @@ td.r,th.r{text-align:right}
   <div class="row" style="margin-top:8px"><button class="btn" id="expHist">⬇ ส่งออกประวัติ (Excel)</button><span class="mini" id="histMsg"></span></div>
 </section>
 </main>
+<div id="cdBox" hidden role="alertdialog" aria-live="assertive"><div class="cdin"><div class="cdlab">กำลังเริ่มไลฟ์</div><div class="cdnum" id="cdNum">3</div><div class="cdsub" id="cdSub"></div><button class="btn" id="cdCancel" type="button">ยกเลิก</button></div></div>
+<dialog id="affDlg" aria-label="ส่วนนายหน้า TikTok">
+  <div style="padding:16px 18px">
+    <div class="row" style="justify-content:space-between"><b style="font-family:var(--display);font-weight:500;font-size:18px">🤝 ส่วนนายหน้า TikTok (Affiliate)</b><button class="btn sm" id="affClose" type="button" aria-label="ปิด">✕</button></div>
+    <div class="mini" style="margin-top:6px">ที่หาสินค้ามาขายรับค่าคอม (ตลาดนายหน้า / ศูนย์ครีเอเตอร์ของ TikTok Shop) อยู่ในแอป TikTok เป็นหลัก:</div>
+    <ol class="glsteps" style="margin-top:6px">
+      <li>เปิดแอป TikTok ไปที่ <b>โปรไฟล์</b> กด <b>☰</b> มุมขวาบน</li>
+      <li>เข้า <b>TikTok Studio</b> หรือ <b>เครื่องมือครีเอเตอร์</b> แล้วเลือก <b>TikTok Shop</b> (ศูนย์ครีเอเตอร์ / นายหน้า)</li>
+      <li>เลือกสินค้าในตลาดนายหน้า ดูค่าคอม แล้วกด <b>เพิ่มลงโชว์เคส</b></li>
+      <li>กลับมาที่นี่ เพิ่มสินค้าในแท็บสินค้า (ร้านต้นทาง ค่าคอม % ลิงก์) แล้วเพิ่มเข้าตะกร้าไลฟ์ตามลำดับ</li>
+    </ol>
+    <div class="mini">ชื่อเมนูอาจต่างไปตามรุ่นแอป และบางบัญชีต้องมีผู้ติดตามถึงเกณฑ์ที่ TikTok กำหนดก่อนเมนูนี้จะขึ้น</div>
+    <div class="row" style="margin-top:10px"><a class="btn primary" id="affOpen" target="_blank" rel="noopener">🤝 เปิดศูนย์นายหน้า</a><a class="btn" id="ttLive3" target="_blank" rel="noopener">📱 เปิด TikTok</a><button class="btn" id="affToAff" type="button">เปลี่ยนเป็นโหมดนายหน้า</button></div>
+    <label for="affUrl" style="margin-top:10px">ลิงก์ศูนย์นายหน้าบนเว็บของคุณ (ถ้ามี)</label>
+    <div class="row" style="flex-wrap:nowrap"><input id="affUrl" placeholder="https://..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0"><button class="btn" id="affSave" type="button">บันทึก</button></div>
+    <div class="mini" id="affMsg" style="margin-top:4px">เปิดศูนย์นายหน้าในคอมแล้ว คัดลอกลิงก์จากแถบที่อยู่มาวาง ครั้งต่อไปปุ่มจะเปิดหน้านั้นเลย ถ้ายังไม่ใส่ ปุ่มจะค้นหาให้</div>
+    <div id="affList" style="margin-top:10px"></div>
+  </div>
+</dialog>
 <dialog id="camDlg" aria-label="ทดสอบกล้อง">
   <div class="camwrap">
     <div class="row" style="justify-content:space-between;flex-wrap:nowrap"><b style="font-family:var(--display);font-weight:500">📷 ทดสอบกล้อง / จัดมุม</b><button class="btn sm" id="camClose" type="button">ปิดกล้อง</button></div>
@@ -584,7 +631,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.16.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.17.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
@@ -949,7 +996,7 @@ $("#fsDown").onclick=()=>{uiCfg.pf-=3;applyFs()};$("#fsUp").onclick=()=>{uiCfg.p
    the TikTok app (phone), TikTok LIVE Studio (OBS Virtual Camera as its camera) and OBS with a
    TikTok stream key (rtmp_custom). The stream key is sent straight to OBS (which stores it) and is
    never kept in this app. ls_golive {mode, server}. */
-const glCfg=Object.assign({mode:matchMedia("(pointer:coarse)").matches?"phone":"studio",server:""},store.get("ls_golive",{}));
+const glCfg=Object.assign({mode:matchMedia("(pointer:coarse)").matches?"phone":"inapp",server:""},store.get("ls_golive",{}));
 let glStream=false,glVcam=false,glSince=0,glKeySet=false;
 function glSave(){store.set("ls_golive",{mode:glCfg.mode,server:glCfg.server})}
 function renderGoLive(){$("#glMode").value=glCfg.mode;document.querySelectorAll(".glpane").forEach(d=>d.hidden=d.dataset.gl!==glCfg.mode);
@@ -959,16 +1006,17 @@ function renderGoLive(){$("#glMode").value=glCfg.mode;document.querySelectorAll(
  sb.textContent=glStream?"⏹ หยุดส่งภาพ (จบไลฟ์)":"🔴 เริ่มส่งภาพขึ้น TikTok";sb.classList.toggle("primary",!glStream);
  [vb,sb,$("#skSave")].forEach(b=>b.disabled=!obsReady);
  st.hidden=!(glStream||glVcam);st.textContent=glStream?"● กำลังส่งภาพ":"กล้อง OBS เปิดอยู่";st.className="livestate"+(glStream?"":" vcam");
- if(!obsReady&&glCfg.mode!=="phone")$("#glMsg").textContent="ต้องต่อ OBS ก่อน (กล่อง \"สลับซีน OBS อัตโนมัติ\" ด้านล่าง)";
+ if(!obsReady&&(glCfg.mode==="studio"||glCfg.mode==="key"))$("#glMsg").textContent="ต้องต่อ OBS ก่อน (กล่อง \"สลับซีน OBS อัตโนมัติ\" ด้านล่าง)";
  else if($("#glMsg").dataset.auto)$("#glMsg").textContent="";
- $("#glMsg").dataset.auto=!obsReady&&glCfg.mode!=="phone"?"1":"";
- $("#obsCamRow").hidden=glCfg.mode==="phone"||!obsReady;renderGlSteps()}
+ $("#glMsg").dataset.auto=!obsReady&&(glCfg.mode==="studio"||glCfg.mode==="key")?"1":"";
+ $("#obsCamRow").hidden=glCfg.mode==="phone"||glCfg.mode==="inapp"||!obsReady;renderGlSteps()}
 /* step-by-step go-live list: each step turns ✓ from the real state (OBS, virtual camera, stream,
    round running); steps the app cannot see are ticked by the host (ckCfg, reset daily, shared
    with the pre-live checklist for "basket"). The first unfinished step is highlighted. */
 let obsCamOk=false,obsCamProp="",obsCamLoaded=false;
 function glStepList(){const fixObs=()=>ckFix("obs"),setup=()=>{$("#scSetup").click();document.querySelector("#scSetup").scrollIntoView({behavior:"smooth",block:"center"})};
- const start={tx:elapsed>0&&!running?"พักอยู่ กด <b>ไลฟ์ต่อ</b> (หรือกด P)":"กด <b>เริ่มรอบ</b> ในโปรแกรมนี้ (หรือกด P)",ok:running,btn:[elapsed>0?"ไลฟ์ต่อ":"เริ่มรอบ",()=>$(elapsed>0?"#pauseBtn":"#startBtn").click()]};
+ const start=elapsed>0&&!running?{tx:"พักอยู่ กด <b>ไลฟ์ต่อ</b> (หรือกด P)",ok:false,btn:["ไลฟ์ต่อ",()=>$("#pauseBtn").click()]}:
+  {tx:"กด <b>🔴 เริ่มไลฟ์</b> ด้านบน โปรแกรมนับ 3-2-1 แล้วเริ่มรอบ",ok:running,btn:["🔴 เริ่มไลฟ์",()=>$("#goBtn").click()]};
  const obs={tx:"เปิด OBS แล้วต่อกับโปรแกรมนี้",ok:obsReady,btn:["ไปตั้งค่า",fixObs]};
  const scene={tx:"จัดฉาก + ใส่กล้องใน OBS",ok:obsReady&&obsScenesOk&&obsCamOk,btn:["🪄 จัดฉาก",setup]};
  if(glCfg.mode==="phone")return[
@@ -976,6 +1024,10 @@ function glStepList(){const fixObs=()=>ckFix("obs"),setup=()=>{$("#scSetup").cli
   {tx:"เพิ่มสินค้าเข้าตะกร้าไลฟ์ใน TikTok ตามลำดับในแท็บตารางรอบ",tick:"basket",btn:["ดูลำดับ",()=>show("plan")]},
   {tx:"เปิดแอป TikTok กด <b>+</b> เลือก <b>LIVE</b> แล้วกด <b>เริ่ม LIVE</b>",tick:"gl_app",link:["📱 เปิด TikTok","https://www.tiktok.com/"]},
   start];
+ if(glCfg.mode==="inapp")return[
+  {tx:"เปิด <b>จอไลฟ์</b> ในโปรแกรม (กล้อง + ฉากสินค้า AI + ป้าย)",ok:stLive()&&stCamOk,btn:["🖥 เปิดจอไลฟ์",()=>stOpen()]},
+  {tx:"ใน TikTok LIVE Studio เพิ่มแหล่งภาพแบบ <b>จับภาพหน้าต่าง</b> เลือก <b>LiveStudio จอไลฟ์</b> (ทำครั้งแรกครั้งเดียว)",tick:"gl_win"},
+  {tx:"กด <b>🔴 เริ่มไลฟ์</b> ด้านบน แล้วกด <b>Go LIVE</b> ใน LIVE Studio",ok:running,btn:["🔴 เริ่มไลฟ์",()=>$("#goBtn").click()]}];
  if(glCfg.mode==="studio")return[obs,scene,
   {tx:"เปิดกล้อง OBS (Virtual Camera)",ok:glVcam,btn:["🎥 เปิด",()=>$("#vcamBtn").click()]},
   {tx:"ใน TikTok LIVE Studio เพิ่มแหล่งภาพ <b>กล้อง</b> เลือก <b>OBS Virtual Camera</b> แล้วกด <b>Go LIVE</b>",tick:"gl_studio"},
@@ -1057,6 +1109,89 @@ $("#camMirror").onchange=()=>$("#camStage").classList.toggle("mirror",$("#camMir
 $("#camClose").onclick=()=>$("#camDlg").close();
 $("#camDlg").addEventListener("close",camStop);
 
+/* in-app live screen (studio.html): replaces OBS for TikTok LIVE Studio (window capture).
+   The popup gets the scene + overlay/showcase hashes by postMessage (works on file:// too) and
+   reports camera state back. Scene follows the same rules as OBS (setScene/pickScene). */
+let stw=null,stScene="cam",stCamOk=false,stDevs=[],stCur="";
+const stLive=()=>!!(stw&&!stw.closed);
+const stCfg=Object.assign({cam:"",mirror:false},store.get("ls_studio",{}));
+function stPush(){if(!stLive())return;const ov=overlayURL(overlayData()).split("#")[1],sc=showcaseURL(showcaseData()).split("#")[1];
+ try{stw.postMessage({t:"state",scene:stScene,ov,sc},"*")}catch(e){}}
+function stOpen(){if(stLive()){stw.focus();return stw}
+ stCamOk=false;stw=window.open(new URL("studio.html",location.href).href.split("#")[0]+"?cam="+encodeURIComponent(stCfg.cam||"")+"&m="+(stCfg.mirror?1:0),"ls_studio","popup,width=450,height=800");
+ if(!stw){$("#stMsg").textContent="เปิดหน้าต่างจอไลฟ์ไม่ได้ (เบราว์เซอร์บล็อกป๊อปอัป) อนุญาตป๊อปอัปให้โปรแกรมนี้แล้วลองใหม่";return null}
+ stScene=running&&plan.length&&plan[cur].type==="prod"&&obsCfg.mode!=="manual"?"ai":"cam";
+ setTimeout(stPush,800);setTimeout(stPush,2000);renderStudio();return stw}
+addEventListener("message",e=>{const d=e.data||{};if(d.t!=="studio"||!stLive()||e.source!==stw)return;
+ if(d.closed){stCamOk=false;setTimeout(renderStudio,300);return}
+ stCamOk=!!d.camOk;if(d.devices)stDevs=d.devices;if(d.cur)stCur=d.cur;
+ $("#stMsg").textContent=d.camOk?"✓ จอไลฟ์เปิดกล้องแล้ว ใน TikTok LIVE Studio เลือกจับภาพหน้าต่าง \"LiveStudio จอไลฟ์\"":
+  d.err==="NotAllowedError"?"จอไลฟ์ยังไม่ได้รับอนุญาตให้ใช้กล้อง กดอนุญาตที่แถบบนของหน้าต่างจอไลฟ์":d.err==="NotReadableError"?"กล้องถูกโปรแกรมอื่นใช้อยู่ (เช่น OBS หรือหน้าทดสอบกล้อง) ปิดก่อนแล้วเลือกกล้องใหม่":d.err?"ไม่พบกล้อง เสียบกล้องแล้วเลือกจากรายการ":"";
+ if(d.camOk)stPush();renderStudio();renderSceneBar()});
+function renderStudio(){const live=stLive();$("#stOpenBtn").textContent=live?"⏹ ปิดจอไลฟ์":"🖥 เปิดจอไลฟ์";$("#stOpenBtn").classList.toggle("primary",!live);$("#stFocusBtn").hidden=!live;
+ const sel=$("#stCamSel");sel.innerHTML=stDevs.length?stDevs.map(d=>`<option value="${esc(d.id)}">${esc(d.label)}</option>`).join(""):`<option value="">(เปิดจอไลฟ์ก่อน)</option>`;
+ if(stCur)sel.value=stCur;sel.disabled=!live;$("#stMirror").checked=!!stCfg.mirror;
+ if(typeof renderGlSteps==="function")renderGlSteps()}
+$("#stOpenBtn").onclick=()=>{if(stLive()){if(running&&!confirm("ปิดจอไลฟ์ตอนนี้?\nภาพใน LIVE Studio จะดับ"))return;stw.close();stw=null;stCamOk=false;renderStudio();renderSceneBar();return}stOpen()};
+$("#stFocusBtn").onclick=()=>stLive()&&stw.focus();
+$("#stCamSel").onchange=()=>{stCfg.cam=$("#stCamSel").value;store.set("ls_studio",stCfg);if(stLive())stw.postMessage({t:"cam",id:stCfg.cam,mirror:stCfg.mirror},"*")};
+$("#stMirror").onchange=()=>{stCfg.mirror=$("#stMirror").checked;store.set("ls_studio",stCfg);if(stLive())stw.postMessage({t:"cam",mirror:stCfg.mirror},"*")};
+setInterval(()=>{if(stw&&stw.closed){stw=null;stCamOk=false;renderStudio();renderSceneBar()}},2000);
+
+/* one-button go live / end live. TikTok has no API to start a live, so the button does every
+   step it can (camera, live screen, OBS virtual camera, or the OBS stream itself with a key),
+   asks the host to confirm the TikTok side, counts 3-2-1 like TikTok, then starts the round. */
+let cdTimer=null;
+function countdown(sub){return new Promise(res=>{let n=3;$("#cdNum").textContent=n;$("#cdSub").textContent=sub||"";$("#cdBox").hidden=false;
+ const beep=()=>{try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=n?660:990;g.gain.value=.08;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.15)}catch(e){}};
+ beep();$("#cdCancel").onclick=()=>{clearInterval(cdTimer);$("#cdBox").hidden=true;res(false)};
+ cdTimer=setInterval(()=>{n--;if(n<=0){clearInterval(cdTimer);$("#cdBox").hidden=true;res(true);return}$("#cdNum").textContent=n;beep()},1000)})}
+function startRoundNow(){if(running)return;if(elapsed>0)$("#pauseBtn").click();else $("#startBtn").click()}
+const waitFor=(fn,ms)=>new Promise(res=>{const t0=Date.now(),iv=setInterval(()=>{if(fn()||Date.now()-t0>ms){clearInterval(iv);res(fn())}},250)});
+async function goLive(){const note=$("#goNote"),m=glCfg.mode;note.textContent="";
+ if(!liveProducts().length){note.textContent="ยังไม่ได้เลือกสินค้าสำหรับรอบนี้ (แท็บ 1. สินค้า)";return}
+ if(m==="phone"){if(!confirm("กด \"เริ่ม LIVE\" ในแอป TikTok แล้วใช่ไหม?\n\nกดตกลง แล้วโปรแกรมจะนับ 3-2-1 และเริ่มรอบ"))return}
+ else if(m==="inapp"){if(!stLive()&&!stOpen())return;note.textContent="กำลังเปิดกล้องในจอไลฟ์...";
+  if(!await waitFor(()=>stCamOk,10000)){note.textContent="จอไลฟ์ยังเปิดกล้องไม่ได้ ดูข้อความในหน้าต่างจอไลฟ์ แล้วกดเริ่มไลฟ์อีกครั้ง";return}
+  note.textContent="✓ จอไลฟ์พร้อม (กล้องเปิดแล้ว)";
+  if(!confirm("จอไลฟ์พร้อมแล้ว\n\nใน TikTok LIVE Studio กด \"Go LIVE\" แล้วใช่ไหม?\n(ครั้งแรก: เพิ่มแหล่งภาพแบบจับภาพหน้าต่าง เลือก \"LiveStudio จอไลฟ์\")\n\nกดตกลง แล้วโปรแกรมจะนับ 3-2-1 และเริ่มรอบ"))return}
+ else{if(!obsReady){note.textContent="ยังไม่ได้ต่อ OBS เปิด OBS ก่อน หรือเลือกโหมด \"จอไลฟ์ในโปรแกรม (ไม่ต้องมี OBS)\"";return}
+  if(!obsScenesOk||!obsCamOk){note.textContent="กำลังจัดฉากและใส่กล้องใน OBS...";$("#scSetup").click();await waitFor(()=>obsScenesOk&&obsCamOk,8000)}
+  if(m==="studio"){if(!glVcam){await obsReq("StartVirtualCam");await glPoll()}
+   if(!glVcam){note.textContent="เปิดกล้อง OBS (Virtual Camera) ไม่ได้ ต้องใช้ OBS 28 ขึ้นไป";return}
+   note.textContent="✓ กล้อง OBS เปิดแล้ว";
+   if(!confirm("กล้อง OBS พร้อมแล้ว\n\nใน TikTok LIVE Studio กด \"Go LIVE\" แล้วใช่ไหม?\n(กล้องต้องเป็น \"OBS Virtual Camera\")\n\nกดตกลง แล้วโปรแกรมจะนับ 3-2-1 และเริ่มรอบ"))return}
+  else{await glPoll();if(!glKeySet){note.textContent="ยังไม่ได้ใส่ Server URL / Stream key ใส่แล้วกด \"บันทึกลง OBS\" ก่อน";$("#skServer").focus();return}
+   if(!glStream){if(!confirm("เริ่มไลฟ์ขึ้น TikTok ตอนนี้?\n\nโปรแกรมจะนับ 3-2-1 แล้วให้ OBS ส่งภาพขึ้นไลฟ์ทันที"))return;
+    if(!await countdown("OBS จะส่งภาพขึ้น TikTok เมื่อครบ"))return;
+    const r=await obsReq("StartStream");if(!ok(r)){note.textContent="เริ่มส่งภาพไม่ได้: "+((r&&r.requestStatus&&r.requestStatus.comment)||"OBS ไม่ตอบ")+" (ตรวจ Server URL / Stream key)";return}
+    setTimeout(glPoll,1500);startRoundNow();note.textContent="● กำลังไลฟ์ ภาพจะขึ้นใน TikTok อีกสักครู่";renderGo();return}}}
+ if(!await countdown(m==="phone"?"ยิ้ม แล้วทักทายคนดูได้เลย":"ภาพในไลฟ์จะเริ่มตามตารางเมื่อครบ"))return;
+ startRoundNow();note.textContent="● กำลังไลฟ์ ทักทายคนดูได้เลย";renderGo()}
+async function endLive(){const m=glCfg.mode;
+ if(!confirm(m==="key"?"จบไลฟ์?\n\nOBS จะหยุดส่งภาพ คนดูจะเห็นว่าไลฟ์จบ และโปรแกรมจะสรุปรอบนี้":"จบรอบนี้?\n\nโปรแกรมจะสรุปยอด อย่าลืมกดจบไลฟ์ใน "+(m==="phone"?"แอป TikTok":"TikTok LIVE Studio")+" ด้วย"))return;
+ if(m==="key"&&glStream){await obsReq("StopStream");setTimeout(glPoll,1200)}
+ if(running||elapsed>0)$("#startBtn").click();
+ $("#goNote").textContent=m==="key"?"จบไลฟ์แล้ว":"จบรอบแล้ว อย่าลืมกดจบไลฟ์ใน "+(m==="phone"?"แอป TikTok":"LIVE Studio");renderGo()}
+function renderGo(){const b=$("#goBtn");if(!b)return;const on=running||elapsed>0;b.textContent=on?"⏹ จบไลฟ์":"🔴 เริ่มไลฟ์";b.classList.toggle("end",on);b.classList.toggle("primary",!on)}
+$("#goBtn").onclick=()=>{if(running||elapsed>0)endLive();else goLive()};
+setInterval(renderGo,1000);
+
+/* affiliate (นายหน้า) helper: where the TikTok Shop affiliate area is, the host's own web link
+   (https only, saved in ls_tt.aff), and the product links of affiliate products. */
+function affFill(){const u=safeURL(ttCfg.aff||"");$("#affUrl").value=ttCfg.aff||"";
+ $("#affOpen").href=u||"https://www.google.com/search?q="+encodeURIComponent("TikTok Shop ศูนย์ครีเอเตอร์ นายหน้า เข้าสู่ระบบ");
+ $("#affOpen").textContent=u?"🤝 เปิดศูนย์นายหน้า":"🔎 ค้นหาศูนย์นายหน้า TikTok Shop";
+ $("#ttLive3").href=ttCfg.user?ttLiveURL():"https://www.tiktok.com/";$("#affToAff").hidden=aff();
+ const P=products.filter(p=>p.url&&safeURL(p.url));
+ $("#affList").innerHTML=P.length?`<b style="font-size:13px">ลิงก์สินค้านายหน้าของคุณ</b><div class="afflist" style="margin-top:4px">`+P.map(p=>`<div><span><b>${esc(p.code)}</b> ${esc(p.name)}${p.comm?` · คอม ${esc(p.comm)}%`:""}</span><a class="btn sm" href="${esc(safeURL(p.url))}" target="_blank" rel="noopener">เปิด</a></div>`).join("")+`</div>`:
+  (aff()?`<div class="mini">ใส่ลิงก์สินค้าในแท็บสินค้า แล้วจะเปิดจากที่นี่ได้</div>`:"")}
+document.querySelectorAll("[data-aff]").forEach(b=>b.onclick=()=>{affFill();$("#affDlg").showModal()});
+$("#affClose").onclick=()=>$("#affDlg").close();
+$("#affSave").onclick=()=>{const v=$("#affUrl").value.trim();if(v&&!safeURL(v)){$("#affMsg").textContent="ลิงก์ต้องขึ้นต้นด้วย https://";return}
+ ttCfg.aff=v;store.set("ls_tt",ttCfg);affFill();$("#affMsg").textContent=v?"✓ บันทึกแล้ว ปุ่มจะเปิดหน้านี้":"ลบลิงก์แล้ว ปุ่มจะค้นหาให้"};
+$("#affToAff").onclick=()=>{const b=document.querySelector('#sellerSw button[data-seller="aff"]');if(b)b.click();affFill()};
+
 /* pre-live checklist: automatic checks (from the app's own state) + items the host ticks.
    Ticks live in ls_check {d: date, t: {key: true}} and reset each day. */
 let obsScenesOk=false,camTested=false;
@@ -1074,7 +1209,8 @@ function ckAuto(){const P=liveProducts(),items=[];
  items.push({ok:!blanks,tx:blanks?"คำตอบสำเร็จรูปยังมีช่องว่างที่ต้องแก้ให้ตรงร้าน":"คำตอบสำเร็จรูปพร้อมใช้",fix:["faq","แก้เลย"]});
  const has=orders.length||liveHist.length,days=meta.lastBackup?(Date.now()-meta.lastBackup)/864e5:null;
  if(has)items.push({ok:days!==null&&days<3,tx:days!==null&&days<3?"สำรองข้อมูลล่าสุดไม่เกิน 3 วัน":"ยังไม่ได้สำรองข้อมูลช่วงนี้",fix:["backup","สำรองเลย"]});
- if(obsCfg.on||glCfg.mode!=="phone")items.push({ok:obsReady&&obsScenesOk,tx:obsReady?(obsScenesOk?"ต่อ OBS แล้ว ซีนครบ":"ต่อ OBS แล้ว แต่ซีนยังไม่ครบ (กด 🪄 จัดฉาก)"):"ยังไม่ได้ต่อ OBS",fix:["obs","ไปตั้งค่า"]});
+ if(glCfg.mode==="studio"||glCfg.mode==="key"||(obsCfg.on&&glCfg.mode!=="inapp"))items.push({ok:obsReady&&obsScenesOk,tx:obsReady?(obsScenesOk?"ต่อ OBS แล้ว ซีนครบ":"ต่อ OBS แล้ว แต่ซีนยังไม่ครบ (กด 🪄 จัดฉาก)"):"ยังไม่ได้ต่อ OBS",fix:["obs","ไปตั้งค่า"]});
+ if(stCamOk)camTested=true;
  items.push({ok:camTested,tx:camTested?"ทดสอบกล้องแล้ว":"ยังไม่ได้ทดสอบกล้อง / จัดมุม",fix:["cam","ทดสอบ"]});
  return items}
 function ckFix(k){if(k==="faq"){$("#faqBox").open=true;$("#faqEditor").hidden=false;$("#faqText").value=faqToText(faqList());$("#faqBox").scrollIntoView({behavior:"smooth",block:"center"})}
@@ -1267,7 +1403,7 @@ async function checkScenes(){const r=await obsReq("GetSceneList");if(!r)return;g
  obsScenesOk=!miss.length;
  if(miss.length)obsStatus(`ต่อ OBS แล้ว แต่ไม่พบซีน "${miss.join('", "')}" · ซีนที่มีใน OBS: ${names.join(", ")}`);
  else{obsStatus("ต่อ OBS แล้ว ซีนครบ พร้อมสลับ",true);ovMissing=false;if(running)syncScene();pushOverlay()}}
-async function setScene(name){if(!obsReady||!name)return;const r=await obsReq("SetCurrentProgramScene",{sceneName:name});
+async function setScene(name){if(name){stScene=name===obsCfg.clip?"ai":"cam";stPush()}if(!obsReady||!name)return;const r=await obsReq("SetCurrentProgramScene",{sceneName:name});
  if(r&&r.requestStatus&&r.requestStatus.result){obsStatus("ซีนตอนนี้: "+name,true);sceneNow=name;renderSceneBar()}
  else obsStatus("สลับซีนไม่ได้: "+((r&&r.requestStatus&&r.requestStatus.comment)||"OBS ไม่ตอบ"))}
 const planScene=()=>running&&plan.length&&plan[cur].type==="prod"?obsCfg.clip:obsCfg.talk;
@@ -1276,15 +1412,15 @@ function syncScene(){if(plan.length&&obsCfg.mode!=="manual")setScene(planScene()
    (e.code), so they work with the Thai keyboard layout too. */
 function renderSceneBar(){if(typeof renderGoLive==="function")try{renderGoLive()}catch(e){}const cam=$("#toCam"),ai=$("#toAI");if(!cam)return;const man=obsCfg.mode==="manual";
  document.querySelectorAll(".modesw button[data-mode]").forEach(b=>b.setAttribute("aria-checked",String(b.dataset.mode===obsCfg.mode)));
- cam.disabled=ai.disabled=!obsReady;
- cam.classList.toggle("on",obsReady&&sceneNow===obsCfg.talk);ai.classList.toggle("on",obsReady&&sceneNow===obsCfg.clip);
+ const sl=!obsReady&&stLive();cam.disabled=ai.disabled=!obsReady&&!sl;
+ cam.classList.toggle("on",sl?stScene==="cam":obsReady&&sceneNow===obsCfg.talk);ai.classList.toggle("on",sl?stScene==="ai":obsReady&&sceneNow===obsCfg.clip);
  const rec=planScene();cam.classList.toggle("rec",man&&running&&rec===obsCfg.talk&&sceneNow!==rec);ai.classList.toggle("rec",man&&running&&rec===obsCfg.clip&&sceneNow!==rec);
- $("#sceneNow").textContent=!obsReady?"ยังไม่ได้ต่อ OBS":sceneNow===obsCfg.talk?"📷 กล้อง":sceneNow===obsCfg.clip?"🤖 ฉากสินค้า AI":(sceneNow||"-");
- $("#sceneHint").textContent=!obsReady?"ต่อ OBS ก่อน (กล่อง \"สลับซีน OBS อัตโนมัติ\" ด้านขวา) แล้วปุ่มนี้จะใช้ได้"
+ $("#sceneNow").textContent=sl?(stScene==="ai"?"🤖 ฉากสินค้า AI (จอไลฟ์)":"📷 กล้อง (จอไลฟ์)"):!obsReady?"ยังไม่ได้ต่อ OBS":sceneNow===obsCfg.talk?"📷 กล้อง":sceneNow===obsCfg.clip?"🤖 ฉากสินค้า AI":(sceneNow||"-");
+ $("#sceneHint").textContent=sl?(man?"สลับเอง: กดปุ่มเลือกภาพในจอไลฟ์":"อัตโนมัติ: ช่วงสินค้า = ฉาก AI · คุยสด เปิด ปิด = กล้อง (จอไลฟ์ในโปรแกรม)"):!obsReady?"ต่อ OBS หรือเปิดจอไลฟ์ก่อน (กล่อง \"สลับซีน OBS อัตโนมัติ\" ด้านขวา) แล้วปุ่มนี้จะใช้ได้"
   :man?(running?`สลับเอง: โปรแกรมไม่เปลี่ยนภาพให้ ตามตารางช่วงนี้คือ ${rec===obsCfg.clip?"ฉาก AI":"กล้อง"} (ปุ่มขอบประ) · พักหรือจบรอบจะกลับไปกล้องเอง`:"สลับเอง: กดปุ่มเลือกภาพได้ตลอด โปรแกรมไม่เปลี่ยนให้")
   :"อัตโนมัติ: ช่วงสินค้า = ฉาก AI · คุยสด เปิด ปิด = กล้อง กดปุ่มเพื่อสลับเองชั่วคราวได้ จะกลับไปตามตารางเมื่อเปลี่ยนช่วง";
  if(!man&&obsReady)$("#sceneHint").textContent+=matchMedia("(pointer:coarse)").matches?"":" · คีย์ลัด C = กล้อง, A = ฉาก AI"}
-function pickScene(which){if(!obsReady)return;setScene(which==="ai"?obsCfg.clip:obsCfg.talk);if(which==="ai")pushShowcase(true)}
+function pickScene(which){if(stLive()){stScene=which;stPush();renderSceneBar()}if(!obsReady)return;setScene(which==="ai"?obsCfg.clip:obsCfg.talk);if(which==="ai")pushShowcase(true)}
 $("#toCam").onclick=()=>pickScene("cam");$("#toAI").onclick=()=>pickScene("ai");
 document.querySelectorAll(".modesw button[data-mode]").forEach(b=>b.onclick=()=>{obsCfg.mode=b.dataset.mode;store.set("ls_obs",obsCfg);
  if(obsCfg.mode==="auto"&&running)syncScene();renderSceneBar()});
@@ -1306,7 +1442,7 @@ function overlayData(){const d={s:"idle",pos:obsCfg.ovPos};if(!running||!plan.le
  return d}
 function overlayURL(d){return new URL("overlay.html",location.href).href.split("#")[0]+"#"+encodeURIComponent(JSON.stringify(d))}
 let ovMissing=false;
-async function pushOverlay(){pushShowcase();if(!obsReady||ovMissing)return;const r=await obsReq("SetInputSettings",{inputName:OV_NAME,inputSettings:{url:overlayURL(overlayData())},overlay:true});
+async function pushOverlay(){stPush();pushShowcase();if(!obsReady||ovMissing)return;const r=await obsReq("SetInputSettings",{inputName:OV_NAME,inputSettings:{url:overlayURL(overlayData())},overlay:true});
  if(r&&r.requestStatus&&!r.requestStatus.result&&r.requestStatus.code===600){ovMissing=true;$("#ovMsg").textContent="ยังไม่ได้ติดตั้งป้ายใน OBS กด \"ติดตั้งป้ายลงใน OBS\""}}
 const ok=r=>r&&r.requestStatus&&r.requestStatus.result;
 
@@ -1540,7 +1676,7 @@ if(location.protocol==="file:"){
   if(!v||!newer(v.version,APP_VERSION))return;const b=$("#updBox");b.hidden=false;
   b.innerHTML=`<div><b>มีเวอร์ชันใหม่ ${esc(v.version)}</b> (ตอนนี้ใช้ ${APP_VERSION})<div class="mini">กดดาวน์โหลด แล้วเปิดไฟล์ที่ได้ สินค้าและออเดอร์เดิมไม่หาย ถ้า Edge เตือน ให้กด "เก็บไว้" (Keep) ไม่ควรอัปเดตตอนกำลังไลฟ์</div></div><a class="btn primary" href="${esc(UPDATE_SITE+v.installer)}" download>⬇ ดาวน์โหลดตัวอัปเดต</a>`}).catch(()=>{});
 }else $("#verNote").textContent="เวอร์ชันใหม่จะโหลดเองเมื่อต่อเน็ต แล้วใช้ได้ตอนเปิดครั้งถัดไป";
-renderProducts();aiStateText();buildPlan();applyFs();renderSeller();renderFaq();fillSpotSel();renderGoLive();obsFill();ttFill();renderSceneBar();obsConnect();renderLive();renderHome();
+renderProducts();aiStateText();buildPlan();applyFs();renderSeller();renderFaq();fillSpotSel();renderGoLive();obsFill();ttFill();renderStudio();renderGo();renderSceneBar();obsConnect();renderLive();renderHome();
 </script>
 <script>
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){navigator.serviceWorker.register("sw.js").catch(()=>{})}

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LiveStudio จอไลฟ์</title>
+<style>
+/* Built-in live screen (no OBS needed). Opened by index.html as a popup; TikTok LIVE Studio
+   captures this window ("Window capture"). index.html posts {t:"state", scene:"cam"|"ai", ov, sc}
+   (ov/sc = URL hashes for overlay.html / showcase.html) and {t:"cam", id, mirror}; this page
+   answers {t:"studio", camOk, err, devices, cur}. Nothing here is interactive, so nothing extra
+   shows up in the live picture. Camera = real host; AI scene = product photo + text only. */
+html,body{margin:0;height:100%;overflow:hidden;background:#000}
+.layer{position:absolute;inset:0;width:100%;height:100%;border:0;transition:opacity .35s ease}
+video.layer{object-fit:cover;background:#111}
+video.mirror{transform:scaleX(-1)}
+.hide{opacity:0;pointer-events:none}
+#msg{position:absolute;left:8%;right:8%;top:38%;text-align:center;font:500 20px/1.5 "Leelawadee UI",system-ui,sans-serif;color:#fff;
+  background:rgba(0,0,0,.6);border-radius:14px;padding:16px}
+#msg:empty{display:none}
+</style>
+</head>
+<body>
+<video id="cam" class="layer" autoplay muted playsinline></video>
+<iframe id="sc" class="layer hide" src="showcase.html#%7B%22s%22%3A%22idle%22%7D" title="ฉากสินค้า AI"></iframe>
+<iframe id="ov" class="layer" src="overlay.html#%7B%22s%22%3A%22idle%22%7D" title="ป้ายสินค้า" allowtransparency="true"></iframe>
+<div id="msg">กำลังเปิดกล้อง...</div>
+<script>
+const $=s=>document.querySelector(s),cam=$("#cam"),sc=$("#sc"),ov=$("#ov");
+let stream=null,camOk=false,err="",lastSc="",lastOv="";
+function tell(devices){const cur=stream?stream.getVideoTracks()[0].getSettings().deviceId:"";
+ try{opener&&opener.postMessage({t:"studio",camOk,err,devices:devices||null,cur},"*")}catch(e){}}
+async function openCam(id){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+ try{stream=await navigator.mediaDevices.getUserMedia({audio:false,video:id?{deviceId:{exact:id},width:{ideal:1920},height:{ideal:1080}}:{width:{ideal:1920},height:{ideal:1080}}});
+  cam.srcObject=stream;camOk=true;err="";$("#msg").textContent="";
+  const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==="videoinput").map((d,i)=>({id:d.deviceId,label:d.label||"กล้อง "+(i+1)}));
+  tell(devs)}
+ catch(e){camOk=false;err=e.name;
+  $("#msg").textContent=e.name==="NotAllowedError"?"ไม่ได้อนุญาตให้ใช้กล้อง กดอนุญาตที่แถบด้านบนของหน้าต่างนี้":
+   e.name==="NotReadableError"?"กล้องถูกใช้อยู่ในโปรแกรมอื่น ปิดโปรแกรมนั้นก่อน":"ไม่พบกล้อง เสียบกล้องแล้วเลือกใหม่ในโปรแกรม";tell()}}
+addEventListener("message",e=>{const d=e.data||{};
+ if(d.t==="state"){const ai=d.scene==="ai";sc.classList.toggle("hide",!ai);ov.classList.toggle("hide",ai);
+  // only the fragment changes, so the pages re-render on hashchange without reloading
+  if(d.sc&&d.sc!==lastSc){lastSc=d.sc;sc.src="showcase.html#"+d.sc}
+  if(d.ov&&d.ov!==lastOv){lastOv=d.ov;ov.src="overlay.html#"+d.ov}}
+ else if(d.t==="cam"){cam.classList.toggle("mirror",!!d.mirror);if(d.id!==undefined)openCam(d.id)}
+ else if(d.t==="ping")tell()});
+cam.classList.toggle("mirror",new URLSearchParams(location.search).get("m")==="1");
+openCam(new URLSearchParams(location.search).get("cam")||"");
+// opened directly (not from the app's button): nothing will drive the scenes, so say so
+if(!window.opener)setTimeout(()=>{if(camOk)$("#msg").innerHTML='หน้านี้ต้องเปิดจากปุ่ม "🖥 เปิดจอไลฟ์" ในโปรแกรม<br><a href="index.html" style="color:#ffd84d">กลับไปที่โปรแกรม</a>'},1500);
+addEventListener("beforeunload",()=>{if(stream)stream.getTracks().forEach(t=>t.stop());try{opener&&opener.postMessage({t:"studio",closed:true},"*")}catch(e){}});
+</script>
+</body>
+</html>
