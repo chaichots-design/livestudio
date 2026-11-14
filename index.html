@@ -124,6 +124,10 @@ a.btn:not([href]){opacity:.5;pointer-events:none}
 .snaplist{display:grid;gap:4px}.snaplist div{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px;padding:5px 8px;background:var(--bg);border-radius:6px}
 .snaplist span{flex:1;min-width:150px}.snaplist .btn{padding:2px 8px;font-size:12px}
 body:not(.has-helper) .hl-only{display:none!important}
+.hlstat{font-size:12.5px;margin-top:4px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.hlstat .dot{width:9px;height:9px;border-radius:50%;background:var(--line);flex:none}
+.hlstat.on .dot{background:var(--talk)}.hlstat.off .dot{background:#e09b1a}.hlstat.miss .dot{background:var(--accent)}
+.hlstat a{color:var(--accent)}
 .slgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:6px;margin-top:8px}
 .slgrid div{background:var(--bg);border-radius:8px;padding:6px 8px}
 .slgrid span{display:block;font-size:11px;color:var(--muted)}
@@ -512,6 +516,7 @@ td.r,th.r{text-align:right}
           <ol class="glsteps live" data-steps="inapp"></ol>
           <div class="row" style="flex-wrap:nowrap;margin-top:4px"><button class="btn primary" id="stOpenBtn" type="button" style="flex:1">🖥 เปิดจอไลฟ์</button><button class="btn" id="stFocusBtn" type="button" hidden>ไปที่จอไลฟ์</button></div>
           <button class="btn hl-only" type="button" data-launch="tiktok-studio" style="width:100%;margin-top:6px">🚀 เปิด TikTok LIVE Studio</button>
+          <div class="hlstat hl-only" data-hl="studio"></div>
           <label for="stCamSel" style="margin-top:6px">📷 กล้องในจอไลฟ์</label>
           <div class="row" style="flex-wrap:nowrap"><select id="stCamSel" style="flex:1;min-width:0"><option value="">(เปิดจอไลฟ์ก่อน)</option></select><label style="display:flex;gap:4px;align-items:center;margin:0;white-space:nowrap;font-size:12px"><input type="checkbox" id="stMirror" style="width:auto">กลับซ้ายขวา</label></div>
           <div class="mini" id="stMsg" style="margin-top:4px">อย่าย่อ (minimize) หรือปิดหน้าต่างจอไลฟ์ระหว่างไลฟ์ วางไว้ข้างหลังได้ ภาพในจอไลฟ์ไม่มีปุ่มอะไร คนดูเห็นเฉพาะกล้อง ฉากสินค้า และป้าย</div>
@@ -521,6 +526,7 @@ td.r,th.r{text-align:right}
           <div class="glcam">📷 <b>กล้อง:</b> เว็บแคม (หรือมือถือที่ต่อเป็นกล้อง) อยู่ใน OBS แล้ว OBS ส่งภาพทั้งหมดให้ LIVE Studio เป็น "OBS Virtual Camera"</div>
           <ol class="glsteps live" data-steps="studio"></ol>
           <div class="row hl-only" style="flex-wrap:nowrap;margin-bottom:6px"><button class="btn" type="button" data-launch="obs" style="flex:1">▶ เปิด OBS</button><button class="btn" type="button" data-launch="tiktok-studio" style="flex:1">🚀 เปิด LIVE Studio</button></div>
+          <div class="hlstat hl-only" data-hl="obs"></div><div class="hlstat hl-only" data-hl="studio" style="margin-bottom:6px"></div>
           <button class="btn primary" id="vcamBtn" type="button" style="width:100%">🎥 เปิดกล้อง OBS ให้ LIVE Studio</button>
           <a class="btn desk-only" href="https://www.tiktok.com/studio/download" target="_blank" rel="noopener" style="width:100%;text-align:center;margin-top:6px;box-sizing:border-box">🖥 โหลด TikTok LIVE Studio</a>
         </div>
@@ -528,7 +534,8 @@ td.r,th.r{text-align:right}
           <div class="glcam">📷 <b>กล้อง:</b> เว็บแคม (หรือมือถือที่ต่อเป็นกล้อง) อยู่ใน OBS แล้ว OBS ส่งภาพขึ้น TikTok เองด้วย Stream key</div>
           <ol class="glsteps live" data-steps="key"></ol>
           <div class="mini">Server URL กับ Stream key มีเฉพาะบัญชีที่ TikTok เปิดให้ ดูได้ตอนตั้งค่าไลฟ์ผ่านซอฟต์แวร์ (LIVE Center)</div>
-          <button class="btn hl-only" type="button" data-launch="obs" style="width:100%;margin-bottom:6px">▶ เปิด OBS</button>
+          <button class="btn hl-only" type="button" data-launch="obs" style="width:100%;margin-bottom:4px">▶ เปิด OBS</button>
+          <div class="hlstat hl-only" data-hl="obs" style="margin-bottom:6px"></div>
           <label for="skServer">Server URL</label><input id="skServer" placeholder="rtmp://..." autocomplete="off" spellcheck="false">
           <label for="skKey" style="margin-top:6px">Stream key</label><input id="skKey" type="password" autocomplete="off" spellcheck="false" placeholder="วางเฉพาะตอนตั้งค่า">
           <div class="mini" style="margin-top:4px">🔒 key ไม่ถูกเก็บในโปรแกรมนี้ (OBS เก็บเอง) อย่าให้ใครเห็น ใครได้ key ไปจะไลฟ์ในชื่อคุณได้ ส่วนมาก TikTok ให้ key ใหม่ทุกครั้งที่ไลฟ์</div>
@@ -694,7 +701,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.22.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.23.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){if(e&&(e.name==="QuotaExceededError"||e.code===22)){const q=document.getElementById("quotaNag");if(q)q.hidden=false}return false}}};
@@ -1090,7 +1097,8 @@ function glStepList(){const fixObs=()=>ckFix("obs"),setup=()=>{$("#scSetup").cli
   start];
  if(glCfg.mode==="inapp")return[
   {tx:"เปิด <b>จอไลฟ์</b> ในโปรแกรม (กล้อง + ฉากสินค้า AI + ป้าย)",ok:stLive()&&stCamOk,btn:["🖥 เปิดจอไลฟ์",()=>stOpen()]},
-  {tx:"ใน TikTok LIVE Studio เพิ่มแหล่งภาพแบบ <b>จับภาพหน้าต่าง</b> เลือก <b>LiveStudio จอไลฟ์</b> (ทำครั้งแรกครั้งเดียว)",tick:"gl_win",btn:hasHelper?["🚀 เปิด LIVE Studio",()=>launchApp("tiktok-studio")]:null},
+  ...(hasHelper?[{tx:"เปิด <b>TikTok LIVE Studio</b>"+(hs&&hs.studio&&!hs.studio.installed?" (ยังไม่พบในเครื่อง)":""),ok:!!(hs&&hs.studio&&hs.studio.running),btn:["🚀 เปิด LIVE Studio",()=>launchApp("tiktok-studio")]}]:[]),
+  {tx:"ใน TikTok LIVE Studio เพิ่มแหล่งภาพแบบ <b>จับภาพหน้าต่าง</b> เลือก <b>LiveStudio จอไลฟ์</b> (ทำครั้งแรกครั้งเดียว)",tick:"gl_win"},
   {tx:"กด <b>🔴 เริ่มไลฟ์</b> ด้านบน แล้วกด <b>Go LIVE</b> ใน LIVE Studio",ok:running,btn:["🔴 เริ่มไลฟ์",()=>$("#goBtn").click()]}];
  if(glCfg.mode==="studio")return[obs,scene,
   {tx:"เปิดกล้อง OBS (Virtual Camera)",ok:glVcam,btn:["🎥 เปิด",()=>$("#vcamBtn").click()]},
@@ -1180,9 +1188,25 @@ $("#camDlg").addEventListener("close",camStop);
 const hasHelper=location.protocol==="file:"&&/Windows/i.test(navigator.userAgent);
 document.body.classList.toggle("has-helper",hasHelper);
 const launchCfg=Object.assign({auto:true},store.get("ls_launch",{}));
-function launchApp(which){if(!hasHelper)return false;const a=document.createElement("a");a.href="livestudio:"+which;document.body.appendChild(a);a.click();a.remove();
+/* the helper writes app/helper-status.js (window.LS_HELPER = {ts, last, note, studio:{installed,running}, obs:{...}})
+   after every request; the page reloads that script to show whether LIVE Studio / OBS is found and open. */
+let hs=null,hsFastUntil=0,hsLaunchTs=0;
+function loadHelperStatus(){if(!hasHelper)return Promise.resolve(hs);return new Promise(res=>{const s=document.createElement("script");s.src="helper-status.js?t="+Date.now();
+ const done=()=>{s.remove();const v=window.LS_HELPER;if(v&&typeof v==="object"&&(!hs||v.ts!==hs.ts)){hs=v;renderHelperStatus();if(typeof renderGlSteps==="function")renderGlSteps()}res(hs)};
+ s.onload=done;s.onerror=done;document.head.appendChild(s)})}
+function renderHelperStatus(){const at=hs?new Date(hs.ts).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"}):"";
+ document.querySelectorAll("[data-hl]").forEach(el=>{const k=el.dataset.hl,name=k==="obs"?"OBS":"TikTok LIVE Studio",x=hs&&hs[k],dl=k==="obs"?"https://obsproject.com/download":"https://www.tiktok.com/studio/download";
+  let cls="",tx;
+  if(!x)tx=`${name}: ยังไม่ได้ตรวจ (กดปุ่มเปิดด้านบน โปรแกรมจะหาให้)`;
+  else if(x.running){cls="on";tx=`${name}: ✓ เปิดอยู่ (ตรวจเมื่อ ${at})`}
+  else if(x.installed){cls="off";tx=hs.last===(k==="obs"?"obs":"tiktok-studio")&&hs.note==="starting"?`${name}: กำลังเปิด...`:`${name}: มีในเครื่องแล้ว ยังไม่ได้เปิด (ตรวจเมื่อ ${at})`}
+  else{cls="miss";tx=`${name}: ยังไม่พบในเครื่องนี้ `}
+  el.className="hlstat hl-only "+cls;el.innerHTML=`<span class="dot"></span><span>${esc(tx)}</span>`+(x&&!x.installed?`<a href="${dl}" target="_blank" rel="noopener">ดาวน์โหลด</a>`:"")})}
+setInterval(()=>{if(!hasHelper)return;if(Date.now()<hsFastUntil||!$("#tab-live").hidden)loadHelperStatus()},2000);
+function launchApp(which){if(!hasHelper)return false;hsLaunchTs=Date.now();hsFastUntil=Date.now()+60000;const a=document.createElement("a");a.href="livestudio:"+which;document.body.appendChild(a);a.click();a.remove();
  const n=$("#goNote");if(n)n.textContent=(which==="obs"?"กำลังเปิด OBS...":"กำลังเปิด TikTok LIVE Studio...")+" (ครั้งแรก Edge จะถาม ให้ติ๊ก \"อนุญาตเสมอ\" แล้วกด เปิด)";return true}
 document.querySelectorAll("[data-launch]").forEach(b=>b.onclick=()=>{launchApp(b.dataset.launch);if(b.dataset.launch==="obs"&&!obsCfg.on){obsCfg.on=true;store.set("ls_obs",obsCfg);obsFill()}if(b.dataset.launch==="obs")setTimeout(obsConnect,6000)});
+if(hasHelper)loadHelperStatus();
 $("#autoLaunch").checked=launchCfg.auto;$("#autoLaunch").onchange=()=>{launchCfg.auto=$("#autoLaunch").checked;store.set("ls_launch",launchCfg)};
 
 /* in-app live screen (studio.html): replaces OBS for TikTok LIVE Studio (window capture).
@@ -1227,9 +1251,15 @@ const waitFor=(fn,ms)=>new Promise(res=>{const t0=Date.now(),iv=setInterval(()=>
 async function goLive(){const note=$("#goNote"),m=glCfg.mode;note.textContent="";
  if(!liveProducts().length){note.textContent="ยังไม่ได้เลือกสินค้าสำหรับรอบนี้ (แท็บ 1. สินค้า)";return}
  if(m==="phone"){if(!confirm("กด \"เริ่ม LIVE\" ในแอป TikTok แล้วใช่ไหม?\n\nกดตกลง แล้วโปรแกรมจะนับ 3-2-1 และเริ่มรอบ"))return}
- else if(m==="inapp"){if(!stLive()&&!stOpen())return;if(launchCfg.auto&&hasHelper)setTimeout(()=>launchApp("tiktok-studio"),400);note.textContent="กำลังเปิดกล้องในจอไลฟ์...";
+ else if(m==="inapp"){if(!stLive()&&!stOpen())return;const wantLS=launchCfg.auto&&hasHelper;if(wantLS)setTimeout(()=>launchApp("tiktok-studio"),400);note.textContent="กำลังเปิดกล้องในจอไลฟ์...";
   if(!await waitFor(()=>stCamOk,10000)){note.textContent="จอไลฟ์ยังเปิดกล้องไม่ได้ ดูข้อความในหน้าต่างจอไลฟ์ แล้วกดเริ่มไลฟ์อีกครั้ง";return}
-  note.textContent="✓ จอไลฟ์พร้อม (กล้องเปิดแล้ว)"+(launchCfg.auto&&hasHelper?" · เปิด TikTok LIVE Studio ให้แล้ว":"");
+  let lsTx="";
+  if(wantLS){note.textContent="✓ จอไลฟ์พร้อม · กำลังรอ TikTok LIVE Studio...";
+   const fresh=()=>hs&&hs.ts>=hsLaunchTs-1000&&hs.last==="tiktok-studio";
+   await waitFor(()=>{loadHelperStatus();return fresh()&&(hs.studio.running||hs.note==="missing"||hs.note==="slow")},30000);
+   if(fresh()&&hs.note==="missing"){note.innerHTML='ยังไม่พบ TikTok LIVE Studio ในเครื่องนี้ <a href="https://www.tiktok.com/studio/download" target="_blank" rel="noopener" style="color:var(--accent)">ดาวน์โหลด</a> ติดตั้งแล้วกดเริ่มไลฟ์อีกครั้ง';return}
+   lsTx=fresh()&&hs.studio.running?" · ✓ TikTok LIVE Studio เปิดแล้ว":fresh()?" · TikTok LIVE Studio กำลังเปิด (เครื่องช้า รอสักครู่)":" · ถ้า LIVE Studio ยังไม่เปิด กด 🚀 เปิด TikTok LIVE Studio"}
+  note.textContent="✓ จอไลฟ์พร้อม (กล้องเปิดแล้ว)"+lsTx;
   if(!confirm("จอไลฟ์พร้อมแล้ว\n\nใน TikTok LIVE Studio กด \"Go LIVE\" แล้วใช่ไหม?\n(ครั้งแรก: เพิ่มแหล่งภาพแบบจับภาพหน้าต่าง เลือก \"LiveStudio จอไลฟ์\")\n\nกดตกลง แล้วโปรแกรมจะนับ 3-2-1 และเริ่มรอบ"))return}
  else{if(!obsReady&&launchCfg.auto&&hasHelper){launchApp("obs");if(!obsCfg.on){obsCfg.on=true;store.set("ls_obs",obsCfg);obsFill()}
    note.textContent="กำลังเปิด OBS แล้วต่อให้เอง...";for(let i=0;i<6&&!obsReady;i++){await new Promise(r=>setTimeout(r,4000));if(!obsReady)obsConnect()}await waitFor(()=>obsReady,3000)}
