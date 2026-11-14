@@ -115,6 +115,15 @@ a.btn:not([href]){opacity:.5;pointer-events:none}
 .glsteps.live label{display:flex;gap:6px;align-items:center;margin:0;font-size:12px;color:var(--muted);white-space:nowrap;cursor:pointer}
 .glsteps.live label input{width:auto}
 .obscam{margin-top:8px}
+.slgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:6px;margin-top:8px}
+.slgrid div{background:var(--bg);border-radius:8px;padding:6px 8px}
+.slgrid span{display:block;font-size:11px;color:var(--muted)}
+.slgrid b{font-family:var(--mono);font-size:18px;font-weight:600}
+.slbar{height:8px;border-radius:999px;background:var(--line);overflow:hidden;margin:8px 0 4px}
+.slbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#b5179e);transition:width .4s}
+.slbar.done i{background:var(--talk)}
+.slcold{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:12px}
+.slcold button{padding:2px 8px;font-size:12px}
 .osnow{font-family:var(--mono);font-size:11px;padding:1px 8px;border-radius:999px;background:var(--accent);color:#fff;margin-left:4px}
 .golivebtn{width:100%;margin-top:8px;font-size:18px;padding:12px;border-radius:999px;font-family:var(--display);font-weight:500}
 .golivebtn.end{background:var(--surface);color:var(--accent);border:2px solid var(--accent)}
@@ -418,6 +427,18 @@ td.r,th.r{text-align:right}
         </div>
         <div class="mini" id="spotHint" style="margin-top:4px">คนดูถามถึงสินค้าตัวไหน เลือกได้เลย บท เลขตะกร้า ป้ายบนจอ และฉาก AI จะเปลี่ยนเป็นตัวนั้นชั่วคราว เวลาตามตารางยังเดินต่อ</div>
       </div>
+      <div class="card salescard" id="salesBox" style="margin-top:10px">
+        <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:nowrap">
+          <b style="font-family:var(--display);font-weight:500">📈 ยอดขาย <span id="slScope" class="mini"></span></b>
+          <label style="display:flex;gap:4px;align-items:center;margin:0;font-size:12px;color:var(--muted);white-space:nowrap">เป้า ฿<input id="goalIn" type="number" min="0" step="100" inputmode="numeric" placeholder="ไม่ตั้ง" style="width:90px;padding:4px 6px"></label>
+        </div>
+        <div class="slgrid" id="slGrid"></div>
+        <div class="slbar" id="slBarWrap" hidden><i id="slBar"></i></div>
+        <div class="mini" id="slGoal"></div>
+        <div class="mini" id="slTop" style="margin-top:4px"></div>
+        <div id="slCold" style="margin-top:6px"></div>
+        <div class="mini" style="margin-top:4px">นับจากออเดอร์ที่จดในโปรแกรมเท่านั้น เห็นเฉพาะคุณ ไม่ขึ้นบนจอไลฟ์</div>
+      </div>
       <details class="card oscard" id="osBox" style="margin-top:10px">
         <summary style="cursor:pointer;font-size:14px"><b style="font-family:var(--display);font-weight:500">📺 ข้อความขึ้นจอ</b> <span class="mini">ให้คนดูเห็นข้อความบนจอไลฟ์ (จอไลฟ์ในโปรแกรม หรือป้ายใน OBS)</span> <span class="osnow" id="osNow" hidden>กำลังขึ้นจอ</span></summary>
         <div class="faqbtns" id="osPresets" style="margin-top:8px"></div>
@@ -639,7 +660,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.18.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.19.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
@@ -1225,6 +1246,29 @@ $("#osOff").onclick=()=>{offScreen();$("#osMsg").textContent="เอาข้อ
 $("#osThx").checked=uiCfg.thx!==false;if(uiCfg.thx===undefined)uiCfg.thx=true;
 $("#osThx").onchange=()=>{uiCfg.thx=$("#osThx").checked;store.set("ls_ui",uiCfg)};
 
+/* live sales card (host only, never on screen): totals of this round (orders with ts >= roundStart)
+   or of today before a round starts, an optional goal (ls_ui.goal, baht), sales per hour, best
+   sellers, and products in this live with no order yet, each with a spotlight button. */
+function salesScope(){if(roundStart)return{label:"รอบนี้",list:orders.filter(o=>o.ts&&o.ts>=roundStart),live:true};
+ const d=localDate();return{label:"วันนี้ (ยังไม่เริ่มรอบ)",list:orders.filter(o=>o.d===d),live:false}}
+function renderSales(){const box=$("#salesBox");if(!box)return;const sc=salesScope(),S=summarize(sc.list),goal=+uiCfg.goal||0;
+ $("#slScope").textContent="· "+sc.label;
+ const hrs=sc.live&&elapsed>=300?elapsed/3600:0,last=liveHist.length?liveHist[liveHist.length-1]:null;
+ $("#slGrid").innerHTML=`<div><span>ยอดขาย (บาท)</span><b>${fmt(S.s)}</b></div><div><span>ออเดอร์</span><b>${fmt(S.n)}</b></div><div><span>ชิ้น</span><b>${fmt(S.q)}</b></div>`+
+  (aff()?`<div><span>ค่าคอมประมาณ</span><b>${fmt(S.cm)}</b></div>`:"")+(hrs?`<div><span>ต่อชั่วโมง</span><b>${fmt(Math.round(S.s/hrs))}</b></div>`:"")+
+  (last&&sc.live?`<div><span>รอบก่อน</span><b>${fmt(last.s)}</b></div>`:"");
+ const bw=$("#slBarWrap");bw.hidden=!goal;
+ if(goal){const pc=Math.min(100,Math.round(S.s/goal*100));$("#slBar").style.width=pc+"%";bw.classList.toggle("done",S.s>=goal);
+  $("#slGoal").textContent=S.s>=goal?`🎉 ถึงเป้า ${fmt(goal)} บาทแล้ว (${Math.round(S.s/goal*100)}%)`:`${pc}% ของเป้า · อีก ${fmt(goal-S.s)} บาท`+(hrs&&S.s>0?` · ถ้าขายเท่านี้ต่อไปอีกราว ${fmtDur(Math.max(1,Math.round((goal-S.s)/(S.s/hrs)*60)))}`:"")}
+ else $("#slGoal").textContent="";
+ $("#slTop").textContent=S.top.length?"ขายดี: "+S.top.map((x,i)=>`${i+1}) ${x.c} ${x.q} ชิ้น`).join(" · "):"ยังไม่มีออเดอร์"+(sc.live?"ในรอบนี้":"วันนี้");
+ const sold=new Set(sc.list.map(o=>o.code)),cold=sc.live&&elapsed>=600?liveProducts().filter(p=>!sold.has(p.code)&&!(hasStock(p)&&p.stock<=0)):[];
+ $("#slCold").innerHTML=cold.length?`<div class="slcold"><span class="mini">ยังไม่มีคนสั่ง ลองหยิบมาพูดอีกครั้ง:</span>${cold.slice(0,6).map(p=>`<button class="btn" type="button" data-cold="${esc(p.code)}" title="พูดถึงตัวนี้ (ตารางยังเดินต่อ)">🔦 ${esc(p.code)}</button>`).join("")}</div>`:"";
+ $("#slCold").querySelectorAll("[data-cold]").forEach(b=>b.onclick=()=>{$("#spotSel").value=b.dataset.cold;$("#spotSel").onchange();document.querySelector(".spotcard").scrollIntoView({behavior:"smooth",block:"center"})})}
+$("#goalIn").value=uiCfg.goal||"";
+$("#goalIn").onchange=()=>{const v=Math.max(0,Math.round(+$("#goalIn").value||0));uiCfg.goal=v||0;$("#goalIn").value=v||"";store.set("ls_ui",uiCfg);renderSales()};
+setInterval(()=>{if(!$("#tab-live").hidden)renderSales()},3000);
+
 /* pre-live checklist: automatic checks (from the app's own state) + items the host ticks.
    Ticks live in ls_check {d: date, t: {key: true}} and reset each day. */
 let obsScenesOk=false,camTested=false;
@@ -1626,7 +1670,7 @@ function renderHome(){if(!plan.length)buildPlan();
  st("#stProd",lp>0,lp?`✓ ไลฟ์ ${lp} จาก ${products.length} รายการ · มีรูป ${withImg}`:"ยังไม่ได้เลือกสินค้า");
  st("#stPlan",plan.length>0,`${plan.length} ช่วง · ${fmtDur(dur)}`);
  st("#stObs",obsReady,obsReady?"✓ ต่อ OBS แล้ว":(obsCfg.on?"กำลังรอ OBS":"ยังไม่ได้เปิดใช้"));
- renderBkNag();const ck=renderCheck();st("#stLive",running||ck.done===ck.total,running?"● กำลังไลฟ์":`เช็กก่อนไลฟ์ ${ck.done}/${ck.total}`+(orders.length?` · ออเดอร์ ${orders.length}`:""));}
+ renderBkNag();try{renderSales()}catch(e){}const ck=renderCheck();st("#stLive",running||ck.done===ck.total,running?"● กำลังไลฟ์":`เช็กก่อนไลฟ์ ${ck.done}/${ck.total}`+(orders.length?` · ออเดอร์ ${orders.length}`:""));}
 document.querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>show(b.dataset.goto));
 $("#homeGo").onclick=()=>show("live");
 
