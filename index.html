@@ -116,6 +116,14 @@ a.btn:not([href]){opacity:.5;pointer-events:none}
 .glsteps.live label{display:flex;gap:6px;align-items:center;margin:0;font-size:12px;color:var(--muted);white-space:nowrap;cursor:pointer}
 .glsteps.live label input{width:auto}
 .obscam{margin-top:8px}
+.glauto{font-size:12.5px;line-height:1.5;margin-top:8px;padding:6px 10px;border-radius:8px;background:var(--talk-soft)}
+.glauto b{font-weight:600}
+.wizq{font-family:var(--display);font-weight:500;font-size:16px;margin:4px 0 8px}
+.wizopts{display:grid;gap:8px}
+.wizopts button{text-align:left;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;cursor:pointer}
+.wizopts button b{display:block;font-family:var(--display);font-weight:500;font-size:15px}
+.wizopts button span{font-size:12.5px;color:var(--muted)}
+.wizopts button.rec{border-color:var(--talk)}
 #undoBar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:40;display:flex;gap:10px;align-items:center;width:max-content;max-width:calc(100vw - 32px);box-sizing:border-box;
   background:var(--ink);color:var(--surface);border-radius:16px;padding:8px 10px 8px 16px;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
 #undoBar[hidden],#quotaNag[hidden]{display:none}
@@ -156,8 +164,8 @@ body:not(.has-helper) .hl-only{display:none!important}
 .cdsub{font-size:14px;opacity:.85;margin:4px 0 14px;max-width:320px}
 @keyframes cdpop{0%{transform:scale(1.35);opacity:.2}30%{transform:scale(1);opacity:1}100%{transform:scale(.92);opacity:.9}}
 @media (prefers-reduced-motion:reduce){.cdnum{animation:none}}
-#shareDlg,#affDlg{border:0;border-radius:14px;padding:0;max-width:min(96vw,520px);width:100%;background:var(--surface);color:var(--ink)}
-#shareDlg::backdrop,#affDlg::backdrop{background:rgba(0,0,0,.55)}
+#wizDlg,#shareDlg,#affDlg{border:0;border-radius:14px;padding:0;max-width:min(96vw,520px);width:100%;background:var(--surface);color:var(--ink)}
+#wizDlg::backdrop,#shareDlg::backdrop,#affDlg::backdrop{background:rgba(0,0,0,.55)}
 .afflist{display:grid;gap:4px}.afflist div{display:flex;gap:8px;align-items:center;font-size:13px;padding:5px 6px;background:var(--bg);border-radius:6px}
 .afflist span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #camDlg{border:0;border-radius:14px;padding:0;max-width:min(96vw,460px);width:100%;background:var(--surface);color:var(--ink)}
@@ -509,6 +517,8 @@ td.r,th.r{text-align:right}
         <button class="btn primary golivebtn" id="goBtn" type="button">🔴 เริ่มไลฟ์</button>
         <div class="mini" id="goNote" style="margin-top:4px;text-align:center"></div>
         <label class="hl-only" style="display:flex;gap:6px;align-items:center;justify-content:center;margin:4px 0 0;font-size:12px;color:var(--muted)"><input type="checkbox" id="autoLaunch" style="width:auto">กดเริ่มไลฟ์แล้วเปิด TikTok LIVE Studio (และ OBS) ให้เอง</label>
+        <div class="glauto" id="glAuto"></div>
+        <button class="btn sm" id="wizBtn" type="button" style="display:block;margin:6px auto 0">🧭 ช่วยเลือกวิธีไลฟ์ให้</button>
         <select id="glMode" aria-label="ไลฟ์ด้วยอะไร" style="margin-top:8px">
           <option value="phone">ไลฟ์จากมือถือ (แอป TikTok)</option>
           <option value="inapp">คอม: LIVE Studio + จอไลฟ์ในโปรแกรม (ไม่ต้องมี OBS)</option>
@@ -673,6 +683,12 @@ td.r,th.r{text-align:right}
   <div class="row" style="justify-content:center;margin-top:8px"><button class="btn sm" id="wbOpen" type="button"></button><button class="btn sm" id="wbCancel" type="button">ยกเลิก</button></div>
 </div></div>
 <div id="cdBox" hidden role="alertdialog" aria-live="assertive"><div class="cdin"><div class="cdlab">กำลังเริ่มไลฟ์</div><div class="cdnum" id="cdNum">3</div><div class="cdsub" id="cdSub"></div><button class="btn" id="cdCancel" type="button">ยกเลิก</button></div></div>
+<dialog id="wizDlg" aria-label="เลือกวิธีไลฟ์">
+  <div style="padding:16px 18px">
+    <div class="row" style="justify-content:space-between"><b style="font-family:var(--display);font-weight:500;font-size:18px">🧭 เลือกวิธีไลฟ์</b><button class="btn sm" id="wizClose" type="button" aria-label="ปิด">✕</button></div>
+    <div id="wizBody" style="margin-top:8px"></div>
+  </div>
+</dialog>
 <dialog id="shareDlg" aria-label="ติดตั้งเครื่องอื่น">
   <div style="padding:16px 18px">
     <div class="row" style="justify-content:space-between"><b style="font-family:var(--display);font-weight:500;font-size:18px">📤 ติดตั้งเครื่องอื่น</b><button class="btn sm" id="shClose" type="button" aria-label="ปิด">✕</button></div>
@@ -718,7 +734,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.24.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.25.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){if(e&&(e.name==="QuotaExceededError"||e.code===22)){const q=document.getElementById("quotaNag");if(q)q.hidden=false}return false}}};
@@ -1086,7 +1102,7 @@ $("#fsDown").onclick=()=>{uiCfg.pf-=3;applyFs()};$("#fsUp").onclick=()=>{uiCfg.p
    never kept in this app. ls_golive {mode, server}. */
 const glCfg=Object.assign({mode:matchMedia("(pointer:coarse)").matches?"phone":"inapp",server:""},store.get("ls_golive",{}));
 let glStream=false,glVcam=false,glSince=0,glKeySet=false;
-function glSave(){store.set("ls_golive",{mode:glCfg.mode,server:glCfg.server})}
+function glSave(){store.set("ls_golive",{mode:glCfg.mode,server:glCfg.server,picked:glCfg.picked?1:0})}
 function renderGoLive(){$("#glMode").value=glCfg.mode;document.querySelectorAll(".glpane").forEach(d=>d.hidden=d.dataset.gl!==glCfg.mode);
  $("#skServer").value=glCfg.server||"";
  const vb=$("#vcamBtn"),sb=$("#streamBtn"),st=$("#glState");
@@ -1153,7 +1169,7 @@ $("#obsCamSel").onchange=async()=>{const sel=$("#obsCamSel"),v=sel.value;if(!v||
  const r=await obsReq("SetInputSettings",{inputName:sel.dataset.input,inputSettings:{[obsCamProp]:v},overlay:true});
  $("#obsCamMsg").textContent=ok(r)?"✓ เปลี่ยนกล้องใน OBS แล้ว":"เปลี่ยนไม่ได้ ลองเลือกใน OBS เอง";loadObsCams()};
 $("#obsCamRe").onclick=()=>loadObsCams();
-$("#glMode").onchange=()=>{glCfg.mode=$("#glMode").value;glSave();renderGoLive();glPoll()};
+$("#glMode").onchange=()=>{glCfg.mode=$("#glMode").value;glCfg.picked=1;glSave();renderGoLive();glPoll()};
 $("#skServer").onchange=()=>{glCfg.server=$("#skServer").value.trim();glSave()};
 async function glPoll(){if(!obsReady){glStream=glVcam=glKeySet=obsCamOk=obsCamLoaded=false;renderGoLive();return}
  if(!obsCamLoaded&&glCfg.mode!=="phone")await loadObsCams();
@@ -1277,6 +1293,35 @@ document.addEventListener("visibilitychange",()=>{if($("#waitBox").hidden)return
 addEventListener("focus",()=>{if(!$("#waitBox").hidden&&wbWasHidden){$("#wbBack").hidden=false}});
 addEventListener("blur",()=>{if(!$("#waitBox").hidden)wbWasHidden=true});
 
+/* "choose how to go live" wizard: device -> Stream key -> OBS, then sets glCfg.mode and says what the
+   go-live button does by itself and what the host still presses in TikTok. Opens by itself the first
+   time the go-live button is pressed (ls_golive.picked). */
+const MODE_AUTO={
+ phone:{name:"ไลฟ์จากมือถือ",auto:"เปิดแอป TikTok ให้ · จับเวลา แสดงบท จดออเดอร์",you:"ในแอปกด + → LIVE → เริ่ม LIVE (แอปเปิดกล้องเอง) 1 ครั้ง"},
+ inapp:{name:"คอม: จอไลฟ์ในโปรแกรม + TikTok LIVE Studio",auto:"เปิดกล้อง จอไลฟ์ และ TikTok LIVE Studio ให้ · สลับกล้องกับฉากสินค้า AI เอง",you:"กด Go LIVE ใน LIVE Studio 1 ครั้ง"},
+ studio:{name:"คอม: OBS + TikTok LIVE Studio",auto:"เปิด OBS ต่อให้เอง เปิดกล้อง OBS และ LIVE Studio ให้ · สลับซีนเอง",you:"กด Go LIVE ใน LIVE Studio 1 ครั้ง"},
+ key:{name:"คอม: OBS + Stream key",auto:"เปิด OBS ต่อให้เอง แล้ว<b>เริ่มส่งภาพขึ้น TikTok เอง</b>หลังนับ 3-2-1 · สลับซีนเอง",you:"วาง Stream key ใหม่เมื่อ TikTok ให้ key ใหม่ (ไม่ต้องกดอะไรใน TikTok)"}};
+function renderGlAuto(){const el=$("#glAuto");if(!el)return;const x=MODE_AUTO[glCfg.mode];if(!x){el.textContent="";return}
+ el.innerHTML=`<b>กดเริ่มไลฟ์แล้ว โปรแกรมทำให้:</b> ${x.auto}<br><b>คุณกดเอง:</b> ${x.you}`}
+function wizStep(q,opts){$("#wizBody").innerHTML=`<div class="wizq">${q}</div><div class="wizopts">`+opts.map((o,i)=>`<button type="button" data-wz="${i}" class="${o.rec?"rec":""}"><b>${o.label}${o.rec?" (แนะนำ)":""}</b><span>${o.desc}</span></button>`).join("")+`</div>`;
+ $("#wizBody").querySelectorAll("[data-wz]").forEach(b=>b.onclick=()=>opts[+b.dataset.wz].go())}
+function wizDone(mode){glCfg.mode=mode;glCfg.picked=1;store.set("ls_golive",{mode,server:glCfg.server,picked:1});renderGoLive();if(typeof glPoll==="function")glPoll();
+ const x=MODE_AUTO[mode];
+ $("#wizBody").innerHTML=`<div class="wizq">✓ เลือกแล้ว: ${x.name}</div><div class="glauto"><b>กดเริ่มไลฟ์แล้ว โปรแกรมทำให้:</b> ${x.auto}<br><b>คุณกดเอง:</b> ${x.you}</div>`+
+  `<div class="mini" style="margin-top:8px">${mode==="key"?"ต้องมี OBS ในเครื่อง และใส่ Server URL / Stream key ในกล่องขึ้นไลฟ์ก่อน":mode==="phone"?"เปิดโปรแกรมนี้ในอีกเครื่อง (หรือแบ่งจอ) ไว้ดูบทระหว่างไลฟ์":"ต้องมี TikTok LIVE Studio ในเครื่อง (ปุ่ม 🚀 จะบอกว่าพบหรือยัง)"} · TikTok ไม่เปิดให้โปรแกรมอื่นกดเริ่มไลฟ์แทน จึงยังต้องกดในแอปหรือ LIVE Studio เอง ยกเว้นวิธี Stream key</div>`+
+  `<div class="row" style="margin-top:10px"><button class="btn primary" type="button" id="wizOk">เข้าใจแล้ว</button><button class="btn" type="button" id="wizAgain">เลือกใหม่</button></div>`;
+ $("#wizOk").onclick=()=>$("#wizDlg").close();$("#wizAgain").onclick=wizStart}
+function wizStart(){const touch=matchMedia("(pointer:coarse)").matches;
+ wizStep("จะไลฟ์ด้วยกล้องของอะไร?",[
+  {label:"📱 มือถือ",desc:"ไลฟ์ในแอป TikTok ง่ายที่สุด ไม่ต้องลงโปรแกรมเพิ่ม",rec:touch,go:()=>wizDone("phone")},
+  {label:"💻 คอม (เว็บแคม หรือมือถือต่อเป็นกล้อง)",desc:"ภาพสวย มีฉากสินค้า AI สลับให้เอง",rec:!touch,go:()=>wizStep("TikTok ให้ Server URL / Stream key กับบัญชีของคุณไหม?",[
+    {label:"มี Stream key",desc:"เริ่มไลฟ์ได้อัตโนมัติทั้งหมดผ่าน OBS (ต้องลง OBS)",go:()=>wizDone("key")},
+    {label:"ไม่มี / ไม่แน่ใจ",desc:"ใช้ TikTok LIVE Studio ขึ้นไลฟ์ (บัญชีส่วนใหญ่ใช้ทางนี้)",rec:true,go:()=>wizStep("ใช้โปรแกรม OBS อยู่แล้วไหม?",[
+      {label:"ไม่ได้ใช้ OBS",desc:"ใช้จอไลฟ์ในโปรแกรมนี้แทน ไม่ต้องลงอะไรเพิ่มนอกจาก LIVE Studio",rec:true,go:()=>wizDone("inapp")},
+      {label:"ใช้ OBS อยู่แล้ว",desc:"OBS ส่งภาพให้ LIVE Studio เป็นกล้อง",go:()=>wizDone("studio")}])}])}]);
+ if(!$("#wizDlg").open)$("#wizDlg").showModal()}
+$("#wizBtn").onclick=wizStart;$("#wizClose").onclick=()=>$("#wizDlg").close();
+
 /* one-button go live / end live. TikTok has no API to start a live, so the button does every
    step it can (camera, live screen, OBS virtual camera, or the OBS stream itself with a key),
    asks the host to confirm the TikTok side, counts 3-2-1 like TikTok, then starts the round. */
@@ -1323,8 +1368,8 @@ async function endLive(){const m=glCfg.mode;
  if(m==="key"&&glStream){await obsReq("StopStream");setTimeout(glPoll,1200)}
  if(running||elapsed>0)$("#startBtn").click();
  $("#goNote").textContent=m==="key"?"จบไลฟ์แล้ว":"จบรอบแล้ว อย่าลืมกดจบไลฟ์ใน "+(m==="phone"?"แอป TikTok":"LIVE Studio");renderGo()}
-function renderGo(){const b=$("#goBtn");if(!b)return;renderGlAcct();const on=running||elapsed>0;b.textContent=on?"⏹ จบไลฟ์":"🔴 เริ่มไลฟ์";b.classList.toggle("end",on);b.classList.toggle("primary",!on)}
-$("#goBtn").onclick=()=>{if(running||elapsed>0)endLive();else goLive()};
+function renderGo(){const b=$("#goBtn");if(!b)return;renderGlAcct();renderGlAuto();const on=running||elapsed>0;b.textContent=on?"⏹ จบไลฟ์":"🔴 เริ่มไลฟ์";b.classList.toggle("end",on);b.classList.toggle("primary",!on)}
+$("#goBtn").onclick=()=>{if(running||elapsed>0)endLive();else if(!glCfg.picked){wizStart();$("#goNote").textContent="เลือกวิธีไลฟ์ก่อน แล้วกดเริ่มไลฟ์อีกครั้ง"}else goLive()};
 setInterval(renderGo,1000);
 
 /* affiliate (นายหน้า) helper: where the TikTok Shop affiliate area is, the host's own web link
