@@ -37,10 +37,20 @@ body{font-family:"Kanit","IBM Plex Sans Thai","Leelawadee UI",sans-serif;color:v
 @keyframes in{from{transform:translateX(calc(var(--u)*-110))}to{transform:none}}
 .demo{position:fixed;right:8px;bottom:8px;font:12px system-ui;color:#fff;background:rgba(0,0,0,.55);padding:4px 8px;border-radius:6px}
 .tag.low{color:#fff;background:#e09b1a}.tag.out{color:#fff;background:var(--pink)}
+.msg{position:absolute;left:calc(var(--u)*5);right:calc(var(--u)*5);display:flex}
+.msg.at-low{bottom:30vh}.msg.at-high{top:calc(var(--u)*17)}
+@media (orientation:landscape){.msg.at-low{bottom:calc(var(--u)*6)}}
+.mbox{max-width:calc(var(--u)*80);background:rgba(20,16,28,.88);color:#fff;border-radius:calc(var(--u)*2.6);padding:calc(var(--u)*2) calc(var(--u)*3);
+  font-weight:500;font-size:calc(var(--u)*3.6);line-height:1.35;box-shadow:0 calc(var(--u)*1) calc(var(--u)*4) rgba(0,0,0,.3);border-left:calc(var(--u)*1.2) solid var(--pink)}
+.mbox.faq{border-left-color:var(--green)}.mbox.thx{border-left-color:#ffd84d}
+.mbox .q{display:block;font-family:"IBM Plex Sans Thai",sans-serif;font-size:calc(var(--u)*2.5);opacity:.8;margin-bottom:calc(var(--u)*.4)}
+.pop{animation:pop .45s cubic-bezier(.2,.8,.2,1) both}
+@keyframes pop{from{transform:translateY(calc(var(--u)*6));opacity:0}to{transform:none;opacity:1}}
 </style>
 </head>
 <body>
 <div class="wrap top" id="wrap"></div>
+<div class="msg at-low" id="msg"></div>
 <script>
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const baht=n=>"฿"+Number(n||0).toLocaleString("th-TH");
@@ -59,7 +69,13 @@ function card(d){
   if(d.s==="close")return`<div class="card in"><div class="top-row"><span class="tag live">● ใกล้ปิดไลฟ์</span></div>
     <div class="name">${d.af?"ยังกดตะกร้าสั่งได้":"รีบ CF ก่อนโปรหมด"}</div><div class="sub">${d.af?"ขอบคุณทุกคนที่อยู่ด้วยกันค่ะ":"โปรราคาไลฟ์หมดเมื่อปิดไลฟ์ ขอบคุณทุกคนที่อยู่ด้วยกันค่ะ"}</div></div>`;
   return"";}
-function render(){const d=data(),key=JSON.stringify(d);if(key===lastKey)return;lastKey=key;
+let lastMsg="";
+// host message / ready answer / thank-you (field m); drawn apart from the card so the card does not re-animate
+function msgHTML(m){if(!m||!m.t)return"";const k=m.k==="faq"?"faq":m.k==="thx"?"thx":"note";
+  return`<div class="mbox ${k} pop">${m.q?`<span class="q">ถาม: ${esc(m.q)}</span>`:""}${k==="thx"?"🎉 ":""}${esc(m.t)}</div>`}
+function render(){const d=data(),m=d.m||null;delete d.m;const key=JSON.stringify(d),mk=JSON.stringify(m);
+  const ms=document.getElementById("msg");if(mk!==lastMsg){lastMsg=mk;ms.className="msg "+(d.pos==="bottom"?"at-high":"at-low");ms.innerHTML=msgHTML(m)}
+  if(key===lastKey)return;lastKey=key;
   const w=document.getElementById("wrap");w.className="wrap "+(d.pos==="bottom"?"bottom":"top");
   w.innerHTML=card(d)+(d.demo?'<div class="demo">ตัวอย่าง: เปิดผ่าน OBS แล้วป้ายจะเปลี่ยนตามรอบไลฟ์เอง</div>':"");}
 addEventListener("hashchange",render);render();
