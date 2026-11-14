@@ -140,6 +140,14 @@ body:not(.has-helper) .hl-only{display:none!important}
 .osnow{font-family:var(--mono);font-size:11px;padding:1px 8px;border-radius:999px;background:var(--accent);color:#fff;margin-left:4px}
 .golivebtn{width:100%;margin-top:8px;font-size:18px;padding:12px;border-radius:999px;font-family:var(--display);font-weight:500}
 .golivebtn.end{background:var(--surface);color:var(--accent);border:2px solid var(--accent)}
+#waitBox{position:fixed;inset:0;z-index:48;background:rgba(10,10,14,.55);display:grid;place-items:center;padding:16px}
+#waitBox[hidden]{display:none}
+.wbin{background:var(--surface);color:var(--ink);border-radius:16px;padding:18px;max-width:440px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+.wbacct{font-size:13px;color:var(--muted)}.wbacct b{color:var(--ink)}
+.wbtitle{display:block;font-family:var(--display);font-weight:500;font-size:20px;margin:4px 0 6px}
+.wbsteps{margin:0 0 6px;padding-left:20px;font-size:14px;line-height:1.6}
+.wbback{background:var(--talk-soft);border-radius:8px;padding:6px 10px;font-weight:500;margin:6px 0}
+.glacct{font-size:12.5px;color:var(--muted);text-align:center;margin-top:6px}.glacct b{color:var(--ink)}.glacct a{color:var(--accent)}
 #cdBox{position:fixed;inset:0;z-index:50;background:rgba(10,10,14,.82);display:grid;place-items:center}
 #cdBox[hidden]{display:none}
 .cdin{text-align:center;color:#fff}
@@ -497,6 +505,7 @@ td.r,th.r{text-align:right}
       </details>
       <div class="card golive" id="goLive">
         <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:nowrap"><b style="font-family:var(--display);font-weight:500">🔴 ขึ้นไลฟ์ TikTok</b><span class="livestate" id="glState" hidden></span></div>
+        <div class="glacct" id="glAcct"></div>
         <button class="btn primary golivebtn" id="goBtn" type="button">🔴 เริ่มไลฟ์</button>
         <div class="mini" id="goNote" style="margin-top:4px;text-align:center"></div>
         <label class="hl-only" style="display:flex;gap:6px;align-items:center;justify-content:center;margin:4px 0 0;font-size:12px;color:var(--muted)"><input type="checkbox" id="autoLaunch" style="width:auto">กดเริ่มไลฟ์แล้วเปิด TikTok LIVE Studio (และ OBS) ให้เอง</label>
@@ -655,6 +664,14 @@ td.r,th.r{text-align:right}
 </main>
 <div id="undoBar" hidden role="status"><span id="undoText"></span><button class="btn sm" id="undoBtn" type="button">↶ ยกเลิก</button></div>
 <div id="quotaNag" hidden role="alert"><b>⚠ พื้นที่เก็บข้อมูลเต็ม</b> ข้อมูลล่าสุดอาจยังไม่ถูกบันทึก กด "สำรองทั้งหมด" ในหน้าแรกก่อน แล้วลบรูปสินค้าที่ไม่ใช้ หรือส่งออกแล้วล้างออเดอร์เก่า <button class="btn sm" id="quotaClose" type="button">ปิด</button></div>
+<div id="waitBox" hidden role="dialog" aria-modal="true" aria-labelledby="wbTitle"><div class="wbin">
+  <div class="wbacct" id="wbAcct"></div>
+  <b id="wbTitle" class="wbtitle">ไปกดเริ่มไลฟ์ใน TikTok</b>
+  <ol class="wbsteps" id="wbSteps"></ol>
+  <div class="wbback" id="wbBack" hidden>กลับมาแล้ว ไลฟ์ขึ้นใน TikTok แล้วใช่ไหม?</div>
+  <button class="btn primary golivebtn" id="wbGo" type="button">✓ ไลฟ์ใน TikTok แล้ว เริ่มนับ 3-2-1</button>
+  <div class="row" style="justify-content:center;margin-top:8px"><button class="btn sm" id="wbOpen" type="button"></button><button class="btn sm" id="wbCancel" type="button">ยกเลิก</button></div>
+</div></div>
 <div id="cdBox" hidden role="alertdialog" aria-live="assertive"><div class="cdin"><div class="cdlab">กำลังเริ่มไลฟ์</div><div class="cdnum" id="cdNum">3</div><div class="cdsub" id="cdSub"></div><button class="btn" id="cdCancel" type="button">ยกเลิก</button></div></div>
 <dialog id="shareDlg" aria-label="ติดตั้งเครื่องอื่น">
   <div style="padding:16px 18px">
@@ -701,7 +718,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.23.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.24.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){if(e&&(e.name==="QuotaExceededError"||e.code===22)){const q=document.getElementById("quotaNag");if(q)q.hidden=false}return false}}};
@@ -1214,6 +1231,7 @@ $("#autoLaunch").checked=launchCfg.auto;$("#autoLaunch").onchange=()=>{launchCfg
    reports camera state back. Scene follows the same rules as OBS (setScene/pickScene). */
 let stw=null,stScene="cam",stCamOk=false,stDevs=[],stCur="";
 const stLive=()=>!!(stw&&!stw.closed);
+const touchDev=matchMedia("(pointer:coarse)").matches;
 const stCfg=Object.assign({cam:"",mirror:false},store.get("ls_studio",{}));
 function stPush(){if(!stLive())return;const ov=overlayURL(overlayData()).split("#")[1],sc=showcaseURL(showcaseData()).split("#")[1];
  try{stw.postMessage({t:"state",scene:stScene,ov,sc},"*")}catch(e){}}
@@ -1238,6 +1256,27 @@ $("#stCamSel").onchange=()=>{stCfg.cam=$("#stCamSel").value;store.set("ls_studio
 $("#stMirror").onchange=()=>{stCfg.mirror=$("#stMirror").checked;store.set("ls_studio",stCfg);if(stLive())stw.postMessage({t:"cam",mirror:stCfg.mirror},"*")};
 setInterval(()=>{if(stw&&stw.closed){stw=null;stCamOk=false;renderStudio();renderSceneBar()}},2000);
 
+/* linked TikTok account (ls_tt.user, set on the home page) and the "go live in TikTok" panel that
+   replaces confirm(): shows the account and the steps, can open TikTok again, and on phones notices
+   when the host comes back from the TikTok app. TikTok has no API to start a live, so this is where
+   the host confirms the TikTok side before the 3-2-1. */
+function acctName(){try{return ttCfg.user||""}catch(e){return""}}
+function renderGlAcct(){const el=$("#glAcct");if(!el)return;const u=acctName();
+ el.innerHTML=u?`บัญชี TikTok ที่ผูกไว้: <b>@${esc(u)}</b> · <a href="#" data-goto-acct>เปลี่ยน</a>`:`ยังไม่ได้ผูกบัญชี TikTok · <a href="#" data-goto-acct>ใส่ชื่อบัญชี</a>`;
+ el.querySelector("[data-goto-acct]").onclick=e=>{e.preventDefault();show("home");$("#ttUser").scrollIntoView({block:"center"});$("#ttUser").focus()}}
+function openTikTokApp(){const u=acctName(),a=document.createElement("a");a.href=u?`https://www.tiktok.com/@${encodeURIComponent(u)}`:"https://www.tiktok.com/";a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();a.remove()}
+let wbResolve=null,wbWasHidden=false;
+function waitTikTok(opt){return new Promise(res=>{wbResolve=res;wbWasHidden=false;const u=acctName();
+ $("#wbAcct").innerHTML=u?`บัญชีที่ผูกไว้: <b>@${esc(u)}</b> (ตรวจว่า ${esc(opt.where)}ล็อกอินบัญชีนี้อยู่)`:`ยังไม่ได้ผูกบัญชี TikTok (ใส่ได้ที่หน้าแรก)`;
+ $("#wbTitle").textContent=opt.title;$("#wbSteps").innerHTML=opt.steps.map(s=>`<li>${s}</li>`).join("");
+ $("#wbBack").hidden=true;$("#wbOpen").hidden=!opt.open;if(opt.open){$("#wbOpen").textContent=opt.openLabel;$("#wbOpen").onclick=opt.open}
+ $("#waitBox").hidden=false;setTimeout(()=>$("#wbGo").focus(),50)})}
+function wbDone(v){$("#waitBox").hidden=true;const r=wbResolve;wbResolve=null;if(r)r(v)}
+$("#wbGo").onclick=()=>wbDone(true);$("#wbCancel").onclick=()=>wbDone(false);
+document.addEventListener("visibilitychange",()=>{if($("#waitBox").hidden)return;if(document.hidden)wbWasHidden=true;else if(wbWasHidden){$("#wbBack").hidden=false;$("#wbGo").focus()}});
+addEventListener("focus",()=>{if(!$("#waitBox").hidden&&wbWasHidden){$("#wbBack").hidden=false}});
+addEventListener("blur",()=>{if(!$("#waitBox").hidden)wbWasHidden=true});
+
 /* one-button go live / end live. TikTok has no API to start a live, so the button does every
    step it can (camera, live screen, OBS virtual camera, or the OBS stream itself with a key),
    asks the host to confirm the TikTok side, counts 3-2-1 like TikTok, then starts the round. */
@@ -1250,7 +1289,8 @@ function startRoundNow(){if(running)return;if(elapsed>0)$("#pauseBtn").click();e
 const waitFor=(fn,ms)=>new Promise(res=>{const t0=Date.now(),iv=setInterval(()=>{if(fn()||Date.now()-t0>ms){clearInterval(iv);res(fn())}},250)});
 async function goLive(){const note=$("#goNote"),m=glCfg.mode;note.textContent="";
  if(!liveProducts().length){note.textContent="ยังไม่ได้เลือกสินค้าสำหรับรอบนี้ (แท็บ 1. สินค้า)";return}
- if(m==="phone"){if(!confirm("กด \"เริ่ม LIVE\" ในแอป TikTok แล้วใช่ไหม?\n\nกดตกลง แล้วโปรแกรมจะนับ 3-2-1 และเริ่มรอบ"))return}
+ if(m==="phone"){if(touchDev)openTikTokApp();
+  if(!await waitTikTok({where:"แอป TikTok ",title:"เริ่มไลฟ์ในแอป TikTok",steps:[touchDev?"แอป TikTok เปิดให้แล้ว (ถ้ายังไม่เปิด กดปุ่ม \"เปิด TikTok\" ด้านล่าง)":"เปิดแอป TikTok ในมือถือ","กด <b>+</b> ด้านล่าง แล้วเลือก <b>LIVE</b> (แอปเปิดกล้องให้เอง)","ตั้งชื่อไลฟ์ แล้วกด <b>เริ่ม LIVE</b>","กลับมาที่นี่ กดปุ่มสีชมพูด้านล่าง"],open:openTikTokApp,openLabel:"📱 เปิด TikTok"}))return}
  else if(m==="inapp"){if(!stLive()&&!stOpen())return;const wantLS=launchCfg.auto&&hasHelper;if(wantLS)setTimeout(()=>launchApp("tiktok-studio"),400);note.textContent="กำลังเปิดกล้องในจอไลฟ์...";
   if(!await waitFor(()=>stCamOk,10000)){note.textContent="จอไลฟ์ยังเปิดกล้องไม่ได้ ดูข้อความในหน้าต่างจอไลฟ์ แล้วกดเริ่มไลฟ์อีกครั้ง";return}
   let lsTx="";
@@ -1260,7 +1300,7 @@ async function goLive(){const note=$("#goNote"),m=glCfg.mode;note.textContent=""
    if(fresh()&&hs.note==="missing"){note.innerHTML='ยังไม่พบ TikTok LIVE Studio ในเครื่องนี้ <a href="https://www.tiktok.com/studio/download" target="_blank" rel="noopener" style="color:var(--accent)">ดาวน์โหลด</a> ติดตั้งแล้วกดเริ่มไลฟ์อีกครั้ง';return}
    lsTx=fresh()&&hs.studio.running?" · ✓ TikTok LIVE Studio เปิดแล้ว":fresh()?" · TikTok LIVE Studio กำลังเปิด (เครื่องช้า รอสักครู่)":" · ถ้า LIVE Studio ยังไม่เปิด กด 🚀 เปิด TikTok LIVE Studio"}
   note.textContent="✓ จอไลฟ์พร้อม (กล้องเปิดแล้ว)"+lsTx;
-  if(!confirm("จอไลฟ์พร้อมแล้ว\n\nใน TikTok LIVE Studio กด \"Go LIVE\" แล้วใช่ไหม?\n(ครั้งแรก: เพิ่มแหล่งภาพแบบจับภาพหน้าต่าง เลือก \"LiveStudio จอไลฟ์\")\n\nกดตกลง แล้วโปรแกรมจะนับ 3-2-1 และเริ่มรอบ"))return}
+  if(!await waitTikTok({where:"TikTok LIVE Studio ",title:"กด Go LIVE ใน TikTok LIVE Studio",steps:["✓ จอไลฟ์พร้อม กล้องเปิดแล้ว"+(lsTx.includes("✓ TikTok")?"<br>✓ TikTok LIVE Studio เปิดแล้ว":""),"ใน LIVE Studio ภาพต้องเป็น <b>LiveStudio จอไลฟ์</b> (ครั้งแรก: เพิ่มแหล่งภาพแบบจับภาพหน้าต่าง)","กด <b>Go LIVE</b> ใน LIVE Studio","กลับมาที่นี่ กดปุ่มสีชมพูด้านล่าง"],open:hasHelper?()=>launchApp("tiktok-studio"):null,openLabel:"🚀 เปิด LIVE Studio"}))return}
  else{if(!obsReady&&launchCfg.auto&&hasHelper){launchApp("obs");if(!obsCfg.on){obsCfg.on=true;store.set("ls_obs",obsCfg);obsFill()}
    note.textContent="กำลังเปิด OBS แล้วต่อให้เอง...";for(let i=0;i<6&&!obsReady;i++){await new Promise(r=>setTimeout(r,4000));if(!obsReady)obsConnect()}await waitFor(()=>obsReady,3000)}
   if(!obsReady){note.textContent="ยังไม่ได้ต่อ OBS เปิด OBS ก่อน หรือเลือกโหมด \"จอไลฟ์ในโปรแกรม (ไม่ต้องมี OBS)\"";return}
@@ -1269,20 +1309,21 @@ async function goLive(){const note=$("#goNote"),m=glCfg.mode;note.textContent=""
   if(m==="studio"){if(!glVcam){await obsReq("StartVirtualCam");await glPoll()}
    if(!glVcam){note.textContent="เปิดกล้อง OBS (Virtual Camera) ไม่ได้ ต้องใช้ OBS 28 ขึ้นไป";return}
    note.textContent="✓ กล้อง OBS เปิดแล้ว";
-   if(!confirm("กล้อง OBS พร้อมแล้ว\n\nใน TikTok LIVE Studio กด \"Go LIVE\" แล้วใช่ไหม?\n(กล้องต้องเป็น \"OBS Virtual Camera\")\n\nกดตกลง แล้วโปรแกรมจะนับ 3-2-1 และเริ่มรอบ"))return}
+   if(!await waitTikTok({where:"TikTok LIVE Studio ",title:"กด Go LIVE ใน TikTok LIVE Studio",steps:["✓ กล้อง OBS เปิดแล้ว","ใน LIVE Studio กล้องต้องเป็น <b>OBS Virtual Camera</b>","กด <b>Go LIVE</b> ใน LIVE Studio","กลับมาที่นี่ กดปุ่มสีชมพูด้านล่าง"],open:hasHelper?()=>launchApp("tiktok-studio"):null,openLabel:"🚀 เปิด LIVE Studio"}))return}
   else{await glPoll();if(!glKeySet){note.textContent="ยังไม่ได้ใส่ Server URL / Stream key ใส่แล้วกด \"บันทึกลง OBS\" ก่อน";$("#skServer").focus();return}
    if(!glStream){if(!confirm("เริ่มไลฟ์ขึ้น TikTok ตอนนี้?\n\nโปรแกรมจะนับ 3-2-1 แล้วให้ OBS ส่งภาพขึ้นไลฟ์ทันที"))return;
     if(!await countdown("OBS จะส่งภาพขึ้น TikTok เมื่อครบ"))return;
     const r=await obsReq("StartStream");if(!ok(r)){note.textContent="เริ่มส่งภาพไม่ได้: "+((r&&r.requestStatus&&r.requestStatus.comment)||"OBS ไม่ตอบ")+" (ตรวจ Server URL / Stream key)";return}
-    setTimeout(glPoll,1500);startRoundNow();note.textContent="● กำลังไลฟ์ ภาพจะขึ้นใน TikTok อีกสักครู่";renderGo();return}}}
+    setTimeout(glPoll,1500);startRoundNow();note.innerHTML="● กำลังไลฟ์ ภาพจะขึ้นใน TikTok อีกสักครู่"+watchLink();renderGo();return}}}
  if(!await countdown(m==="phone"?"ยิ้ม แล้วทักทายคนดูได้เลย":"ภาพในไลฟ์จะเริ่มตามตารางเมื่อครบ"))return;
- startRoundNow();note.textContent="● กำลังไลฟ์ ทักทายคนดูได้เลย";renderGo()}
+ startRoundNow();note.innerHTML="● กำลังไลฟ์ ทักทายคนดูได้เลย"+watchLink();renderGo()}
+function watchLink(){const u=acctName();return u?` · <a href="https://www.tiktok.com/@${encodeURIComponent(u)}/live" target="_blank" rel="noopener" style="color:var(--accent)">👀 ดูไลฟ์ของ @${esc(u)}</a>`:""}
 async function endLive(){const m=glCfg.mode;
  if(!confirm(m==="key"?"จบไลฟ์?\n\nOBS จะหยุดส่งภาพ คนดูจะเห็นว่าไลฟ์จบ และโปรแกรมจะสรุปรอบนี้":"จบรอบนี้?\n\nโปรแกรมจะสรุปยอด อย่าลืมกดจบไลฟ์ใน "+(m==="phone"?"แอป TikTok":"TikTok LIVE Studio")+" ด้วย"))return;
  if(m==="key"&&glStream){await obsReq("StopStream");setTimeout(glPoll,1200)}
  if(running||elapsed>0)$("#startBtn").click();
  $("#goNote").textContent=m==="key"?"จบไลฟ์แล้ว":"จบรอบแล้ว อย่าลืมกดจบไลฟ์ใน "+(m==="phone"?"แอป TikTok":"LIVE Studio");renderGo()}
-function renderGo(){const b=$("#goBtn");if(!b)return;const on=running||elapsed>0;b.textContent=on?"⏹ จบไลฟ์":"🔴 เริ่มไลฟ์";b.classList.toggle("end",on);b.classList.toggle("primary",!on)}
+function renderGo(){const b=$("#goBtn");if(!b)return;renderGlAcct();const on=running||elapsed>0;b.textContent=on?"⏹ จบไลฟ์":"🔴 เริ่มไลฟ์";b.classList.toggle("end",on);b.classList.toggle("primary",!on)}
 $("#goBtn").onclick=()=>{if(running||elapsed>0)endLive();else goLive()};
 setInterval(renderGo,1000);
 
