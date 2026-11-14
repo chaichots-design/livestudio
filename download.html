@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ติดตั้ง LiveStudio</title>
+<meta name="theme-color" content="#e2365b">
+<link rel="icon" href="icon-192.png">
+<style>
+/* Download / install page for other computers and phones. Published with the web copy;
+   reads version.json (written by tools/publish_web.py). Opened from the installed file:// app
+   it links to the web site instead. No external resources. */
+:root{--bg:#f5f6f8;--surface:#fff;--ink:#18202b;--muted:#5d6876;--line:#dfe3e8;--accent:#e2365b;--accent-soft:#fde7ec;--talk:#1f7a5a;--talk-soft:#e1f3ec;--warn-soft:#fdf1dc;
+  --display:"Kanit","Leelawadee UI","Noto Sans Thai",system-ui,sans-serif;--body:"IBM Plex Sans Thai","Leelawadee UI","Noto Sans Thai",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--surface:#1b2129;--ink:#e9edf2;--muted:#9aa5b2;--line:#2c3440;--accent:#ff5c7c;--accent-soft:#3a1a23;--talk:#4cc79a;--talk-soft:#15322a;--warn-soft:#3a2c14;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--body)}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+.hero{border-radius:16px;padding:22px 20px;color:#fff;background:linear-gradient(140deg,#e2365b 0%,#b5179e 60%,#5b1474 100%)}
+.hero h1{font:600 28px/1.25 var(--display);margin:0}
+.hero p{margin:6px 0 0;opacity:.95}
+.ver{display:inline-block;margin-top:10px;font-size:13px;border:1px solid rgba(255,255,255,.6);border-radius:999px;padding:1px 10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-top:14px}
+h2{font:500 20px/1.3 var(--display);margin:0 0 6px}
+ol{margin:6px 0;padding-left:22px}li{margin:3px 0}
+.btn{display:inline-block;font:500 15px var(--display);text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer}
+.btn.big{display:block;text-align:center;font-size:18px;padding:13px;border-radius:999px;background:var(--accent);border-color:var(--accent);color:#fff;margin:10px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.mini{font-size:13px;color:var(--muted)}
+.note{border-radius:10px;padding:8px 12px;margin-top:8px;font-size:14px;background:var(--warn-soft)}
+.tip{background:var(--talk-soft)}
+.tabs{display:flex;gap:6px;margin-top:8px}
+.tabs button{flex:1;font:500 14px var(--display);padding:7px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+[hidden]{display:none!important}
+kbd{font:12px Consolas,monospace;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 4px}
+</style>
+</head>
+<body>
+<main>
+  <div class="hero">
+    <h1>ติดตั้ง LiveStudio</h1>
+    <p>ผู้ช่วยไลฟ์ขายของ TikTok ใช้ได้ทั้งคอม Windows และมือถือ ฟรี ไม่ต้องสมัคร</p>
+    <span class="ver" id="ver">เวอร์ชันล่าสุด</span>
+  </div>
+
+  <section class="card" id="pc">
+    <h2>💻 คอม Windows</h2>
+    <a class="btn big" id="dlBtn" href="LiveStudio-Setup-Windows.bat" download>⬇ ดาวน์โหลดตัวติดตั้ง</a>
+    <ol>
+      <li>เปิดไฟล์ที่ดาวน์โหลดมา (อยู่ในโฟลเดอร์ Downloads)</li>
+      <li>ถ้าขึ้นหน้าต่างสีน้ำเงิน "Windows protected your PC" กด <b>More info</b> แล้วกด <b>Run anyway</b></li>
+      <li>เลือกที่วางไอคอน (เดสก์ท็อป / โฟลเดอร์บนเดสก์ท็อป / โฟลเดอร์อื่น)</li>
+      <li>เสร็จแล้วโปรแกรมเปิดขึ้นเอง ครั้งต่อไปเปิดจากไอคอน <b>ไลฟ์สตูดิโอ</b></li>
+    </ol>
+    <div class="note tip"><b>อัปเดต:</b> เมื่อมีเวอร์ชันใหม่ หน้าแรกของโปรแกรมจะบอกเอง ดาวน์โหลดไฟล์ใหม่แล้วเปิดทับได้เลย สินค้าและออเดอร์เดิมไม่หาย</div>
+    <div class="mini" style="margin-top:6px">ไม่ต้องใช้สิทธิ์ผู้ดูแลเครื่อง ไม่ต้องต่อเน็ตตอนใช้งาน ใช้ Microsoft Edge ที่มากับ Windows</div>
+  </section>
+
+  <section class="card" id="phone">
+    <h2>📱 มือถือ</h2>
+    <p style="margin:0">ไม่ต้องลงแอป เปิดโปรแกรมในเบราว์เซอร์แล้วเพิ่มไว้ที่หน้าจอหลัก จะได้ไอคอนเหมือนแอป ใช้ได้แม้ไม่มีเน็ต</p>
+    <a class="btn big" id="openApp" href="index.html">▶ เปิดโปรแกรมบนมือถือ</a>
+    <div class="tabs" role="group" aria-label="ระบบมือถือ"><button type="button" data-os="ios" aria-pressed="false">iPhone / iPad</button><button type="button" data-os="android" aria-pressed="false">Android</button></div>
+    <ol data-for="ios" hidden><li>เปิดลิงก์นี้ใน <b>Safari</b></li><li>กดปุ่ม <b>แชร์</b> (สี่เหลี่ยมมีลูกศรขึ้น) ด้านล่าง</li><li>เลือก <b>เพิ่มไปยังหน้าจอโฮม</b> แล้วกด <b>เพิ่ม</b></li></ol>
+    <ol data-for="android" hidden><li>เปิดลิงก์นี้ใน <b>Chrome</b></li><li>กด <b>⋮</b> มุมขวาบน</li><li>เลือก <b>ติดตั้งแอป</b> หรือ <b>เพิ่มลงในหน้าจอหลัก</b></li></ol>
+    <div class="mini">ชื่อเมนูอาจต่างไปตามรุ่นเครื่อง</div>
+  </section>
+
+  <section class="card">
+    <h2>📦 ย้ายสินค้าและออเดอร์มาเครื่องใหม่</h2>
+    <ol>
+      <li>เครื่องเดิม: หน้าแรก กด <b>⬇ สำรองทั้งหมด</b> (หรือ <b>📤 ติดตั้งเครื่องอื่น</b> แล้วกด <b>ส่งไฟล์สำรอง</b>)</li>
+      <li>ส่งไฟล์ <b>livestudio-สำรอง-....json</b> ไปเครื่องใหม่ เช่น ทาง LINE ถึงตัวเอง หรือแฟลชไดรฟ์</li>
+      <li>เครื่องใหม่: หน้าแรก กด <b>⬆ กู้คืนจากไฟล์สำรอง</b> แล้วเลือกไฟล์นั้น</li>
+    </ol>
+    <div class="note">ไฟล์สำรองมีชื่อลูกค้าและออเดอร์ ส่งไปเฉพาะเครื่องของตัวเอง รหัส OBS และคีย์ AI ไม่อยู่ในไฟล์ ใส่ใหม่ที่เครื่องนั้น</div>
+  </section>
+
+  <section class="card">
+    <h2>📘 คู่มือ</h2>
+    <div class="row"><a class="btn" id="mQuick" href="quickstart.pdf" target="_blank" rel="noopener">📷 คู่มือสั้น: เปิดกล้อง + เริ่มไลฟ์</a><a class="btn" id="mFull" href="manual.pdf" target="_blank" rel="noopener">📘 คู่มือฉบับเต็ม</a></div>
+  </section>
+</main>
+<script>
+const SITE="https://chaichots-design.github.io/livestudio/"; // used only when opened from the installed copy (file://)
+const base=location.protocol==="file:"?SITE:"";
+const touch=matchMedia("(pointer:coarse)").matches,ios=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+if(base){["dlBtn","openApp","mQuick","mFull"].forEach(id=>{const a=document.getElementById(id);a.href=base+a.getAttribute("href")})}
+// phone first on phones
+if(touch){const m=document.querySelector("main"),ph=document.getElementById("phone");m.insertBefore(ph,document.getElementById("pc"))}
+function pick(os){document.querySelectorAll("[data-os]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.os===os)));
+  document.querySelectorAll("[data-for]").forEach(o=>o.hidden=o.dataset.for!==os)}
+document.querySelectorAll("[data-os]").forEach(b=>b.onclick=()=>pick(b.dataset.os));
+pick(ios?"ios":"android");
+fetch(base+"version.json",{cache:"no-store"}).then(r=>r.json()).then(v=>{
+  document.getElementById("ver").textContent="เวอร์ชันล่าสุด "+v.version;
+  if(v.installer){const a=document.getElementById("dlBtn");a.href=base+v.installer;a.textContent="⬇ ดาวน์โหลดตัวติดตั้ง ("+v.version+")"}}).catch(()=>{});
+</script>
+</body>
+</html>

@@ -135,8 +135,8 @@ a.btn:not([href]){opacity:.5;pointer-events:none}
 .cdsub{font-size:14px;opacity:.85;margin:4px 0 14px;max-width:320px}
 @keyframes cdpop{0%{transform:scale(1.35);opacity:.2}30%{transform:scale(1);opacity:1}100%{transform:scale(.92);opacity:.9}}
 @media (prefers-reduced-motion:reduce){.cdnum{animation:none}}
-#affDlg{border:0;border-radius:14px;padding:0;max-width:min(96vw,520px);width:100%;background:var(--surface);color:var(--ink)}
-#affDlg::backdrop{background:rgba(0,0,0,.55)}
+#shareDlg,#affDlg{border:0;border-radius:14px;padding:0;max-width:min(96vw,520px);width:100%;background:var(--surface);color:var(--ink)}
+#shareDlg::backdrop,#affDlg::backdrop{background:rgba(0,0,0,.55)}
 .afflist{display:grid;gap:4px}.afflist div{display:flex;gap:8px;align-items:center;font-size:13px;padding:5px 6px;background:var(--bg);border-radius:6px}
 .afflist span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #camDlg{border:0;border-radius:14px;padding:0;max-width:min(96vw,460px);width:100%;background:var(--surface);color:var(--ink)}
@@ -330,7 +330,7 @@ td.r,th.r{text-align:right}
     <div class="row" style="justify-content:space-between">
       <div><b style="font-family:var(--display);font-weight:500">สำรองข้อมูลและย้ายเครื่อง</b>
         <div class="mini">เก็บสินค้า ออเดอร์ และการตั้งค่ารอบไว้ในไฟล์เดียว เอาไปกู้คืนในเครื่องอื่นได้ (ไม่รวมรหัส OBS)</div></div>
-      <div class="row"><button class="btn" id="backupAll">⬇ สำรองทั้งหมด</button><button class="btn" id="restoreAll">⬆ กู้คืนจากไฟล์สำรอง</button></div>
+      <div class="row"><button class="btn" id="backupAll">⬇ สำรองทั้งหมด</button><button class="btn" id="restoreAll">⬆ กู้คืนจากไฟล์สำรอง</button><button class="btn" type="button" data-share>📤 ติดตั้งเครื่องอื่น</button></div>
     </div>
     <div class="mini" id="bMsg" style="margin-top:6px"></div>
   </div>
@@ -340,7 +340,7 @@ td.r,th.r{text-align:right}
     <div><b>ช่วงสีเขียวต้องเป็นคนพูดสด</b><div class="mini" style="margin-top:2px">กฎ TikTok Shop ไม่ให้ใช้เสียง AI หรือคลิปเก่าแทนการพูดสดทั้งรอบ โปรแกรมจึงเว้นช่วงให้คุณเข้ามาทักทายและตอบคอมเมนต์เป็นระยะ ถ้าใช้ตัวละคร AI อย่าให้เกินครึ่งจอ และแจ้งคนดูว่ามี AI ช่วยนำเสนอ</div></div>
   </div>
   <div class="rulecard" id="updBox" hidden style="justify-content:space-between;flex-wrap:wrap"></div>
-  <p class="mini" style="text-align:center;margin-top:14px"><a id="manualLink" target="_blank" rel="noopener" style="color:var(--accent);font-weight:500">📘 คู่มือการใช้งาน (PDF)</a> · <a id="quickLink" target="_blank" rel="noopener" style="color:var(--accent);font-weight:500">📷 คู่มือเปิดกล้อง + เริ่มไลฟ์</a> · LiveStudio เวอร์ชัน <b id="appVer"></b> · <span id="verNote">มีเวอร์ชันใหม่ ให้เปิดไฟล์ติดตั้งตัวใหม่ทับได้เลย สินค้าและออเดอร์เดิมไม่หาย</span></p>
+  <p class="mini" style="text-align:center;margin-top:14px"><a href="#" data-share style="color:var(--accent);font-weight:500">📤 ติดตั้งเครื่องอื่น</a> · <a id="manualLink" target="_blank" rel="noopener" style="color:var(--accent);font-weight:500">📘 คู่มือการใช้งาน (PDF)</a> · <a id="quickLink" target="_blank" rel="noopener" style="color:var(--accent);font-weight:500">📷 คู่มือเปิดกล้อง + เริ่มไลฟ์</a> · LiveStudio เวอร์ชัน <b id="appVer"></b> · <span id="verNote">มีเวอร์ชันใหม่ ให้เปิดไฟล์ติดตั้งตัวใหม่ทับได้เลย สินค้าและออเดอร์เดิมไม่หาย</span></p>
 </section>
 
 <section id="tab-products" hidden>
@@ -629,6 +629,20 @@ td.r,th.r{text-align:right}
 </section>
 </main>
 <div id="cdBox" hidden role="alertdialog" aria-live="assertive"><div class="cdin"><div class="cdlab">กำลังเริ่มไลฟ์</div><div class="cdnum" id="cdNum">3</div><div class="cdsub" id="cdSub"></div><button class="btn" id="cdCancel" type="button">ยกเลิก</button></div></div>
+<dialog id="shareDlg" aria-label="ติดตั้งเครื่องอื่น">
+  <div style="padding:16px 18px">
+    <div class="row" style="justify-content:space-between"><b style="font-family:var(--display);font-weight:500;font-size:18px">📤 ติดตั้งเครื่องอื่น</b><button class="btn sm" id="shClose" type="button" aria-label="ปิด">✕</button></div>
+    <div class="mini" style="margin-top:6px">ส่งลิงก์นี้ไปที่คอมหรือมือถือเครื่องอื่น เปิดแล้วมีปุ่มดาวน์โหลดตัวติดตั้ง Windows และวิธีเพิ่มไว้ที่หน้าจอมือถือ</div>
+    <div class="row" style="flex-wrap:nowrap;margin-top:8px"><input id="shUrl" readonly style="flex:1;min-width:0;font-family:var(--mono);font-size:12px"><button class="btn" id="shCopy" type="button">คัดลอก</button></div>
+    <div class="row" style="margin-top:8px"><a class="btn primary" id="shLine" target="_blank" rel="noopener">💬 ส่งทาง LINE</a><button class="btn" id="shNative" type="button" hidden>📤 แชร์</button><a class="btn" id="shOpen" target="_blank" rel="noopener">🌐 เปิดหน้าดาวน์โหลด</a></div>
+    <div class="mini" id="shMsg" style="margin-top:4px"></div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:14px 0 10px">
+    <b style="font-family:var(--display);font-weight:500">📦 ย้ายสินค้าและออเดอร์ไปด้วย</b>
+    <ol class="glsteps" style="margin-top:4px"><li>กด <b>ส่งไฟล์สำรอง</b> ด้านล่าง (มือถือจะเปิดเมนูแชร์ คอมจะบันทึกไฟล์ลง Downloads)</li><li>ส่งไฟล์ไปเครื่องใหม่ เช่น LINE ถึงตัวเอง หรือแฟลชไดรฟ์</li><li>เครื่องใหม่: หน้าแรก กด <b>⬆ กู้คืนจากไฟล์สำรอง</b> แล้วเลือกไฟล์นั้น</li></ol>
+    <div class="row"><button class="btn" id="shBackup" type="button">📦 ส่งไฟล์สำรอง</button><span class="mini" id="shBkMsg"></span></div>
+    <div class="mini" style="margin-top:6px">⚠ ไฟล์สำรองมีชื่อลูกค้าและออเดอร์ ส่งไปเฉพาะเครื่องของตัวเอง รหัส OBS และคีย์ AI ไม่อยู่ในไฟล์</div>
+  </div>
+</dialog>
 <dialog id="affDlg" aria-label="ส่วนนายหน้า TikTok">
   <div style="padding:16px 18px">
     <div class="row" style="justify-content:space-between"><b style="font-family:var(--display);font-weight:500;font-size:18px">🤝 ส่วนนายหน้า TikTok (Affiliate)</b><button class="btn sm" id="affClose" type="button" aria-label="ปิด">✕</button></div>
@@ -660,7 +674,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.19.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.20.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
@@ -1269,6 +1283,22 @@ $("#goalIn").value=uiCfg.goal||"";
 $("#goalIn").onchange=()=>{const v=Math.max(0,Math.round(+$("#goalIn").value||0));uiCfg.goal=v||0;$("#goalIn").value=v||"";store.set("ls_ui",uiCfg);renderSales()};
 setInterval(()=>{if(!$("#tab-live").hidden)renderSales()},3000);
 
+/* install on another device: link to the web download page (download.html), LINE share,
+   native share, and the backup file (Web Share with a file where supported, else a download). */
+const siteBase=()=>location.protocol==="file:"?(UPDATE_SITE||"https://chaichots-design.github.io/livestudio/"):new URL(".",location.href).href;
+function shareFill(){const url=siteBase()+"download.html",txt="ติดตั้ง LiveStudio ผู้ช่วยไลฟ์ขายของ TikTok (คอม Windows และมือถือ): "+url;
+ $("#shUrl").value=url;$("#shOpen").href=url;$("#shLine").href="https://line.me/R/msg/text/?"+encodeURIComponent(txt);
+ $("#shNative").hidden=!navigator.share;$("#shNative").onclick=()=>navigator.share({title:"LiveStudio",text:"ติดตั้ง LiveStudio ผู้ช่วยไลฟ์ขายของ TikTok",url}).catch(()=>{});
+ $("#shMsg").textContent="";$("#shBkMsg").textContent=""}
+document.querySelectorAll("[data-share]").forEach(b=>b.onclick=e=>{e.preventDefault();shareFill();$("#shareDlg").showModal()});
+$("#shClose").onclick=()=>$("#shareDlg").close();
+$("#shCopy").onclick=()=>copyText($("#shUrl").value).then(()=>$("#shMsg").textContent="✓ คัดลอกลิงก์แล้ว วางในแชตได้เลย").catch(()=>{$("#shUrl").select();$("#shMsg").textContent="คัดลอกไม่ได้ กดค้างที่ลิงก์แล้วคัดลอกเอง"});
+$("#shBackup").onclick=async()=>{const name=backupName(),json=backupJSON();
+ try{const f=new File([json],name,{type:"application/json"});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:"ไฟล์สำรอง LiveStudio"});markBackedUp();$("#shBkMsg").textContent="✓ ส่งไฟล์สำรองแล้ว";return}}
+ catch(e){if(e&&e.name==="AbortError"){$("#shBkMsg").textContent="ยกเลิกแล้ว";return}}
+ markBackedUp();download(name,json,"application/json");$("#shBkMsg").textContent=`✓ บันทึก ${name} ลงโฟลเดอร์ Downloads แล้ว ส่งไฟล์นี้ไปเครื่องใหม่`};
+
 /* pre-live checklist: automatic checks (from the app's own state) + items the host ticks.
    Ticks live in ls_check {d: date, t: {key: true}} and reset each day. */
 let obsScenesOk=false,camTested=false;
@@ -1701,7 +1731,9 @@ $("#expProd").onclick=()=>{download(`livestudio-สินค้า-${localDate()
 $("#expOrd").onclick=()=>{if(!orders.length){$("#clearMsg").textContent="ยังไม่มีออเดอร์ให้ส่งออก";return}
  download(`livestudio-ออเดอร์-${localDate()}.csv`,toCSV([["วันที่","เวลา","ลูกค้า","รหัส","สินค้า","จำนวน","ราคาต่อชิ้น","รวม","ค่าคอม (%)","ค่าคอม (บาท)","จ่ายแล้ว"],...orders.map(o=>[o.d||"",o.t,o.name,o.code,o.pname,o.qty,o.price,o.qty*o.price,o.cm||"",o.cm?Math.round(commOf(o)*100)/100:"",o.paid?"ใช่":""])]),"text/csv;charset=utf-8");
  $("#clearMsg").textContent=`ส่งออกออเดอร์ ${orders.length} รายการแล้ว ไฟล์อยู่ในโฟลเดอร์ Downloads`};
-$("#backupAll").onclick=()=>{markBackedUp();download(`livestudio-สำรอง-${localDate()}.json`,JSON.stringify({app:"LiveStudio",format:1,exported:new Date().toISOString(),products,orders,plan:planSettings(),seller:sellerCfg.type,history:liveHist},null,1),"application/json");
+const backupName=()=>`livestudio-สำรอง-${localDate()}.json`;
+const backupJSON=()=>JSON.stringify({app:"LiveStudio",format:1,exported:new Date().toISOString(),products,orders,plan:planSettings(),seller:sellerCfg.type,history:liveHist},null,1);
+$("#backupAll").onclick=()=>{markBackedUp();download(backupName(),backupJSON(),"application/json");
  $("#bMsg").textContent=`สำรองแล้ว: สินค้า ${products.length} รายการ ออเดอร์ ${orders.length} รายการ ไฟล์อยู่ในโฟลเดอร์ Downloads`};
 
 let fileKind="";
