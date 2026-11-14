@@ -116,6 +116,13 @@ a.btn:not([href]){opacity:.5;pointer-events:none}
 .glsteps.live label{display:flex;gap:6px;align-items:center;margin:0;font-size:12px;color:var(--muted);white-space:nowrap;cursor:pointer}
 .glsteps.live label input{width:auto}
 .obscam{margin-top:8px}
+#undoBar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:40;display:flex;gap:10px;align-items:center;width:max-content;max-width:calc(100vw - 32px);box-sizing:border-box;
+  background:var(--ink);color:var(--surface);border-radius:16px;padding:8px 10px 8px 16px;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+#undoBar[hidden],#quotaNag[hidden]{display:none}
+#undoBar .btn{background:var(--surface);color:var(--ink);border-color:var(--surface);white-space:nowrap}
+#quotaNag{position:fixed;left:16px;right:16px;top:12px;z-index:45;background:var(--warn-soft);color:var(--ink);border:1px solid var(--warn);border-radius:10px;padding:10px 12px;font-size:14px}
+.snaplist{display:grid;gap:4px}.snaplist div{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px;padding:5px 8px;background:var(--bg);border-radius:6px}
+.snaplist span{flex:1;min-width:150px}.snaplist .btn{padding:2px 8px;font-size:12px}
 body:not(.has-helper) .hl-only{display:none!important}
 .slgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:6px;margin-top:8px}
 .slgrid div{background:var(--bg);border-radius:8px;padding:6px 8px}
@@ -335,6 +342,11 @@ td.r,th.r{text-align:right}
       <div class="row"><button class="btn" id="backupAll">⬇ สำรองทั้งหมด</button><button class="btn" id="restoreAll">⬆ กู้คืนจากไฟล์สำรอง</button><button class="btn" type="button" data-share>📤 ติดตั้งเครื่องอื่น</button></div>
     </div>
     <div class="mini" id="bMsg" style="margin-top:6px"></div>
+    <details id="snapBox" style="margin-top:8px"><summary class="mini" style="cursor:pointer">🕘 สำเนาอัตโนมัติในเครื่องนี้ <span id="snapCount"></span></summary>
+      <div class="mini" style="margin-top:4px">โปรแกรมเก็บสำเนาให้เองเมื่อเปิดโปรแกรม ทุก 15 นาทีที่ข้อมูลเปลี่ยน เมื่อจบรอบ และก่อนกู้คืนหรือล้างออเดอร์ (เก็บ 15 ชุดล่าสุด) ใช้แก้กรณีเผลอลบหรือกู้คืนผิดไฟล์ ถ้าย้ายเครื่องหรือถอนการติดตั้ง ยังต้องใช้ปุ่ม "สำรองทั้งหมด"</div>
+      <div id="snapList" style="margin-top:6px"></div>
+    </details>
+    <div class="mini" id="storeUse" style="margin-top:6px"></div>
   </div>
 
   <div class="rulecard">
@@ -634,6 +646,8 @@ td.r,th.r{text-align:right}
   <div class="row" style="margin-top:8px"><button class="btn" id="expHist">⬇ ส่งออกประวัติ (Excel)</button><span class="mini" id="histMsg"></span></div>
 </section>
 </main>
+<div id="undoBar" hidden role="status"><span id="undoText"></span><button class="btn sm" id="undoBtn" type="button">↶ ยกเลิก</button></div>
+<div id="quotaNag" hidden role="alert"><b>⚠ พื้นที่เก็บข้อมูลเต็ม</b> ข้อมูลล่าสุดอาจยังไม่ถูกบันทึก กด "สำรองทั้งหมด" ในหน้าแรกก่อน แล้วลบรูปสินค้าที่ไม่ใช้ หรือส่งออกแล้วล้างออเดอร์เก่า <button class="btn sm" id="quotaClose" type="button">ปิด</button></div>
 <div id="cdBox" hidden role="alertdialog" aria-live="assertive"><div class="cdin"><div class="cdlab">กำลังเริ่มไลฟ์</div><div class="cdnum" id="cdNum">3</div><div class="cdsub" id="cdSub"></div><button class="btn" id="cdCancel" type="button">ยกเลิก</button></div></div>
 <dialog id="shareDlg" aria-label="ติดตั้งเครื่องอื่น">
   <div style="padding:16px 18px">
@@ -680,10 +694,10 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.21.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.22.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
-const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){if(e&&(e.name==="QuotaExceededError"||e.code===22)){const q=document.getElementById("quotaNag");if(q)q.hidden=false}return false}}};
 const SAMPLE=[
  {code:"A1",name:"เซรั่มวิตามินซี 30ml",price:290,points:"ผิวดูกระจ่างใสใน 2 สัปดาห์|เนื้อบางซึมไว ไม่เหนียว|ใช้ได้ทั้งเช้าและเย็น",promo:"ซื้อ 2 ขวดเหลือ 499"},
  {code:"A2",name:"ครีมกันแดด SPF50 PA++++",price:259,points:"บางเบา ไม่วอก|กันน้ำกันเหงื่อ|ใช้แทนไพรเมอร์ได้",promo:"แถมซองทดลอง 3 ซอง"},
@@ -759,7 +773,8 @@ function renderProducts(){const el=$("#plist");el.innerHTML="";
   if(k==="comm")p.comm=Math.min(100,p.comm);store.set("ls_products",products);plan=[];if(k==="code")inp.closest(".card").querySelector(".code").textContent=inp.value;if(k==="url")setOpenLink(+inp.dataset.i)});
  el.querySelectorAll("[data-open]").forEach(a=>setOpenLink(+a.dataset.open));
  el.querySelectorAll('input[data-k="stock"]').forEach(inp=>inp.onchange=()=>{const i=+inp.dataset.i,had=!!document.querySelector(`[data-stockchip="${i}"]`);if(had!==hasStock(products[i]))renderProducts()});
- el.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{products.splice(+b.dataset.del,1);save()});
+ el.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{const i=+b.dataset.del,[p]=products.splice(i,1);save();
+  offerUndo(`ลบสินค้า ${p.code} ${p.name} แล้ว`,()=>{products.splice(Math.min(i,products.length),0,p);save()})});
  el.querySelectorAll("[data-on]").forEach(b=>b.onchange=()=>{products[+b.dataset.on].on=b.checked;save()});
  el.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{const i=+b.dataset.mv,j=i+ +b.dataset.d;if(j<0||j>=products.length)return;[products[i],products[j]]=[products[j],products[i]];save()});
  el.querySelectorAll("[data-img]").forEach(inp=>inp.onchange=()=>setPhoto(+inp.dataset.img,inp.files[0]));
@@ -1418,7 +1433,7 @@ function summarize(list){const by={};list.forEach(o=>{by[o.code]=by[o.code]||{c:
  return{n:list.length,q:list.reduce((a,o)=>a+o.qty,0),s:list.reduce((a,o)=>a+o.qty*o.price,0),cm:Math.round(list.reduce((a,o)=>a+commOf(o),0)),
   top:Object.values(by).sort((a,b)=>b.s-a.s).slice(0,3)}}
 function finishRound(){if(!roundStart)return;const startTs=roundStart;roundStart=0;
- if(elapsed<60)return;
+ if(elapsed<60)return;setTimeout(()=>snapTake("จบรอบ"),500);
  const rec={d:localDate(),st:roundStartHM,plan:durMin(),real:Math.round(elapsed/60),aff:aff()?1:0,...summarize(orders.filter(o=>o.ts&&o.ts>=startTs))};
  liveHist.push(rec);if(liveHist.length>HIST_MAX)liveHist=liveHist.slice(-HIST_MAX);store.set("ls_history",liveHist);
  showRoundSum(rec);renderOrders()}
@@ -1488,7 +1503,9 @@ $("#qAdd").onclick=()=>{const name=$("#qName").value.trim(),code=$("#qCode").val
   (sk.over!=null?` · ⚠ สต็อกมีแค่ ${sk.over} ชิ้น ขายเกินสต็อก`:sk.tracked?` · ${stockLabel(p)}`:"");$("#qName").value="";$("#qQty").value=1;$("#qName").focus()};
 function renderOrders(){const ob=$("#obody");ob.innerHTML=orders.length?"":`<tr><td colspan="6" class="mini">ยังไม่มีออเดอร์ จดได้จากแท็บไลฟ์ระหว่างไลฟ์</td></tr>`;
  orders.forEach((o,i)=>{const tr=document.createElement("tr");tr.innerHTML=`<td class="num">${o.t}</td><td>${esc(o.name)}${o.paid&&!aff()?' <span class="paidtick" title="จ่ายแล้ว">✓</span>':""}</td><td><span class="code">${esc(o.code)}</span> ${esc(o.pname)}</td><td class="r num">${o.qty}</td><td class="r num">${fmt(o.qty*o.price)}</td><td class="r num aff-only">${o.cm?fmt(Math.round(commOf(o))):"-"}</td><td><button class="btn" data-o="${i}" style="padding:2px 8px;font-size:12px">ลบ</button></td>`;ob.appendChild(tr)});
- ob.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{const [o]=orders.splice(+b.dataset.o,1);returnStock(o);store.set("ls_orders",orders);renderOrders();renderHome()});
+ ob.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{const i=+b.dataset.o,[o]=orders.splice(i,1);returnStock(o);store.set("ls_orders",orders);renderOrders();renderHome();
+  offerUndo(`ลบออเดอร์ ${o.name} ${o.code} x${o.qty} แล้ว`,()=>{const p=products.find(x=>x.code===o.code);if(o.sk&&p&&hasStock(p)){p.stock=Math.max(0,p.stock-o.sk);store.set("ls_products",products);stockChanged(p)}
+   orders.splice(Math.min(i,orders.length),0,o);store.set("ls_orders",orders);renderOrders();renderHome()})});
  const q=orders.reduce((a,o)=>a+o.qty,0),sum=orders.reduce((a,o)=>a+o.qty*o.price,0);
  renderBills();renderHistory();$("#tCount").textContent=fmt(orders.length);$("#tQty").textContent=fmt(q);$("#tSum").textContent=fmt(sum);$("#tComm").textContent=fmt(Math.round(orders.reduce((a,o)=>a+commOf(o),0)));$("#tUnpaid").textContent=fmt(orders.filter(o=>!o.paid).reduce((a,o)=>a+o.qty*o.price,0));
  const by={};orders.forEach(o=>{by[o.code]=by[o.code]||{n:o.pname,q:0,s:0};by[o.code].q+=o.qty;by[o.code].s+=o.qty*o.price});
@@ -1496,7 +1513,7 @@ function renderOrders(){const ob=$("#obody");ob.innerHTML=orders.length?"":`<tr>
 $("#copySum").onclick=()=>{const txt=`สรุปไลฟ์ ${new Date().toLocaleDateString("th-TH")}\nออเดอร์ ${orders.length} · ยอด ${$("#tSum").textContent} บาท${aff()?` · ค่าคอมประมาณ ${$("#tComm").textContent} บาท`:""}\n`+orders.map(o=>`${o.name} ${o.code} x${o.qty} = ${fmt(o.qty*o.price)}`).join("\n");
  navigator.clipboard.writeText(txt).then(()=>$("#clearMsg").textContent="คัดลอกแล้ว").catch(()=>$("#clearMsg").textContent="คัดลอกไม่ได้ในหน้านี้")};
 let armed=false;$("#clearOrders").onclick=()=>{if(!armed){armed=true;$("#clearOrders").textContent="กดอีกครั้งเพื่อยืนยันล้าง";setTimeout(()=>{armed=false;$("#clearOrders").textContent="ล้างออเดอร์ทั้งหมด"},3000);return}
- orders=[];store.set("ls_orders",orders);armed=false;$("#clearOrders").textContent="ล้างออเดอร์ทั้งหมด";renderOrders()};
+ snapTake("ก่อนล้างออเดอร์",true);orders=[];store.set("ls_orders",orders);armed=false;$("#clearOrders").textContent="ล้างออเดอร์ทั้งหมด";renderOrders()};
 
 /* OBS scene switching (obs-websocket v5, built into OBS 28+).
    prod segments -> clip scene; open/human/close and pause/stop -> live-talk scene.
@@ -1754,6 +1771,37 @@ $("#expOrd").onclick=()=>{if(!orders.length){$("#clearMsg").textContent="ยั�
  $("#clearMsg").textContent=`ส่งออกออเดอร์ ${orders.length} รายการแล้ว ไฟล์อยู่ในโฟลเดอร์ Downloads`};
 const backupName=()=>`livestudio-สำรอง-${localDate()}.json`;
 const backupJSON=()=>JSON.stringify({app:"LiveStudio",format:1,exported:new Date().toISOString(),products,orders,plan:planSettings(),seller:sellerCfg.type,history:liveHist},null,1);
+/* undo bar: deleting an order or a product can be taken back for 8 seconds */
+let undoFn=null,undoTimer=null;
+function offerUndo(text,fn){undoFn=fn;$("#undoText").textContent=text;$("#undoBar").hidden=false;clearTimeout(undoTimer);undoTimer=setTimeout(()=>{$("#undoBar").hidden=true;undoFn=null},8000)}
+$("#undoBtn").onclick=()=>{const f=undoFn;undoFn=null;$("#undoBar").hidden=true;clearTimeout(undoTimer);if(f)f()};
+$("#quotaClose").onclick=()=>$("#quotaNag").hidden=true;
+
+/* automatic snapshots in IndexedDB (bigger than localStorage, stays on this device): the same JSON
+   as "backup all", taken on open (if the last one is over an hour old or the data changed), every
+   15 minutes when data changed, at the end of a round, and before restore / import / clear-all.
+   Keeps the 15 newest; restoring goes through importText (asks first, and snapshots before). */
+const SNAP_MAX=15;let snapDB=null,snapLast="";
+function snapOpen(){if(snapDB)return Promise.resolve(snapDB);return new Promise((res,rej)=>{if(!window.indexedDB)return rej(new Error("no idb"));
+ const r=indexedDB.open("livestudio",1);r.onupgradeneeded=()=>r.result.createObjectStore("snaps",{keyPath:"ts"});r.onsuccess=()=>{snapDB=r.result;res(snapDB)};r.onerror=()=>rej(r.error)})}
+function snapTx(mode,fn){return snapOpen().then(db=>new Promise((res,rej)=>{const tx=db.transaction("snaps",mode),st=tx.objectStore("snaps"),out=fn(st);tx.oncomplete=()=>res(out&&out.result!==undefined?out.result:out);tx.onerror=()=>rej(tx.error)}))}
+const snapAll=()=>snapTx("readonly",st=>st.getAll()).then(a=>(a||[]).sort((x,y)=>y.ts-x.ts)).catch(()=>[]);
+function snapData(){const j=JSON.parse(backupJSON());delete j.exported;return JSON.stringify(j)}
+async function snapTake(reason,force){try{const data=snapData(),np=products.length,no=orders.length;if(!np&&!no)return;
+  const list=await snapAll();if(!force&&list[0]&&list[0].data===data)return;if(force&&list[0]&&list[0].data===data&&Date.now()-list[0].ts<60000)return;
+  await snapTx("readwrite",st=>{st.put({ts:Date.now(),reason,np,no,data});list.slice(SNAP_MAX-1).forEach(s=>st.delete(s.ts))});
+  snapLast=data;renderSnaps()}catch(e){}}
+async function renderSnaps(){const el=$("#snapList");if(!el)return;storeUse();const list=await snapAll();$("#snapCount").textContent=list.length?`(${list.length})`:"";
+ el.innerHTML=list.length?`<div class="snaplist">`+list.map(s=>{const d=new Date(s.ts);return`<div><span>${d.toLocaleDateString("th-TH",{day:"numeric",month:"short"})} ${d.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})} · ${esc(s.reason)} · สินค้า ${s.np} ออเดอร์ ${s.no}</span><button class="btn" type="button" data-snap="${s.ts}">กู้คืน</button><button class="btn" type="button" data-snapdl="${s.ts}">⬇</button></div>`}).join("")+`</div>`
+  :`<div class="mini">ยังไม่มีสำเนา (เบราว์เซอร์นี้อาจไม่ให้เก็บ)</div>`;
+ el.querySelectorAll("[data-snap]").forEach(b=>b.onclick=()=>{const s=list.find(x=>x.ts===+b.dataset.snap);if(!s)return;
+  try{$("#bMsg").textContent=importText("restoreAll",s.data,"snapshot.json")}catch(e){$("#bMsg").textContent="กู้คืนไม่ได้: "+e.message}renderSnaps()});
+ el.querySelectorAll("[data-snapdl]").forEach(b=>b.onclick=()=>{const s=list.find(x=>x.ts===+b.dataset.snapdl);if(s)download(`livestudio-สำเนา-${new Date(s.ts).toISOString().slice(0,16).replace(/[:T]/g,"-")}.json`,s.data,"application/json")})}
+function storeUse(){let n=0;try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(/^ls_/.test(k))n+=(localStorage.getItem(k)||"").length}}catch(e){}
+ const kb=Math.round(n*2/1024),pc=Math.round(kb/5120*100);
+ $("#storeUse").textContent=`ข้อมูลในเครื่องนี้ประมาณ ${fmt(kb)} KB`+(pc>=60?` · ⚠ ใช้ไปราว ${pc}% ของพื้นที่ ลองลบรูปสินค้าที่ไม่ใช้ หรือส่งออกแล้วล้างออเดอร์เก่า`:"")}
+setTimeout(async()=>{const list=await snapAll();if(!list[0]||Date.now()-list[0].ts>36e5)snapTake("เปิดโปรแกรม");else{snapLast=list[0].data;renderSnaps()}storeUse()},3000);
+setInterval(()=>{try{if(snapData()!==snapLast)snapTake("อัตโนมัติ 15 นาที")}catch(e){}storeUse()},15*60*1000);
 $("#backupAll").onclick=()=>{markBackedUp();download(backupName(),backupJSON(),"application/json");
  $("#bMsg").textContent=`สำรองแล้ว: สินค้า ${products.length} รายการ ออเดอร์ ${orders.length} รายการ ไฟล์อยู่ในโฟลเดอร์ Downloads`};
 
@@ -1773,7 +1821,7 @@ function cleanProduct(p){const o={code:unq(p.code),name:unq(p.name),price:num(p.
 function cleanOrder(o){const qty=Math.max(1,Math.round(num(o.qty))||1),r={d:unq(o.d),t:unq(o.t),name:unq(o.name),code:unq(o.code),pname:unq(o.pname),qty,price:num(o.price)};
  if(num(o.cm)>0)r.cm=Math.min(100,num(o.cm));if(num(o.ts)>0)r.ts=num(o.ts);if(o.paid===1||o.paid===true||/^(ใช่|1|true|yes|y|✓)$/i.test(String(o.paid||"").trim()))r.paid=1;if(num(o.sk)>0)r.sk=Math.round(num(o.sk));return r}
 function afterChange(){store.set("ls_products",products);store.set("ls_orders",orders);plan=[];renderProducts();buildPlan();renderOrders();renderHome()}
-function importText(kind,text,fname){
+function importText(kind,text,fname){snapTake(kind==="restoreAll"?"ก่อนกู้คืน":"ก่อนนำเข้าไฟล์",true);
  if(/\.json$/i.test(fname)||/^\s*[\[{]/.test(text)){const j=JSON.parse(text);
   if(kind==="restoreAll"||j.app==="LiveStudio"){
    if(!Array.isArray(j.products)||!Array.isArray(j.orders))throw new Error("ไม่ใช่ไฟล์สำรองของ LiveStudio");
