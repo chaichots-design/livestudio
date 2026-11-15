@@ -66,11 +66,30 @@ body{font-family:"Kanit","IBM Plex Sans Thai","Leelawadee UI",sans-serif;color:#
 .mbox .q{display:block;font-family:"IBM Plex Sans Thai",sans-serif;font-size:calc(var(--u)*2.5);color:#5d6876;margin-bottom:calc(var(--u)*.4)}
 .pop{animation:pop .45s cubic-bezier(.2,.8,.2,1) both}
 @keyframes pop{from{transform:translateY(calc(var(--u)*-6));opacity:0}to{transform:none;opacity:1}}
+/* AI helper mascot (field ms {k: cat|bunny|bear, n: name, sp: 1 while the AI voice speaks}). Product segments
+   only (the app never sends ms in live-talk time), a small corner well under half the screen, always
+   labelled "ผู้ช่วย AI". A cartoon on purpose: nobody mistakes it for a real person. Transform-only animation. */
+.mascot{position:absolute;right:calc(var(--u)*4);bottom:29vh;z-index:4;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.6);pointer-events:none}
+.mascot svg{height:17vh;width:auto;overflow:visible;animation:bob 3.2s ease-in-out infinite;filter:drop-shadow(0 calc(var(--u)*1) calc(var(--u)*2) rgba(0,0,0,.35))}
+@media (orientation:landscape){.mascot{bottom:calc(var(--u)*4)}.mascot svg{height:30vh}}
+@media (orientation:portrait){body.has-ms .info{padding-right:15vh}}
+.mlabel{font-family:"IBM Plex Sans Thai",sans-serif;font-weight:600;font-size:calc(var(--u)*2.3);background:rgba(20,12,26,.78);border:1px solid rgba(255,255,255,.4);
+  padding:calc(var(--u)*.3) calc(var(--u)*1.4);border-radius:999px;white-space:nowrap}
+@keyframes bob{50%{transform:translateY(calc(var(--u)*-1.2))}}
+.mascot .eye{transform-box:fill-box;transform-origin:center;animation:blink 4.6s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+.mascot .mo{transform-box:fill-box;transform-origin:50% 20%;transform:scaleY(0)}
+.mascot.sp .mo{animation:talk .26s ease-in-out infinite alternate}
+@keyframes talk{from{transform:scaleY(.15)}to{transform:scaleY(1)}}
+.mascot .arm{transform-box:fill-box;transform-origin:20% 90%}
+.mascot.sp .arm{animation:wave .9s ease-in-out infinite alternate}
+@keyframes wave{from{transform:rotate(-8deg)}to{transform:rotate(14deg)}}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <div class="msg" id="msg"></div>
+<div class="mascot" id="mascot" hidden></div>
 <script>
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const baht=n=>"฿"+Number(n||0).toLocaleString("th-TH");
@@ -95,10 +114,39 @@ function cyclePoints(){clearInterval(ptTimer);const els=[...document.querySelect
   ptTimer=setInterval(()=>{const a=els[i];i=(i+1)%els.length;const b=els[i];
     a.classList.remove("on");a.classList.add("out");b.classList.remove("out");void b.offsetWidth;b.classList.add("on");
     setTimeout(()=>{a.style.transition="none";a.classList.remove("out");void a.offsetWidth;a.style.transition=""},700)},4000)}
+const MS={cat:{f:"#ffb36b",d:"#d9772e",i:"#ffd2df"},bunny:{f:"#fbf7fb",d:"#c9b8cf",i:"#ffbcd2"},bear:{f:"#c08a62",d:"#86552f",i:"#f0cfae"}};
+function mascotSVG(k){const c=MS[k]||MS.cat,S=`stroke="${c.d}" stroke-width="4"`;
+  const ears=k==="bunny"?`<ellipse cx="72" cy="38" rx="15" ry="42" fill="${c.f}" ${S} transform="rotate(-10 72 38)"/><ellipse cx="72" cy="40" rx="7" ry="30" fill="${c.i}" transform="rotate(-10 72 40)"/><ellipse cx="128" cy="38" rx="15" ry="42" fill="${c.f}" ${S} transform="rotate(10 128 38)"/><ellipse cx="128" cy="40" rx="7" ry="30" fill="${c.i}" transform="rotate(10 128 40)"/>`
+   :k==="bear"?`<circle cx="50" cy="56" r="22" fill="${c.f}" ${S}/><circle cx="50" cy="56" r="11" fill="${c.i}"/><circle cx="150" cy="56" r="22" fill="${c.f}" ${S}/><circle cx="150" cy="56" r="11" fill="${c.i}"/>`
+   :`<path d="M42 78 L52 20 L92 52 Z" fill="${c.f}" ${S} stroke-linejoin="round"/><path d="M54 62 L58 34 L80 52 Z" fill="${c.i}"/><path d="M158 78 L148 20 L108 52 Z" fill="${c.f}" ${S} stroke-linejoin="round"/><path d="M146 62 L142 34 L120 52 Z" fill="${c.i}"/>`;
+  const muzzle=k==="bear"?`<ellipse cx="100" cy="124" rx="26" ry="19" fill="${c.i}"/>`:"";
+  const whisk=k==="cat"?`<g stroke="${c.d}" stroke-width="3" stroke-linecap="round"><path d="M56 118 L30 112"/><path d="M56 126 L30 128"/><path d="M144 118 L170 112"/><path d="M144 126 L170 128"/></g>`:"";
+  return `<svg viewBox="0 0 210 250" role="img" aria-label="มาสคอตผู้ช่วย AI">
+   <g class="arm"><ellipse cx="172" cy="178" rx="15" ry="30" fill="${c.f}" ${S} transform="rotate(30 172 178)"/></g>
+   <ellipse cx="100" cy="206" rx="62" ry="44" fill="${c.f}" ${S}/>
+   <path d="M62 196 Q100 180 138 196 L132 240 Q100 250 68 240 Z" fill="#e2365b"/>
+   <text x="100" y="228" text-anchor="middle" font-family="Kanit,sans-serif" font-weight="700" font-size="24" fill="#fff">AI</text>
+   <ellipse cx="34" cy="200" rx="14" ry="26" fill="${c.f}" ${S} transform="rotate(-18 34 200)"/>
+   ${ears}
+   <circle cx="100" cy="104" r="66" fill="${c.f}" ${S}/>
+   ${muzzle}${whisk}
+   <ellipse cx="62" cy="126" rx="11" ry="7" fill="${c.i}"/><ellipse cx="138" cy="126" rx="11" ry="7" fill="${c.i}"/>
+   <g class="eye"><ellipse cx="76" cy="98" rx="9" ry="12" fill="#2a1d2e"/><circle cx="79" cy="93" r="3.2" fill="#fff"/></g>
+   <g class="eye"><ellipse cx="124" cy="98" rx="9" ry="12" fill="#2a1d2e"/><circle cx="127" cy="93" r="3.2" fill="#fff"/></g>
+   <ellipse cx="100" cy="116" rx="6" ry="4.5" fill="#5a2a3a"/>
+   <path d="M88 126 Q100 136 112 126" stroke="#2a1d2e" stroke-width="4" fill="none" stroke-linecap="round"/>
+   <ellipse class="mo" cx="100" cy="134" rx="11" ry="10" fill="#7a1f3a"/>
+  </svg>`}
+let lastMs="";
+function renderMascot(ms){const el=document.getElementById("mascot"),key=JSON.stringify(ms||null);if(key===lastMs)return;
+  const prev=lastMs?JSON.parse(lastMs):null,same=prev&&ms&&prev.k===ms.k&&prev.n===ms.n;lastMs=key;
+  document.body.classList.toggle("has-ms",!!ms);el.hidden=!ms;if(!ms){el.innerHTML="";return}
+  if(!same)el.innerHTML=mascotSVG(MS[ms.k]?ms.k:"cat")+`<div class="mlabel">🤖 ${esc(String(ms.n||"น้องไลฟ์").slice(0,16))} · ผู้ช่วย AI</div>`;
+  el.classList.toggle("sp",!!ms.sp)}
 let lastMsg="";
 function msgHTML(m){if(!m||!m.t)return"";const k=m.k==="faq"?"faq":m.k==="thx"?"thx":"note";
   return`<div class="mbox ${k} pop">${m.q?`<span class="q">ถาม: ${esc(m.q)}</span>`:""}${k==="thx"?"🎉 ":""}${esc(m.t)}</div>`}
-function render(){const d=data(),m=d.m||null;delete d.m;const mk=JSON.stringify(m);
+function render(){const d=data(),m=d.m||null,ms=d.s==="prod"&&d.ms&&typeof d.ms==="object"?d.ms:null;delete d.m;delete d.ms;renderMascot(ms);const mk=JSON.stringify(m);
   if(mk!==lastMsg){lastMsg=mk;document.getElementById("msg").innerHTML=msgHTML(m)}
   const key=JSON.stringify(d);if(key===lastKey)return;lastKey=key;
   document.getElementById("root").innerHTML=view(d)+(d.demo?'<div class="demo">ตัวอย่าง: ใน OBS ฉากนี้จะเปลี่ยนตามสินค้าที่กำลังขายเอง</div>':"");cyclePoints()}
