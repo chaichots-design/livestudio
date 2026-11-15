@@ -101,6 +101,23 @@ a.btn{text-decoration:none;display:inline-block}
 a.btn:not([href]){opacity:.5;pointer-events:none}
 @media (pointer:coarse){.desk-only{display:none!important}}
 .hist th,.hist td{white-space:nowrap}
+.trtiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin:10px 0}
+.trtiles div{border:1px solid var(--line);border-radius:10px;padding:6px 10px}.trtiles b{display:block;font-family:var(--mono);font-size:18px;font-weight:600}
+.trchart{position:relative;margin:4px 0 2px}
+.trbars{display:flex;align-items:flex-end;gap:2px;height:130px;border-bottom:1px solid var(--line);position:relative}
+.trbars button{flex:1;min-width:0;height:100%;display:flex;align-items:flex-end;background:none;border:0;padding:0 1px;cursor:pointer}
+.trbars i{display:block;width:100%;background:var(--accent);opacity:.45;border-radius:4px 4px 0 0;min-height:2px}
+.trbars button.best i{opacity:1}.trbars button:hover i,.trbars button:focus-visible i{opacity:.85}
+.trbars button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.travg{position:absolute;left:0;right:0;border-top:1px dashed var(--muted);pointer-events:none}
+.travg span{position:absolute;right:0;top:-16px;font-size:11px;color:var(--muted);background:var(--surface);padding:0 3px}
+.trx{display:flex;gap:2px}.trx span{flex:1;min-width:0;text-align:center;font-size:10px;color:var(--muted);font-family:var(--mono);overflow:hidden;white-space:nowrap}
+.trtip{position:absolute;z-index:3;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12px;box-shadow:0 4px 14px rgba(0,0,0,.15);white-space:nowrap}
+.trgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:10px}
+.trlist{display:grid;grid-template-columns:auto 1fr auto;gap:4px 8px;align-items:center;font-size:13px;margin-top:4px}
+.trlist .m{height:8px;background:var(--accent);opacity:.45;border-radius:0 4px 4px 0}.trlist .m.best{opacity:1}
+.trlist .v{font-family:var(--mono);font-size:12px;text-align:right}
+.trtip-note{border-left:3px solid var(--talk);background:var(--talk-soft);border-radius:6px;padding:6px 10px;font-size:13px;margin-top:8px}
 .bills{display:grid;gap:8px}
 .ckscore{font-family:var(--mono);font-size:12px;padding:1px 8px;border-radius:999px;background:var(--warn-soft);color:var(--ink)}
 .ckscore.all{background:var(--talk);color:#fff}
@@ -724,7 +741,12 @@ td.r,th.r{text-align:right}
   <div class="row" style="margin-top:12px"><button class="btn" id="copySum">คัดลอกสรุปยอด</button><button class="btn" id="expOrd">⬇ ส่งออกไฟล์ (Excel)</button><button class="btn" id="impOrd">⬆ นำเข้าออเดอร์</button><button class="btn" id="clearOrders">ล้างออเดอร์ทั้งหมด</button><span class="mini" id="clearMsg"></span></div>
   <h2 style="margin-top:24px">📈 ประวัติไลฟ์</h2>
   <p class="mini" style="margin:-6px 0 8px">บันทึกเองทุกครั้งที่จบรอบ (หมดเวลารอบ หรือกดรีเซ็ตรอบหลังไลฟ์ไปแล้วอย่างน้อย 1 นาที) เก็บไว้ 60 รอบล่าสุด</p>
-  <div class="card tablebox"><table class="hist"><thead><tr><th>วันที่</th><th>เริ่ม</th><th class="r">ยาว</th><th class="r">ออเดอร์</th><th class="r">ยอด</th><th class="r aff-only">ค่าคอม</th><th>ขายดี</th><th></th></tr></thead><tbody id="hbody"></tbody></table></div>
+  <div class="card" id="trendBox">
+    <b style="font-family:var(--display);font-weight:500">📊 ไลฟ์แบบไหนขายดี</b>
+    <div class="mini" id="trendHint" style="margin-top:2px">คิดจากประวัติไลฟ์ด้านล่าง (เฉพาะรอบที่จดออเดอร์ในโปรแกรม)</div>
+    <div id="trendBody"></div>
+  </div>
+  <div class="card tablebox" style="margin-top:12px"><table class="hist"><thead><tr><th>วันที่</th><th>เริ่ม</th><th class="r">ยาว</th><th class="r">ออเดอร์</th><th class="r">ยอด</th><th class="r aff-only">ค่าคอม</th><th>ขายดี</th><th></th></tr></thead><tbody id="hbody"></tbody></table></div>
   <div class="row" style="margin-top:8px"><button class="btn" id="expHist">⬇ ส่งออกประวัติ (Excel)</button><span class="mini" id="histMsg"></span></div>
 </section>
 </main>
@@ -790,7 +812,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.29.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.30.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){if(e&&(e.name==="QuotaExceededError"||e.code===22)){const q=document.getElementById("quotaNag");if(q)q.hidden=false}return false}}};
@@ -1730,8 +1752,47 @@ $("#rsClose").onclick=()=>{$("#roundSum").hidden=true};
 function renderHistory(){const hb=$("#hbody");if(!hb)return;
  hb.innerHTML=liveHist.length?liveHist.map((r,i)=>({r,i})).reverse().map(({r,i})=>`<tr><td class="num">${esc(r.d)}</td><td class="num">${esc(r.st||"")}</td><td class="r num">${esc(fmtDur(r.real||0))}</td><td class="r num">${fmt(r.n)}</td><td class="r num">${fmt(r.s)}</td><td class="r num aff-only">${r.aff?fmt(r.cm):"-"}</td>`+
   `<td class="mini">${(r.top||[]).map(x=>esc(x.c)+" "+x.q).join(", ")||"-"}</td><td><button class="btn" data-hd="${i}" style="padding:2px 8px;font-size:12px" aria-label="ลบรอบนี้จากประวัติ">ลบ</button></td></tr>`).join("")
-  :`<tr><td colspan="8" class="mini">ยังไม่มีประวัติ จบไลฟ์รอบแรกแล้วจะขึ้นที่นี่</td></tr>`;
+  :`<tr><td colspan="8" class="mini">ยังไม่มีประวัติ จบไลฟ์รอบแรกแล้วจะขึ้นที่นี่</td></tr>`;renderTrend();
  hb.querySelectorAll("[data-hd]").forEach(b=>b.onclick=()=>{liveHist.splice(+b.dataset.hd,1);store.set("ls_history",liveHist);renderHistory()})}
+/* trends from ls_history (renderTrend): sales per round as bars (last 14), averages, and which time of day /
+   weekday earned the most per hour. Only the host's own recorded rounds; a "best" needs >= 2 rounds in that group. */
+var TR_SLOTS=[["ดึก","00–06",0,6],["เช้า","06–12",6,12],["บ่าย","12–17",12,17],["เย็น","17–20",17,20],["ค่ำ","20–24",20,24]];
+var TR_DAYS=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัส","ศุกร์","เสาร์"];
+var trRate=r=>r.real>=5?r.s*60/r.real:null;
+function trGroups(L,keyOf,labels){const g=labels.map((l,i)=>({l,i,n:0,s:0,m:0}));
+ L.forEach(r=>{const k=keyOf(r);if(k==null||!g[k])return;g[k].n++;g[k].s+=r.s;g[k].m+=r.real});
+ const used=g.filter(x=>x.n);used.forEach(x=>x.rate=x.m>=5?x.s*60/x.m:0);
+ const cand=used.filter(x=>x.n>=2&&x.rate>0),best=used.length>=2&&cand.length?cand.reduce((a,b)=>b.rate>a.rate?b:a):null;
+ return{used,best}}
+function trListHTML(title,G){if(!G.used.length)return"";const mx=Math.max(...G.used.map(x=>x.rate),1);
+ return `<div><b style="font-size:13px">${title}</b><div class="trlist">`+G.used.map(x=>`<span>${esc(x.l)}${x===G.best?" ⭐":""}</span><span class="m${x===G.best?" best":""}" style="width:${Math.max(2,Math.round(x.rate/mx*100))}%"></span><span class="v">${fmt(Math.round(x.rate))}/ชม. · ${x.n} รอบ</span>`).join("")+`</div></div>`}
+function renderTrend(){const box=$("#trendBody");if(!box)return;
+ const L=liveHist.filter(r=>r&&r.real>=1&&isFinite(r.s));
+ if(L.length<2){box.innerHTML=`<div class="mini" style="margin-top:8px">ไลฟ์ครบ 2 รอบแล้วจะเริ่มเห็นกราฟยอดขายและช่วงเวลาที่ขายดี${L.length?" (ตอนนี้มี 1 รอบ)":""}</div>`;return}
+ const tot=L.reduce((a,r)=>a+r.s,0),mins=L.reduce((a,r)=>a+r.real,0),best=L.reduce((a,r)=>r.s>a.s?r:a);
+ const V=L.slice(-14),mx=Math.max(...V.map(r=>r.s),1),avg=tot/L.length,showAff=V.some(r=>r.aff);
+ const bars=V.map((r,i)=>`<button type="button" data-tr="${i}" class="${r===best?"best":""}" aria-label="${esc(r.d)} ${esc(r.st||"")} ยอด ${fmt(r.s)} บาท"><i style="height:${Math.max(1.5,r.s/mx*100)}%"></i></button>`).join("");
+ const slot=TR_SLOTS.map(x=>x[0]+" "+x[1]),day=TR_DAYS.map(x=>"วัน"+x);
+ const S=trGroups(L,r=>{const h=parseInt(String(r.st||"").slice(0,2),10);return isFinite(h)?TR_SLOTS.findIndex(x=>h>=x[2]&&h<x[3]):null},slot);
+ const D=trGroups(L,r=>{const d=new Date(r.d+"T12:00");return isNaN(d)?null:d.getDay()},day);
+ const tops={};L.forEach(r=>(r.top||[]).forEach(x=>{const k=x.c;tops[k]=tops[k]||{c:x.c,n:x.n,k:0,q:0};tops[k].k++;tops[k].q+=x.q;tops[k].n=x.n}));
+ const T=Object.values(tops).sort((a,b)=>b.k-a.k||b.q-a.q).slice(0,5);
+ let tip="";if(S.best)tip=`ไลฟ์ช่วง<b>${esc(S.best.l)}</b> ได้ยอดต่อชั่วโมงสูงสุด เฉลี่ย ${fmt(Math.round(S.best.rate))} บาท/ชม. (${S.best.n} รอบ)`;
+ if(D.best)tip+=(tip?" · ":"")+`<b>${esc(D.best.l)}</b> ขายดีที่สุดในสัปดาห์`;
+ box.innerHTML=`<div class="trtiles"><div><span class="mini">ยอดเฉลี่ยต่อรอบ</span><b>${fmt(Math.round(avg))}</b></div><div><span class="mini">ยอดเฉลี่ยต่อชั่วโมง</span><b>${mins>=5?fmt(Math.round(tot*60/mins)):"-"}</b></div>`+
+  `<div><span class="mini">รอบที่ดีที่สุด</span><b>${fmt(best.s)}</b><span class="mini">${esc(best.d)} ${esc(best.st||"")}</span></div><div><span class="mini">ไลฟ์ทั้งหมด</span><b>${fmt(L.length)} รอบ</b><span class="mini">${esc(fmtDur(mins))}</span></div></div>`+
+  `<div class="mini">ยอดขายแต่ละรอบ (บาท) ${V.length<L.length?`${V.length} รอบล่าสุด`:""} · แตะแท่งเพื่อดูรายละเอียด</div>`+
+  `<div class="trchart"><div class="trbars">${bars}<div class="travg" style="bottom:${Math.min(100,avg/mx*100)}%"><span>เฉลี่ย ${fmt(Math.round(avg))}</span></div></div>`+
+  `<div class="trx">${V.map(r=>`<span>${esc(String(r.d||"").slice(8,10)+"/"+String(r.d||"").slice(5,7))}</span>`).join("")}</div><div class="trtip" id="trTip" hidden></div></div>`+
+  (tip?`<div class="trtip-note">💡 ${tip} <span class="mini">(จากที่จดไว้ ยิ่งไลฟ์หลายรอบยิ่งแม่น)</span></div>`:`<div class="mini" style="margin-top:8px">ไลฟ์ช่วงเวลาเดียวกันอย่างน้อย 2 รอบ จะบอกได้ว่าช่วงไหนขายดีที่สุด</div>`)+
+  `<div class="mini" style="margin-top:8px">ยอดต่อชั่วโมงแยกตามกลุ่ม · ⭐ = ดีที่สุด (นับเฉพาะกลุ่มที่ไลฟ์อย่างน้อย 2 รอบ)</div><div class="trgrid" style="margin-top:4px">${trListHTML("ช่วงเวลาที่เริ่มไลฟ์",S)}${trListHTML("วันในสัปดาห์",D)}`+
+  (T.length?`<div><b style="font-size:13px">ติดขายดีบ่อย</b><div class="trlist">${T.map(x=>`<span class="code">${esc(x.c)}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.n||"")}</span><span class="v">${x.k} รอบ · ${fmt(x.q)} ชิ้น</span>`).join("")}</div></div>`:"")+`</div>`;
+ const tipEl=$("#trTip"),wrap=box.querySelector(".trchart");
+ const show=b=>{const r=V[+b.dataset.tr],rt=trRate(r);
+  tipEl.innerHTML=`<b>${esc(r.d)} ${esc(r.st||"")}</b> · ${esc(fmtDur(r.real))}<br>ยอด ${fmt(r.s)} บาท · ${fmt(r.n)} ออเดอร์`+(rt!=null?`<br>${fmt(Math.round(rt))} บาท/ชม.`:"")+(showAff&&r.aff?`<br>ค่าคอมประมาณ ${fmt(r.cm)} บาท`:"");
+  tipEl.hidden=false;const W=wrap.clientWidth,bx=b.offsetLeft+b.offsetWidth/2,tw=tipEl.offsetWidth;
+  tipEl.style.left=Math.max(0,Math.min(W-tw,bx-tw/2))+"px";tipEl.style.top="-8px";tipEl.style.transform="translateY(-100%)"};
+ box.querySelectorAll("[data-tr]").forEach(b=>{b.onmouseenter=b.onfocus=b.onclick=()=>show(b);b.onmouseleave=b.onblur=()=>{tipEl.hidden=true}})}
 /* real commission log (affiliate): ls_comm [{d, amt, note}], entered by the host from TikTok's
    affiliate income page; compared with the estimate from recorded orders (commOf) of the same day and
    of this month. In backups as "comm". */
