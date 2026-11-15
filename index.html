@@ -69,7 +69,17 @@ label{font-size:12px;color:var(--muted);display:block;margin-bottom:2px}
 .pick{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--ink);margin:0;cursor:pointer}
 .pick input{width:auto}
 .aiscript{white-space:pre-wrap;font-size:14px;background:var(--bg);border-radius:8px;padding:8px 10px;margin-top:6px}
-.pinhelpbtn{margin-left:auto;padding:2px 10px;font-size:12px;white-space:nowrap}
+.pindone{margin-left:auto;padding:2px 10px;font-size:12px;white-space:nowrap;border-color:var(--warn)}
+.pinbar.ok{background:var(--talk-soft);border-left-color:var(--talk)}
+.pinbar.ok .pindone{border-color:var(--talk);color:var(--talk);font-weight:600}
+.pinbar.due{animation:pinpulse 1.4s ease-in-out infinite}
+@keyframes pinpulse{50%{box-shadow:0 0 0 4px var(--warn-soft),0 0 0 6px var(--warn)}}
+.prsw{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:8px;font-size:13px}
+.prsw label{display:flex;gap:6px;align-items:center;margin:0}
+.prsw select{width:auto;padding:2px 6px;font-size:13px}
+body.is-practice .golive{border-style:dashed;border-color:var(--talk)}
+.prnote{font-size:12.5px;text-align:center;margin-top:4px;padding:4px 8px;border-radius:8px;background:var(--talk-soft)}
+.pinhelpbtn{padding:2px 10px;font-size:12px;white-space:nowrap}
 .pinhelp{background:var(--surface);border:1px solid var(--warn);border-radius:8px;padding:8px 12px;margin:-6px 0 10px;font-size:13.5px;line-height:1.6}
 .pinhelp ol{margin:4px 0;padding-left:20px}.pinhelp a{color:var(--accent)}
 .pinbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--warn-soft);border-left:4px solid var(--warn);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-weight:500}
@@ -444,7 +454,7 @@ td.r,th.r{text-align:right}
       <div class="card">
         <div class="segtitle"><span id="segChip" class="chip ai">AI นำเสนอ</span><b id="segName" style="font-family:var(--display);font-weight:500;font-size:18px;flex:1"></b>
           <span class="fsz" role="group" aria-label="ขนาดตัวอักษรบท"><button class="btn sm" id="fsDown" type="button" aria-label="ตัวอักษรเล็กลง">ก-</button><button class="btn sm" id="fsUp" type="button" aria-label="ตัวอักษรใหญ่ขึ้น">ก+</button></span></div>
-        <div class="pinbar" id="pinbar" hidden>📌 ปักตะกร้าตอนนี้ <b id="pinNo"></b> <span id="pinName" class="mini" style="color:var(--ink)"></span> <span id="pinStock"></span><button class="btn sm pinhelpbtn" id="pinHelpBtn" type="button" aria-expanded="false">วิธีปัก?</button></div>
+        <div class="pinbar" id="pinbar" hidden>📌 ปักตะกร้าตอนนี้ <b id="pinNo"></b> <span id="pinName" class="mini" style="color:var(--ink)"></span> <span id="pinStock"></span><button class="btn sm pindone" id="pinDone" type="button" aria-pressed="false">แตะเมื่อปักแล้ว</button><button class="btn sm pinhelpbtn" id="pinHelpBtn" type="button" aria-expanded="false">วิธีปัก?</button></div>
         <div class="pinhelp" id="pinHelp" hidden></div>
         <div class="prompter" id="prompter"></div>
         <p class="disclose" id="disclose"></p>
@@ -521,6 +531,8 @@ td.r,th.r{text-align:right}
         <button class="btn primary golivebtn" id="goBtn" type="button">🔴 เริ่มไลฟ์</button>
         <div class="mini" id="goNote" style="margin-top:4px;text-align:center"></div>
         <label class="hl-only" style="display:flex;gap:6px;align-items:center;justify-content:center;margin:4px 0 0;font-size:12px;color:var(--muted)"><input type="checkbox" id="autoLaunch" style="width:auto">กดเริ่มไลฟ์แล้วเปิด TikTok LIVE Studio (และ OBS) ให้เอง</label>
+        <div class="prsw"><label><input type="checkbox" id="prOn" style="width:auto">🎓 โหมดซ้อม</label><select id="prSpeed" hidden aria-label="ความเร็วตอนซ้อม"><option value="1">เวลาจริง</option><option value="5">เร็ว 5 เท่า</option><option value="10">เร็ว 10 เท่า</option></select></div>
+        <div class="prnote" id="prNote" hidden>ซ้อมเฉย ๆ ไม่ขึ้นไลฟ์ใน TikTok ไม่สั่ง OBS ส่งภาพ ไม่บันทึกประวัติ · ปิดก่อนไลฟ์จริง</div>
         <div class="glauto" id="glAuto"></div>
         <button class="btn sm" id="wizBtn" type="button" style="display:block;margin:6px auto 0">🧭 ช่วยเลือกวิธีไลฟ์ให้</button>
         <select id="glMode" aria-label="ไลฟ์ด้วยอะไร" style="margin-top:8px">
@@ -738,7 +750,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.26.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.27.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){if(e&&(e.name==="QuotaExceededError"||e.code===22)){const q=document.getElementById("quotaNag");if(q)q.hidden=false}return false}}};
@@ -1042,7 +1054,7 @@ function renderLive(){if(typeof renderGlSteps==="function")try{renderGlSteps()}c
  $("#segChip").className="chip "+(human?"human":"ai");$("#segChip").textContent=human?"ถึงเวลาคุยสด":"AI ช่วยนำเสนอ";
  $("#prompter").textContent=s.text;$("#prompter").parentElement.classList.toggle("prompter-h",human);$("#prompter").classList.toggle("human",human);
  $("#speak").disabled=human||seg.type==="human";renderSpot();if(seg.type==="human"&&!spot)$("#faqBox").open=true;
- $("#pinbar").hidden=s.type!=="prod";if(s.type!=="prod")$("#pinHelp").hidden=true;if(s.type==="prod"){$("#pinNo").textContent="#"+basketNo(s.p);$("#pinName").textContent=`${s.p.code} ${s.p.name}`+(aff()&&s.p.shop?` (${shopName(s.p)})`:"");renderPinStock(s.p);if(!$("#pinHelp").hidden)$("#pinHelp").innerHTML=pinHelpHTML()}
+ $("#pinbar").hidden=s.type!=="prod";if(s.type!=="prod")$("#pinHelp").hidden=true;if(s.type==="prod"){$("#pinNo").textContent="#"+basketNo(s.p);$("#pinName").textContent=`${s.p.code} ${s.p.name}`+(aff()&&s.p.shop?` (${shopName(s.p)})`:"");renderPinStock(s.p);renderPinState();if(!$("#pinHelp").hidden)$("#pinHelp").innerHTML=pinHelpHTML()}
  $("#disclose").textContent=human?"ช่วงนี้ให้คนพูดเอง ไม่ใช้เสียง AI":"ใส่ข้อความบนจอไลฟ์ว่า \"ไลฟ์นี้มี AI ช่วยนำเสนอสินค้า\" และให้ตัวละคร AI กินพื้นที่ไม่เกินครึ่งจอ";
  const n=plan[cur+1];$("#nextInfo").textContent=n?`${n.name} (${n.min} นาที)`:"จบรอบ";
  tick(true);if(s.p)$("#qCode").value=s.p.code;if(running){if(!spot)syncScene();pushOverlay()}renderSceneBar()}
@@ -1054,19 +1066,21 @@ function tick(noAdv){const total=plan.reduce((a,s)=>a+s.min,0)*60;
  const hold=voiceCfg.auto&&s.type==="human"&&left<=0;
  $("#segLeft").textContent=hold?"หมดเวลาคุยสดแล้ว กด \"ถัดไป\" เมื่อพร้อมให้ AI พูดต่อ":`ช่วงนี้เหลือ ${hms(Math.max(0,left))}`;
  $("#segLeft").style.color=hold?"var(--talk)":"";
+ if(s.type==="prod"||spot)renderPinState();
  if(noAdv||!running)return;
+ if(s.type==="prod"&&!spot&&pinnedCode!==s.p.code&&segElapsed>=20&&!pinBeeped){pinBeeped=true;beep()}
  if(hold){if(!holdBeeped){beep();holdBeeped=true}return}
  if(voiceCfg.auto&&s.type==="prod"&&repeatAt>0&&segElapsed>=repeatAt&&left>45&&!speechSynthesis.speaking){
   repeatAt+=voiceCfg.rep*60;s.text=scriptFor(s);$("#prompter").textContent=s.text;speakText(s.text)}
  if(left<=0&&$("#autoNext").checked){if(cur<plan.length-1)go(1);else{stop();finishRound()}}}
-function loop(){const now=Date.now(),dt=(now-last)/1000;last=now;elapsed+=dt;segElapsed+=dt;tick()}
+function loop(){const now=Date.now(),dt=(now-last)/1000*(roundPractice?prCfg.speed:1);last=now;elapsed+=dt;segElapsed+=dt;tick()}
 let repeatAt=0,holdBeeped=false;
-function segStarted(){holdBeeped=false;repeatAt=voiceCfg.rep>0?voiceCfg.rep*60:0;const i=cur;
+function segStarted(){holdBeeped=false;pinBeeped=false;repeatAt=voiceCfg.rep>0?voiceCfg.rep*60:0;const i=cur;
  if(running&&voiceCfg.auto&&plan[cur].type==="prod")setTimeout(()=>{if(running&&cur===i)speakText(plan[i].text)},1500)}
-function start(){if(!plan.length)buildPlan();if(elapsed===0&&!roundStart){roundStart=Date.now();roundStartHM=new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"});$("#roundSum").hidden=true}running=true;last=Date.now();timer=setInterval(loop,500);$("#onair").textContent="ON AIR";$("#onair").classList.add("live");$("#startBtn").textContent="รีเซ็ตรอบ";
+function start(){if(!plan.length)buildPlan();if(elapsed===0&&!roundStart){roundStart=Date.now();roundPractice=prCfg.on;pinnedCode="";roundStartHM=new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"});$("#roundSum").hidden=true}running=true;last=Date.now();timer=setInterval(loop,500);$("#onair").textContent=roundPractice?"ซ้อม":"ON AIR";$("#onair").classList.add("live");$("#startBtn").textContent="รีเซ็ตรอบ";
  try{navigator.wakeLock&&navigator.wakeLock.request("screen").then(w=>wake=w).catch(()=>{})}catch(e){}}
 function stop(){running=false;clearInterval(timer);try{speechSynthesis.cancel()}catch(e){}setScene(obsCfg.talk);pushOverlay();$("#onair").textContent="OFF AIR";$("#onair").classList.remove("live");try{wake&&wake.release()}catch(e){}}
-$("#startBtn").onclick=()=>{spot=null;if(running||elapsed>0){osQueue.length=0;finishRound();stop();elapsed=0;segElapsed=0;cur=0;$("#startBtn").textContent="เริ่มรอบ";$("#pauseBtn").textContent="พัก";renderLive();return}start();renderLive();segStarted()};
+$("#startBtn").onclick=()=>{spot=null;if(running||elapsed>0){osQueue.length=0;finishRound();stop();elapsed=0;segElapsed=0;cur=0;$("#startBtn").textContent="เริ่มรอบ";$("#pauseBtn").textContent="พัก";renderLive();renderPractice();return}start();renderLive();segStarted();renderPractice()};
 $("#pauseBtn").onclick=()=>{if(running){stop();$("#pauseBtn").textContent="ไลฟ์ต่อ"}else if(elapsed>0){start();$("#pauseBtn").textContent="พัก";renderLive()}};
 function go(d){spot=null;cur=Math.max(0,Math.min(plan.length-1,cur+d));segElapsed=0;try{speechSynthesis.cancel()}catch(e){}renderLive();segStarted();
  if(plan[cur].type==="human")beep()}
@@ -1338,6 +1352,24 @@ function pinHelpHTML(){const n=$("#pinNo").textContent||"#n",pc=glCfg.mode!=="ph
  ` · ชื่อเมนูอาจต่างไปตามรุ่นแอป`}
 $("#pinHelpBtn").onclick=()=>{const h=$("#pinHelp"),open=h.hidden;h.hidden=!open;$("#pinHelpBtn").setAttribute("aria-expanded",String(open));if(open)h.innerHTML=pinHelpHTML()};
 
+/* pin reminder: the app cannot see TikTok, so the host taps "ปักแล้ว" after pinning. Until then the
+   pin bar pulses while running, and beeps once after 20 s of a product segment. Reset every round. */
+let pinnedCode="",pinBeeped=false;
+function pinShown(){if(spot)return spot.p;const s=plan[cur];return s&&s.type==="prod"?s.p:null}
+function renderPinState(){const p=pinShown(),b=$("#pinbar");if(!p||!b)return;const ok=pinnedCode===p.code;
+ b.classList.toggle("ok",ok);b.classList.toggle("due",!ok&&running);
+ const d=$("#pinDone");d.textContent=ok?"✓ ปักแล้ว":"แตะเมื่อปักแล้ว";d.setAttribute("aria-pressed",String(ok))}
+$("#pinDone").onclick=()=>{const p=pinShown();if(!p)return;pinnedCode=pinnedCode===p.code?"":p.code;renderPinState()};
+
+/* practice mode (not saved): the go button skips every TikTok/OBS-stream step, the timer can run
+   5x/10x, the round is not added to history, and orders recorded during it can be removed at the end.
+   Off on every start so a real live is never run as practice by mistake. */
+const prCfg={on:false,speed:1};let roundPractice=false;
+function renderPractice(){const on=prCfg.on;document.body.classList.toggle("is-practice",on);$("#prSpeed").hidden=!on;$("#prNote").hidden=!on;
+ const busy=running||elapsed>0;$("#prOn").disabled=busy;$("#prSpeed").disabled=false}
+$("#prOn").onchange=()=>{prCfg.on=$("#prOn").checked;if(!prCfg.on){prCfg.speed=1;$("#prSpeed").value="1"}renderPractice();renderGo()};
+$("#prSpeed").onchange=()=>{prCfg.speed=+$("#prSpeed").value||1};
+
 /* one-button go live / end live. TikTok has no API to start a live, so the button does every
    step it can (camera, live screen, OBS virtual camera, or the OBS stream itself with a key),
    asks the host to confirm the TikTok side, counts 3-2-1 like TikTok, then starts the round. */
@@ -1350,6 +1382,7 @@ function startRoundNow(){if(running)return;if(elapsed>0)$("#pauseBtn").click();e
 const waitFor=(fn,ms)=>new Promise(res=>{const t0=Date.now(),iv=setInterval(()=>{if(fn()||Date.now()-t0>ms){clearInterval(iv);res(fn())}},250)});
 async function goLive(){const note=$("#goNote"),m=glCfg.mode;note.textContent="";
  if(!liveProducts().length){note.textContent="ยังไม่ได้เลือกสินค้าสำหรับรอบนี้ (แท็บ 1. สินค้า)";return}
+ if(prCfg.on){if(!await countdown("ซ้อม ไม่ได้ขึ้นไลฟ์ใน TikTok"))return;startRoundNow();note.textContent="🎓 กำลังซ้อม ลองกดถัดไป จดออเดอร์ และแตะ \"ปักแล้ว\" ได้เลย";renderGo();return}
  if(m==="phone"){if(touchDev)openTikTokApp();
   if(!await waitTikTok({where:"แอป TikTok ",title:"เริ่มไลฟ์ในแอป TikTok",steps:[touchDev?"แอป TikTok เปิดให้แล้ว (ถ้ายังไม่เปิด กดปุ่ม \"เปิด TikTok\" ด้านล่าง)":"เปิดแอป TikTok ในมือถือ","กด <b>+</b> ด้านล่าง แล้วเลือก <b>LIVE</b> (แอปเปิดกล้องให้เอง)","ก่อนกดเริ่ม แตะ <b>🛍 สินค้า</b> เพิ่มสินค้าเข้าไลฟ์ตามลำดับเลขตะกร้า","ตั้งชื่อไลฟ์ แล้วกด <b>เริ่ม LIVE</b> (ปักตะกร้าได้หลังไลฟ์เริ่มแล้ว)","กลับมาที่นี่ กดปุ่มสีชมพูด้านล่าง"],open:openTikTokApp,openLabel:"📱 เปิด TikTok"}))return}
  else if(m==="inapp"){if(!stLive()&&!stOpen())return;const wantLS=launchCfg.auto&&hasHelper;if(wantLS)setTimeout(()=>launchApp("tiktok-studio"),400);note.textContent="กำลังเปิดกล้องในจอไลฟ์...";
@@ -1380,12 +1413,13 @@ async function goLive(){const note=$("#goNote"),m=glCfg.mode;note.textContent=""
  startRoundNow();note.innerHTML="● กำลังไลฟ์ ทักทายคนดูได้เลย"+watchLink();renderGo()}
 function watchLink(){const u=acctName();return u?` · <a href="https://www.tiktok.com/@${encodeURIComponent(u)}/live" target="_blank" rel="noopener" style="color:var(--accent)">👀 ดูไลฟ์ของ @${esc(u)}</a>`:""}
 async function endLive(){const m=glCfg.mode;
+ if(roundPractice){if(!confirm("จบการซ้อม?"))return;if(running||elapsed>0)$("#startBtn").click();$("#goNote").textContent="จบการซ้อมแล้ว ปิดโหมดซ้อมก่อนไลฟ์จริง";renderGo();return}
  if(!confirm(m==="key"?"จบไลฟ์?\n\nOBS จะหยุดส่งภาพ คนดูจะเห็นว่าไลฟ์จบ และโปรแกรมจะสรุปรอบนี้":"จบรอบนี้?\n\nโปรแกรมจะสรุปยอด อย่าลืมกดจบไลฟ์ใน "+(m==="phone"?"แอป TikTok":"TikTok LIVE Studio")+" ด้วย"))return;
  if(m==="key"&&glStream){await obsReq("StopStream");setTimeout(glPoll,1200)}
  if(running||elapsed>0)$("#startBtn").click();
  $("#goNote").textContent=m==="key"?"จบไลฟ์แล้ว":"จบรอบแล้ว อย่าลืมกดจบไลฟ์ใน "+(m==="phone"?"แอป TikTok":"LIVE Studio");renderGo()}
-function renderGo(){const b=$("#goBtn");if(!b)return;renderGlAcct();renderGlAuto();const on=running||elapsed>0;b.textContent=on?"⏹ จบไลฟ์":"🔴 เริ่มไลฟ์";b.classList.toggle("end",on);b.classList.toggle("primary",!on)}
-$("#goBtn").onclick=()=>{if(running||elapsed>0)endLive();else if(!glCfg.picked){wizStart();$("#goNote").textContent="เลือกวิธีไลฟ์ก่อน แล้วกดเริ่มไลฟ์อีกครั้ง"}else goLive()};
+function renderGo(){const b=$("#goBtn");if(!b)return;renderGlAcct();renderGlAuto();const on=running||elapsed>0;b.textContent=on?(roundPractice?"⏹ จบซ้อม":"⏹ จบไลฟ์"):(prCfg.on?"🎓 เริ่มซ้อม":"🔴 เริ่มไลฟ์");b.classList.toggle("end",on);b.classList.toggle("primary",!on)}
+$("#goBtn").onclick=()=>{if(running||elapsed>0)endLive();else if(!glCfg.picked&&!prCfg.on){wizStart();$("#goNote").textContent="เลือกวิธีไลฟ์ก่อน แล้วกดเริ่มไลฟ์อีกครั้ง"}else goLive()};
 setInterval(renderGo,1000);
 
 /* affiliate (นายหน้า) helper: where the TikTok Shop affiliate area is, the host's own web link
@@ -1565,10 +1599,16 @@ function summarize(list){const by={};list.forEach(o=>{by[o.code]=by[o.code]||{c:
  return{n:list.length,q:list.reduce((a,o)=>a+o.qty,0),s:list.reduce((a,o)=>a+o.qty*o.price,0),cm:Math.round(list.reduce((a,o)=>a+commOf(o),0)),
   top:Object.values(by).sort((a,b)=>b.s-a.s).slice(0,3)}}
 function finishRound(){if(!roundStart)return;const startTs=roundStart;roundStart=0;
+ if(roundPractice){roundPractice=false;finishPractice(startTs);return}
  if(elapsed<60)return;setTimeout(()=>snapTake("จบรอบ"),500);
  const rec={d:localDate(),st:roundStartHM,plan:durMin(),real:Math.round(elapsed/60),aff:aff()?1:0,...summarize(orders.filter(o=>o.ts&&o.ts>=startTs))};
  liveHist.push(rec);if(liveHist.length>HIST_MAX)liveHist=liveHist.slice(-HIST_MAX);store.set("ls_history",liveHist);
  showRoundSum(rec);renderOrders()}
+function finishPractice(startTs){const mine=orders.filter(o=>o.ts&&o.ts>=startTs);
+ if(elapsed>=30){const rec={d:localDate(),st:roundStartHM,plan:durMin(),real:Math.round(elapsed/60),aff:aff()?1:0,...summarize(mine)};showRoundSum(rec);
+  $("#rsBody").insertAdjacentHTML("afterbegin",'<div class="prnote" style="margin:0 0 8px">🎓 รอบซ้อม ไม่บันทึกลงประวัติ</div>')}
+ if(mine.length&&confirm(`ลบออเดอร์ที่จดตอนซ้อม ${mine.length} รายการ?\n\nกดตกลง = ลบ (คืนสต็อกให้ด้วย) · กดยกเลิก = เก็บไว้`)){
+  mine.forEach(o=>returnStock(o));orders=orders.filter(o=>!(o.ts&&o.ts>=startTs));store.set("ls_orders",orders);renderOrders();renderHome()}}
 function roundText(r){return `สรุปไลฟ์ ${r.d} เริ่ม ${r.st} · ยาว ${fmtDur(r.real||1)}\nออเดอร์ ${r.n} · ${r.q} ชิ้น · ยอด ${fmt(r.s)} บาท`+(r.aff?` · ค่าคอมประมาณ ${fmt(r.cm)} บาท`:"")+
  (r.top.length?"\nขายดี: "+r.top.map((x,i)=>`${i+1}) ${x.c} ${x.n} ${x.q} ชิ้น`).join("  "):"")}
 function showRoundSum(r){$("#rsBody").innerHTML=`<div class="rsgrid"><div><span class="mini">ไลฟ์ไป</span><b>${esc(fmtDur(r.real||1))}</b></div><div><span class="mini">ออเดอร์</span><b>${fmt(r.n)}</b></div>`+
