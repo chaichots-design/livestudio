@@ -193,6 +193,10 @@ body:not(.has-helper) .hl-only{display:none!important}
 .faqbtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .faqbtns button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:4px 12px;cursor:pointer}
 .faqbtns button[aria-pressed="true"]{background:var(--talk);border-color:var(--talk);color:#fff}
+.commform{gap:6px}.commform input{width:auto}
+.faqai{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line)}
+.faqai textarea{font-size:calc(var(--pf,21px)*.8);line-height:1.5}
+.faqwarn{background:var(--warn-soft);border-left:4px solid var(--warn);border-radius:6px;padding:4px 8px;font-size:13px;margin-bottom:6px}
 .faqans{margin-top:8px;padding:10px 12px;border-radius:8px;background:var(--talk-soft);font-size:calc(var(--pf,21px)*.85);line-height:1.6;white-space:pre-wrap}
 .bill.paid{border-color:var(--talk);opacity:.8}
 .paidtick{color:var(--talk);font-weight:700}
@@ -499,6 +503,16 @@ td.r,th.r{text-align:right}
         <div class="faqbtns" id="faqBtns"></div>
         <div class="faqans" id="faqAns" hidden></div>
         <div class="row" style="margin-top:6px"><button class="btn sm primary" id="faqShow" type="button" hidden>📺 ขึ้นจอคำตอบนี้</button><button class="btn sm" id="faqEdit" type="button">แก้รายการ</button><span class="mini" id="faqMsg"></span></div>
+        <div class="faqai">
+          <div class="mini" style="margin-bottom:4px">✨ <b>AI ร่างคำตอบ:</b> วางคำถามจากคอมเมนต์ AI จะร่างคำตอบจากข้อมูลสินค้าและคำตอบสำเร็จรูปของคุณเท่านั้น ให้คุณอ่านตอบเอง (AI ไม่พูดแทน)</div>
+          <div class="row" style="flex-wrap:nowrap"><input id="faqQ" placeholder="เช่น ตัวนี้มีสีอื่นไหม / ส่งกี่วัน" maxlength="300" style="flex:1"><button class="btn sm primary" id="faqAi" type="button" style="white-space:nowrap">✨ ร่างคำตอบ</button></div>
+          <div id="faqDraftBox" hidden style="margin-top:6px">
+            <div class="faqwarn" id="faqWarn" hidden></div>
+            <textarea id="faqDraft" rows="3" aria-label="คำตอบที่ AI ร่าง แก้ได้"></textarea>
+            <div class="row" style="margin-top:6px"><button class="btn sm primary" id="faqDraftShow" type="button">📺 ขึ้นจอ</button><button class="btn sm" id="faqDraftKeep" type="button">➕ เก็บเป็นคำตอบสำเร็จรูป</button><button class="btn sm" id="faqDraftCopy" type="button">คัดลอก</button></div>
+          </div>
+          <div class="mini" id="faqAiMsg" style="margin-top:4px"></div>
+        </div>
         <div id="faqEditor" hidden style="margin-top:6px">
           <div class="mini">หนึ่งบรรทัดต่อหนึ่งข้อ: คำถาม | คำตอบ (แก้ให้ตรงกับร้านของคุณ ห้ามใส่สิ่งที่ไม่จริง)</div>
           <textarea id="faqText" rows="7" style="margin-top:4px"></textarea>
@@ -679,6 +693,14 @@ td.r,th.r{text-align:right}
     <div class="mini" style="margin:2px 0 8px">กด "คัดลอกบิล" แล้ววางในแชทส่งให้ลูกค้าได้เลย</div>
     <div class="bills" id="bills"></div>
   </div>
+  <div class="card aff-only" id="commBox" style="margin-top:14px">
+    <div class="row" style="justify-content:space-between"><b style="font-family:var(--display);font-weight:500">💰 ค่าคอมที่ได้จริง</b><span class="mini" id="commSum"></span></div>
+    <div class="mini" style="margin:2px 0 8px">ดูยอดจริงจากหน้ารายได้ Affiliate ของ TikTok แล้วกรอกที่นี่ โปรแกรมจะเทียบกับค่าคอมโดยประมาณจากออเดอร์ที่จดไว้</div>
+    <div class="row commform"><input type="date" id="commD" aria-label="วันที่"><input type="number" id="commAmt" min="0" step="0.01" placeholder="บาท" aria-label="ค่าคอมที่ได้จริง (บาท)" style="width:110px"><input id="commNote" placeholder="หมายเหตุ (ไม่ใส่ก็ได้)" maxlength="80" style="flex:1;min-width:120px"><button class="btn sm primary" id="commAdd" type="button">บันทึก</button></div>
+    <div class="mini" id="commMsg" style="margin-top:4px"></div>
+    <div class="tablebox" style="margin-top:6px"><table><thead><tr><th>วันที่</th><th class="r">ได้จริง</th><th class="r">ประมาณจากออเดอร์</th><th>หมายเหตุ</th><th></th></tr></thead><tbody id="commBody"></tbody></table></div>
+    <div class="row" style="margin-top:6px"><button class="btn sm" id="expComm" type="button">⬇ ส่งออก (Excel)</button></div>
+  </div>
   <h2 style="margin-top:20px">ขายดีรายสินค้า</h2>
   <div class="card tablebox"><table><thead><tr><th>รหัส</th><th>สินค้า</th><th class="r">ชิ้น</th><th class="r">ยอด</th></tr></thead><tbody id="sbody"></tbody></table></div>
   <div class="row" style="margin-top:12px"><button class="btn" id="copySum">คัดลอกสรุปยอด</button><button class="btn" id="expOrd">⬇ ส่งออกไฟล์ (Excel)</button><button class="btn" id="impOrd">⬆ นำเข้าออเดอร์</button><button class="btn" id="clearOrders">ล้างออเดอร์ทั้งหมด</button><span class="mini" id="clearMsg"></span></div>
@@ -750,7 +772,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.27.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.28.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){if(e&&(e.name==="QuotaExceededError"||e.code===22)){const q=document.getElementById("quotaNag");if(q)q.hidden=false}return false}}};
@@ -872,14 +894,24 @@ const AI_SYSTEM_AFF=AI_SYSTEM.replace("ทุกบทต้องจบด้�
 const AI_SCHEMA={type:"object",additionalProperties:false,required:["name","points","scripts"],
  properties:{name:{type:"string"},points:{type:"array",items:{type:"string"}},scripts:{type:"array",items:{type:"string"}}}};
 const isDefault=(k,v)=>!String(v||"").trim()||(k==="name"&&v==="สินค้าใหม่")||(k==="points"&&/^จุดเด่น 1\|/.test(v));
+async function aiClient(){sdkPromise=sdkPromise||import(SDK_URL);const mod=await sdkPromise,Anthropic=mod.default||mod.Anthropic;sdkMod=mod;
+ return new Anthropic({apiKey:aiCfg.key,dangerouslyAllowBrowser:true})}
+function aiErrText(e,bad){const M=sdkMod||{},is=c=>c&&e instanceof c;
+ if(is(M.AuthenticationError))return "API key ไม่ถูกต้อง ตรวจใน \"ตั้งค่า AI เขียนบทจากรูป\" (แท็บสินค้า)";
+ if(is(M.PermissionDeniedError))return "API key นี้ไม่มีสิทธิ์ใช้งาน ตรวจบัญชีที่ console.anthropic.com";
+ if(is(M.RateLimitError))return "เรียกใช้ถี่เกินไป รอสักครู่แล้วลองใหม่";
+ if(is(M.BadRequestError))return /credit|billing/i.test(e.message||"")?"เครดิตในบัญชี Anthropic หมด เติมที่ console.anthropic.com":bad;
+ if(is(M.APIConnectionError))return "ต่อ AI ไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่";
+ if(is(M.APIError))return `AI มีปัญหาชั่วคราว (${e.status||"?"}) ลองใหม่อีกครั้ง`;
+ if(!sdkMod){sdkPromise=null;return "โหลดตัวเชื่อม AI ไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่"}
+ return (e&&e.message)||"เกิดข้อผิดพลาด"}
 async function aiWrite(i,btn){const p=products[i],m=$("#aim"+i);
  if(!p.img){m.textContent="ใส่รูปสินค้าก่อน แล้วค่อยกด ✨";return}
  if(!aiCfg.key){m.textContent="ยังไม่ได้ใส่ API key เปิด \"ตั้งค่า AI เขียนบทจากรูป\" ด้านบน";$("#aiBox").open=true;$("#aiBox").scrollIntoView({behavior:"smooth"});return}
  if(!navigator.onLine){m.textContent="ต้องต่ออินเทอร์เน็ตก่อนใช้ AI";return}
  btn.disabled=true;m.textContent="⏳ AI กำลังดูรูปและเขียนบท ประมาณ 10 ถึง 30 วินาที...";
  try{
-  sdkPromise=sdkPromise||import(SDK_URL);const mod=await sdkPromise,Anthropic=mod.default||mod.Anthropic;sdkMod=mod;
-  const client=new Anthropic({apiKey:aiCfg.key,dangerouslyAllowBrowser:true});
+  const client=await aiClient();
   const info=[`ข้อมูลจากร้าน:`,`รหัสสินค้า: ${p.code}`,`ชื่อ: ${isDefault("name",p.name)?"(ยังไม่มี ให้ตั้งจากรูป)":p.name}`,`ราคา: ${p.price?p.price+" บาท":"(ยังไม่กำหนด)"}`,
    `จุดขายที่ร้านเขียนไว้: ${isDefault("points",p.points)?"(ยังไม่มี)":p.points.split("|").join(", ")}`,`โปรในไลฟ์: ${p.promo||"(ไม่มี)"}`,
    ...(aff()?[`ร้านต้นทาง: ${p.shop||"(ไม่ระบุ)"}`]:[])].join("\n");
@@ -897,16 +929,7 @@ async function aiWrite(i,btn){const p=products[i],m=$("#aim"+i);
   if(isDefault("name",p.name)&&out.name){p.name=out.name.trim();changed.push("ชื่อสินค้า")}
   if(isDefault("points",p.points)&&Array.isArray(out.points)&&out.points.length){p.points=out.points.map(s=>String(s).replace(/\|/g," ").trim()).filter(Boolean).slice(0,5).join("|");changed.push("จุดขาย")}
   p.scripts=scripts;save();$("#aim"+i).textContent="✓ AI เขียนแล้ว: "+changed.join(", ")+" ตรวจทานก่อนไลฟ์ด้วยนะคะ";
- }catch(e){const M=sdkMod||{},is=c=>c&&e instanceof c;let msg;
-  if(is(M.AuthenticationError))msg="API key ไม่ถูกต้อง ตรวจใน \"ตั้งค่า AI เขียนบทจากรูป\"";
-  else if(is(M.PermissionDeniedError))msg="API key นี้ไม่มีสิทธิ์ใช้งาน ตรวจบัญชีที่ console.anthropic.com";
-  else if(is(M.RateLimitError))msg="เรียกใช้ถี่เกินไป รอสักครู่แล้วลองใหม่";
-  else if(is(M.BadRequestError))msg=/credit|billing/i.test(e.message||"")?"เครดิตในบัญชี Anthropic หมด เติมที่ console.anthropic.com":"ส่งข้อมูลไม่ผ่าน ลองเปลี่ยนรูปแล้วกดใหม่";
-  else if(is(M.APIConnectionError))msg="ต่อ AI ไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่";
-  else if(is(M.APIError))msg=`AI มีปัญหาชั่วคราว (${e.status||"?"}) ลองใหม่อีกครั้ง`;
-  else if(!sdkMod){msg="โหลดตัวเชื่อม AI ไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่";sdkPromise=null}
-  else msg=(e&&e.message)||"เกิดข้อผิดพลาด";
-  m.textContent="⚠ "+msg}
+ }catch(e){m.textContent="⚠ "+aiErrText(e,"ส่งข้อมูลไม่ผ่าน ลองเปลี่ยนรูปแล้วกดใหม่")}
  finally{btn.disabled=false}}
 $("#addProd").onclick=()=>{products.push({code:"N"+(products.length+1),name:"สินค้าใหม่",price:0,points:"จุดเด่น 1|จุดเด่น 2|จุดเด่น 3",promo:""});save()};
 $("#resetProd").onclick=()=>{products=SAMPLE.map(p=>({...p}));save()};
@@ -1370,6 +1393,59 @@ function renderPractice(){const on=prCfg.on;document.body.classList.toggle("is-p
 $("#prOn").onchange=()=>{prCfg.on=$("#prOn").checked;if(!prCfg.on){prCfg.speed=1;$("#prSpeed").value="1"}renderPractice();renderGo()};
 $("#prSpeed").onchange=()=>{prCfg.speed=+$("#prSpeed").value||1};
 
+/* AI answer draft: the host pastes a viewer question, Claude drafts a short Thai answer from the app's
+   own data only (live products, the current product, the host's ready answers). Shown for the host to
+   read; never spoken by AI. "unknown" = the data does not answer it -> warning, and showing it on
+   screen needs a confirm. */
+const AI_QA_SYSTEM=`คุณช่วยแม่ค้าไลฟ์ TikTok Shop ร่างคำตอบคำถามจากคนดู เป็นภาษาไทย สั้น 1 ถึง 3 ประโยค สุภาพ ลงท้าย "ค่ะ" ให้แม่ค้าอ่านตอบเอง
+ตอบจากข้อมูลที่ให้มาเท่านั้น (รายการสินค้า สินค้าที่กำลังพูดถึง และคำตอบสำเร็จรูปของร้าน)
+ห้ามเดาหรือแต่งข้อมูลที่ไม่มี เช่น สี ไซซ์ วัสดุ การจัดส่ง การเปลี่ยนคืน ของแถม ส่วนลด สรรพคุณทางการแพทย์ หรือรีวิว
+ถ้าข้อมูลไม่พอ ให้ unknown เป็น true และร่างคำตอบกลางๆ ที่ไม่สัญญาอะไร เช่น ขอเช็กให้ก่อน หรือชวนดูรายละเอียดในหน้าสินค้า แล้วบอกใน note ว่าแม่ค้าต้องหาข้อมูลอะไรเพิ่ม
+ถ้าคำถามเกี่ยวกับสินค้าตัวไหน ให้บอกเลขตะกร้าด้วย
+ถ้าคำถามหยาบคาย ไม่เกี่ยวกับการขาย หรือขอข้อมูลส่วนตัว ให้ร่างคำตอบสุภาพสั้นๆ ที่พากลับมาที่สินค้า`;
+const AI_QA_SCHEMA={type:"object",additionalProperties:false,required:["answer","unknown","note"],
+ properties:{answer:{type:"string"},unknown:{type:"boolean"},note:{type:"string"}}};
+function qaContext(){const cur=pinShown(),L=liveProducts();
+ const line=p=>`- ตะกร้าเลข ${basketNo(p)} · รหัส ${p.code} · ${p.name} · ราคา ${p.price?p.price+" บาท":"(ไม่ระบุ)"}`+
+  (p.points?` · จุดขาย: ${p.points.split("|").join(", ")}`:"")+(p.promo?` · โปรในไลฟ์: ${p.promo}`:"")+
+  (aff()&&p.shop?` · ร้านต้นทาง: ${p.shop}`:"")+(!aff()&&hasStock(p)?` · สต็อก: ${p.stock>0?"มีของ":"หมดแล้ว"}`:"");
+ const F=faqList().filter(x=>!/__|\((แก้|ใส่|ตอบ)/.test(x.a));
+ return [`ผู้ขาย: ${aff()?"นายหน้า (affiliate) ขายสินค้าของร้านอื่น ไม่ใช่เจ้าของร้าน ห้ามสัญญาเรื่องจัดส่ง/เปลี่ยนคืนแทนร้าน และห้ามบอกให้พิมพ์ CF":"เจ้าของร้าน รับออเดอร์ด้วยการพิมพ์ CF ตามด้วยรหัส หรือกดตะกร้า"}`,
+  `สินค้าที่กำลังพูดถึงตอนนี้: ${cur?`${cur.code} ${cur.name} (ตะกร้าเลข ${basketNo(cur)})`:"(ไม่มี)"}`,
+  `สินค้าในไลฟ์นี้:`,...(L.length?L.map(line):["(ยังไม่ได้เลือกสินค้า)"]),
+  `คำตอบสำเร็จรูปของร้าน:`,...(F.length?F.map(x=>`- ${x.q}: ${x.a}`):["(ไม่มี)"])].join("\n")}
+let faqDraftQ="",faqDraftUnknown=false;
+async function aiAnswer(){const q=$("#faqQ").value.trim(),m=$("#faqAiMsg"),btn=$("#faqAi");
+ if(!q){m.textContent="วางหรือพิมพ์คำถามของคนดูก่อน";$("#faqQ").focus();return}
+ if(!aiCfg.key){m.textContent="ยังไม่ได้ใส่ API key ใส่ได้ที่แท็บสินค้า \"ตั้งค่า AI เขียนบทจากรูป\"";return}
+ if(!navigator.onLine){m.textContent="ต้องต่ออินเทอร์เน็ตก่อนใช้ AI";return}
+ btn.disabled=true;m.textContent="⏳ AI กำลังร่างคำตอบ...";
+ try{const client=await aiClient();
+  const r=await client.beta.messages.create({model:"claude-opus-5-5",max_tokens:4000,
+   betas:["server-side-fallback-2026-07-01"],fallbacks:"default",
+   output_config:{effort:"low",format:{type:"json_schema",schema:AI_QA_SCHEMA}},
+   system:AI_QA_SYSTEM,
+   messages:[{role:"user",content:`${qaContext()}\n\nคำถามจากคนดู:\n${q}`}]});
+  if(r.stop_reason==="refusal")throw new Error("AI ไม่ร่างคำตอบให้สำหรับคำถามนี้ ตอบเองได้เลย");
+  if(r.stop_reason==="max_tokens")throw new Error("คำตอบยาวเกินไป ลองกดใหม่อีกครั้ง");
+  const tb=r.content.find(b=>b.type==="text");if(!tb)throw new Error("AI ไม่ได้ตอบกลับมา ลองใหม่อีกครั้ง");
+  const out=JSON.parse(tb.text),ans=String(out.answer||"").trim().slice(0,500);if(!ans)throw new Error("AI ไม่ได้ส่งคำตอบกลับมา ลองใหม่อีกครั้ง");
+  faqDraftQ=q;faqDraftUnknown=!!out.unknown;$("#faqDraft").value=ans;$("#faqDraftBox").hidden=false;
+  const w=$("#faqWarn");w.hidden=!faqDraftUnknown;w.textContent="⚠ ข้อมูลในโปรแกรมไม่พอตอบคำถามนี้"+(out.note?": "+String(out.note).slice(0,200):"")+" ตรวจและแก้ก่อนตอบ";
+  m.textContent="✓ ร่างแล้ว อ่านตรวจก่อนตอบ แก้ข้อความในช่องได้"}
+ catch(e){m.textContent="⚠ "+aiErrText(e,"ส่งคำถามไม่ผ่าน ลองใหม่อีกครั้ง")}
+ finally{btn.disabled=false}}
+$("#faqAi").onclick=aiAnswer;
+$("#faqQ").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();aiAnswer()}});
+$("#faqDraftShow").onclick=()=>{const a=$("#faqDraft").value.trim();if(!a)return;
+ if(faqDraftUnknown&&!confirm("AI บอกว่าข้อมูลไม่พอตอบคำถามนี้\nตรวจแล้วว่าคำตอบถูกต้อง และจะขึ้นจอใช่ไหม?"))return;
+ showOnScreen({k:"faq",q:faqDraftQ.slice(0,60),t:a},20);$("#faqAiMsg").textContent="✓ ขึ้นจอแล้ว 20 วินาที"};
+$("#faqDraftKeep").onclick=()=>{const a=$("#faqDraft").value.trim();if(!a||!faqDraftQ)return;
+ if(faqDraftUnknown&&!confirm("AI บอกว่าข้อมูลไม่พอตอบคำถามนี้\nตรวจแล้วว่าคำตอบถูกต้อง และจะเก็บไว้ใช้ซ้ำใช่ไหม?"))return;
+ const L=faqList().map(x=>({...x}));if(L.length>=30){$("#faqAiMsg").textContent="คำตอบสำเร็จรูปเต็ม 30 ข้อแล้ว ลบบางข้อก่อน";return}
+ L.push({q:faqDraftQ.slice(0,60),a:a.slice(0,500)});faq=L;store.set("ls_faq",faq);faqOpen=L.length-1;renderFaq();$("#faqAiMsg").textContent="✓ เก็บไว้ในคำตอบสำเร็จรูปแล้ว"};
+$("#faqDraftCopy").onclick=()=>copyText($("#faqDraft").value).then(()=>$("#faqAiMsg").textContent="คัดลอกแล้ว").catch(()=>$("#faqAiMsg").textContent="คัดลอกไม่ได้");
+
 /* one-button go live / end live. TikTok has no API to start a live, so the button does every
    step it can (camera, live screen, OBS virtual camera, or the OBS stream itself with a key),
    asks the host to confirm the TikTok side, counts 3-2-1 like TikTok, then starts the round. */
@@ -1623,6 +1699,29 @@ function renderHistory(){const hb=$("#hbody");if(!hb)return;
   `<td class="mini">${(r.top||[]).map(x=>esc(x.c)+" "+x.q).join(", ")||"-"}</td><td><button class="btn" data-hd="${i}" style="padding:2px 8px;font-size:12px" aria-label="ลบรอบนี้จากประวัติ">ลบ</button></td></tr>`).join("")
   :`<tr><td colspan="8" class="mini">ยังไม่มีประวัติ จบไลฟ์รอบแรกแล้วจะขึ้นที่นี่</td></tr>`;
  hb.querySelectorAll("[data-hd]").forEach(b=>b.onclick=()=>{liveHist.splice(+b.dataset.hd,1);store.set("ls_history",liveHist);renderHistory()})}
+/* real commission log (affiliate): ls_comm [{d, amt, note}], entered by the host from TikTok's
+   affiliate income page; compared with the estimate from recorded orders (commOf) of the same day and
+   of this month. In backups as "comm". */
+var COMM_MAX=400,commLog=store.get("ls_comm",[]);if(!Array.isArray(commLog))commLog=[];
+const estOn=d=>Math.round(orders.filter(o=>o.d===d).reduce((a,o)=>a+commOf(o),0));
+const estMonth=ym=>Math.round(orders.filter(o=>String(o.d||"").startsWith(ym)).reduce((a,o)=>a+commOf(o),0));
+function renderComm(){const b=$("#commBody");if(!b||!commLog)return;if(!$("#commD").value)$("#commD").value=localDate();
+ const L=commLog.map((c,i)=>({c,i})).sort((x,y)=>y.c.d.localeCompare(x.c.d)||y.i-x.i);
+ b.innerHTML=L.length?L.slice(0,60).map(({c,i})=>`<tr><td class="num">${esc(c.d)}</td><td class="r num"><b>${fmt(c.amt)}</b></td><td class="r num">${fmt(estOn(c.d))}</td><td class="mini">${esc(c.note||"")}</td><td><button class="btn sm" data-cdel="${i}" type="button" aria-label="ลบรายการ ${esc(c.d)}">ลบ</button></td></tr>`).join("")
+  :`<tr><td colspan="5" class="mini">ยังไม่มีรายการ กรอกยอดจริงจากหน้ารายได้ Affiliate ด้านบน</td></tr>`;
+ b.querySelectorAll("[data-cdel]").forEach(x=>x.onclick=()=>{const i=+x.dataset.cdel,[c]=commLog.splice(i,1);store.set("ls_comm",commLog);renderComm();
+  offerUndo(`ลบค่าคอม ${c.d} ${fmt(c.amt)} บาทแล้ว`,()=>{commLog.splice(Math.min(i,commLog.length),0,c);store.set("ls_comm",commLog);renderComm()})});
+ const ym=localDate().slice(0,7),real=commLog.filter(c=>c.d.startsWith(ym)).reduce((a,c)=>a+c.amt,0),est=estMonth(ym);
+ $("#commSum").textContent=`เดือนนี้ ได้จริง ${fmt(Math.round(real*100)/100)} บาท · ประมาณ ${fmt(est)} บาท`}
+$("#commAdd").onclick=()=>{const d=$("#commD").value,amt=Math.round(parseFloat($("#commAmt").value)*100)/100,note=$("#commNote").value.trim().slice(0,80);
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){$("#commMsg").textContent="เลือกวันที่ก่อน";return}
+ if(!(amt>=0)||!isFinite(amt)){$("#commMsg").textContent="ใส่ยอดเป็นตัวเลข (บาท)";$("#commAmt").focus();return}
+ commLog.push({d,amt,...(note?{note}:{})});if(commLog.length>COMM_MAX)commLog=commLog.slice(-COMM_MAX);store.set("ls_comm",commLog);
+ $("#commAmt").value="";$("#commNote").value="";renderComm();const e=estOn(d);
+ $("#commMsg").textContent=`✓ บันทึก ${d} ${fmt(amt)} บาทแล้ว`+(e?` (ประมาณจากออเดอร์วันนั้น ${fmt(e)} บาท)`:"")};
+$("#expComm").onclick=()=>{if(!commLog.length){$("#commMsg").textContent="ยังไม่มีรายการให้ส่งออก";return}
+ download(`livestudio-ค่าคอมจริง-${localDate()}.csv`,toCSV([["วันที่","ได้จริง (บาท)","ประมาณจากออเดอร์ (บาท)","หมายเหตุ"],...[...commLog].sort((a,b)=>a.d.localeCompare(b.d)).map(c=>[c.d,c.amt,estOn(c.d),c.note||""])]),"text/csv;charset=utf-8")};
+
 $("#expHist").onclick=()=>{if(!liveHist.length){$("#histMsg").textContent="ยังไม่มีประวัติให้ส่งออก";return}
  download(`livestudio-ประวัติไลฟ์-${localDate()}.csv`,toCSV([["วันที่","เวลาเริ่ม","ตั้งไว้ (นาที)","ไลฟ์จริง (นาที)","ออเดอร์","ชิ้น","ยอดขาย","ค่าคอมประมาณ","ขายดี"],
   ...liveHist.map(r=>[r.d,r.st,r.plan,r.real,r.n,r.q,r.s,r.aff?r.cm:"",(r.top||[]).map(x=>`${x.c} ${x.n} ${x.q}`).join(" / ")])]),"text/csv;charset=utf-8");
@@ -1679,7 +1778,7 @@ function renderOrders(){const ob=$("#obody");ob.innerHTML=orders.length?"":`<tr>
   offerUndo(`ลบออเดอร์ ${o.name} ${o.code} x${o.qty} แล้ว`,()=>{const p=products.find(x=>x.code===o.code);if(o.sk&&p&&hasStock(p)){p.stock=Math.max(0,p.stock-o.sk);store.set("ls_products",products);stockChanged(p)}
    orders.splice(Math.min(i,orders.length),0,o);store.set("ls_orders",orders);renderOrders();renderHome()})});
  const q=orders.reduce((a,o)=>a+o.qty,0),sum=orders.reduce((a,o)=>a+o.qty*o.price,0);
- renderBills();renderHistory();$("#tCount").textContent=fmt(orders.length);$("#tQty").textContent=fmt(q);$("#tSum").textContent=fmt(sum);$("#tComm").textContent=fmt(Math.round(orders.reduce((a,o)=>a+commOf(o),0)));$("#tUnpaid").textContent=fmt(orders.filter(o=>!o.paid).reduce((a,o)=>a+o.qty*o.price,0));
+ renderBills();renderHistory();renderComm();$("#tCount").textContent=fmt(orders.length);$("#tQty").textContent=fmt(q);$("#tSum").textContent=fmt(sum);$("#tComm").textContent=fmt(Math.round(orders.reduce((a,o)=>a+commOf(o),0)));$("#tUnpaid").textContent=fmt(orders.filter(o=>!o.paid).reduce((a,o)=>a+o.qty*o.price,0));
  const by={};orders.forEach(o=>{by[o.code]=by[o.code]||{n:o.pname,q:0,s:0};by[o.code].q+=o.qty;by[o.code].s+=o.qty*o.price});
  const rows=Object.entries(by).sort((a,b)=>b[1].s-a[1].s);$("#sbody").innerHTML=rows.map(([c,v])=>`<tr><td><span class="code">${esc(c)}</span></td><td>${esc(v.n)}</td><td class="r num">${v.q}</td><td class="r num">${fmt(v.s)}</td></tr>`).join("")||`<tr><td colspan="4" class="mini">ยังไม่มีข้อมูล</td></tr>`;}
 $("#copySum").onclick=()=>{const txt=`สรุปไลฟ์ ${new Date().toLocaleDateString("th-TH")}\nออเดอร์ ${orders.length} · ยอด ${$("#tSum").textContent} บาท${aff()?` · ค่าคอมประมาณ ${$("#tComm").textContent} บาท`:""}\n`+orders.map(o=>`${o.name} ${o.code} x${o.qty} = ${fmt(o.qty*o.price)}`).join("\n");
@@ -1942,7 +2041,7 @@ $("#expOrd").onclick=()=>{if(!orders.length){$("#clearMsg").textContent="ยั�
  download(`livestudio-ออเดอร์-${localDate()}.csv`,toCSV([["วันที่","เวลา","ลูกค้า","รหัส","สินค้า","จำนวน","ราคาต่อชิ้น","รวม","ค่าคอม (%)","ค่าคอม (บาท)","จ่ายแล้ว"],...orders.map(o=>[o.d||"",o.t,o.name,o.code,o.pname,o.qty,o.price,o.qty*o.price,o.cm||"",o.cm?Math.round(commOf(o)*100)/100:"",o.paid?"ใช่":""])]),"text/csv;charset=utf-8");
  $("#clearMsg").textContent=`ส่งออกออเดอร์ ${orders.length} รายการแล้ว ไฟล์อยู่ในโฟลเดอร์ Downloads`};
 const backupName=()=>`livestudio-สำรอง-${localDate()}.json`;
-const backupJSON=()=>JSON.stringify({app:"LiveStudio",format:1,exported:new Date().toISOString(),products,orders,plan:planSettings(),seller:sellerCfg.type,history:liveHist},null,1);
+const backupJSON=()=>JSON.stringify({app:"LiveStudio",format:1,exported:new Date().toISOString(),products,orders,plan:planSettings(),seller:sellerCfg.type,history:liveHist,comm:commLog},null,1);
 /* undo bar: deleting an order or a product can be taken back for 8 seconds */
 let undoFn=null,undoTimer=null;
 function offerUndo(text,fn){undoFn=fn;$("#undoText").textContent=text;$("#undoBar").hidden=false;clearTimeout(undoTimer);undoTimer=setTimeout(()=>{$("#undoBar").hidden=true;undoFn=null},8000)}
@@ -1999,7 +2098,7 @@ function importText(kind,text,fname){snapTake(kind==="restoreAll"?"ก่อน�
    if(!Array.isArray(j.products)||!Array.isArray(j.orders))throw new Error("ไม่ใช่ไฟล์สำรองของ LiveStudio");
    const np=j.products.map(cleanProduct).filter(p=>p.code&&p.name),no=j.orders.map(cleanOrder).filter(o=>o.name&&o.code);
    if(!confirm(`กู้คืนจากไฟล์สำรอง?\nสินค้า ${np.length} รายการ และออเดอร์ ${no.length} รายการ จะมาแทนข้อมูลที่มีอยู่ตอนนี้\n(สินค้า ${products.length} รายการ ออเดอร์ ${orders.length} รายการ)`))return "ยกเลิกการกู้คืน ข้อมูลเดิมยังอยู่ครบ";
-   products=np;orders=no;applyPlanSettings(j.plan);store.set("ls_plan",planSettings());if(Array.isArray(j.history)){liveHist=j.history.filter(h=>h&&h.d).slice(-HIST_MAX);store.set("ls_history",liveHist)}if(j.seller==="aff"||j.seller==="own"){sellerCfg.type=j.seller;store.set("ls_seller",sellerCfg);renderSeller()}afterChange();
+   products=np;orders=no;applyPlanSettings(j.plan);store.set("ls_plan",planSettings());if(Array.isArray(j.history)){liveHist=j.history.filter(h=>h&&h.d).slice(-HIST_MAX);store.set("ls_history",liveHist)}if(Array.isArray(j.comm)){commLog=j.comm.filter(c=>c&&/^\d{4}-\d{2}-\d{2}$/.test(c.d)&&isFinite(+c.amt)).map(c=>({d:c.d,amt:+c.amt,...(c.note?{note:String(c.note).slice(0,80)}:{})})).slice(-COMM_MAX);store.set("ls_comm",commLog)}if(j.seller==="aff"||j.seller==="own"){sellerCfg.type=j.seller;store.set("ls_seller",sellerCfg);renderSeller()}afterChange();
    return `กู้คืนแล้ว: สินค้า ${np.length} รายการ ออเดอร์ ${no.length} รายการ`}
   throw new Error("ไฟล์ .json ใช้กับปุ่มกู้คืนจากไฟล์สำรองในหน้าแรก")}
  if(kind==="restoreAll")throw new Error("ไฟล์สำรองต้องเป็น .json ที่ได้จากปุ่มสำรองทั้งหมด");
