@@ -436,6 +436,7 @@ td.r,th.r{text-align:right}
   <div class="row" style="margin-bottom:12px">
     <button class="btn" id="addProd">+ เพิ่มสินค้า</button>
     <button class="btn" id="resetProd">ใช้ข้อมูลตัวอย่าง</button>
+    <button class="btn" id="sortSales" title="เรียงสินค้าที่ขายได้มากที่สุดขึ้นก่อน (ลำดับนี้คือลำดับพูดและเลขตะกร้า)">📈 เรียงตามยอดขาย</button>
     <span style="flex:1"></span>
     <button class="btn" id="expProd">⬇ ส่งออกไฟล์ (Excel)</button>
     <button class="btn" id="impProd">⬆ นำเข้าจากไฟล์</button>
@@ -461,6 +462,7 @@ td.r,th.r{text-align:right}
     <div style="flex:1;min-width:120px"><label for="talkLen">คุยสดครั้งละ</label>
       <select id="talkLen"><option value="3">3 นาที</option><option value="5" selected>5 นาที</option><option value="8">8 นาที</option></select></div>
   </div>
+  <div class="trtip-note" id="bestTime" hidden style="margin:-4px 0 12px"></div>
   <div class="card" style="margin-bottom:12px">
     <b style="font-family:var(--display);font-weight:500">📌 ลำดับสินค้าในตะกร้าไลฟ์</b>
     <div class="mini own-only">ก่อนไลฟ์ เพิ่มสินค้าเข้าตะกร้าใน TikTok ตามลำดับนี้ เลขตะกร้าจะตรงกับที่โปรแกรมพูดและขึ้นป้าย ระหว่างไลฟ์โปรแกรมจะเตือนให้ปักตะกร้าทุกครั้งที่เปลี่ยนสินค้า</div>
@@ -812,7 +814,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.30.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.31.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){if(e&&(e.name==="QuotaExceededError"||e.code===22)){const q=document.getElementById("quotaNag");if(q)q.hidden=false}return false}}};
@@ -836,7 +838,7 @@ const pick=a=>a[Math.floor(Math.random()*a.length)];
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.tab));
 function show(t){document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
  ["home","products","plan","live","orders"].forEach(x=>$("#tab-"+x).hidden=x!==t);scrollTo(0,0);
- if(t==="home")renderHome(); if(t==="plan")buildPlan(); if(t==="live"){if(!plan.length)buildPlan();renderLive();const c=renderCheck();if(!running&&elapsed===0&&c.done<c.total)$("#checkBox").open=true} if(t==="orders")renderOrders();}
+ if(t==="home")renderHome(); if(t==="plan"){buildPlan();renderBestTime()} if(t==="live"){if(!plan.length)buildPlan();renderLive();const c=renderCheck();if(!running&&elapsed===0&&c.done<c.total)$("#checkBox").open=true} if(t==="orders")renderOrders();}
 
 /* seller type: "own" = the owner's shop (customers may CF in comments, the shop records orders);
    "aff" = affiliate creator selling other shops' products from their showcase: buyers check out
@@ -1090,7 +1092,7 @@ $("#dur").onchange=()=>{const c=$("#dur").value==="custom";$("#durCustom").hidde
 // end time follows start + real length; typing an end time sets the length (needs a start time)
 function syncEndAt(){const real=plan.reduce((a,s)=>a+s.min,0);$("#endAt").value=startAt&&real?min2hm(hm2min(startAt)+real):"";$("#endAt").disabled=!startAt;
  $("#endAt").title=startAt?"":"ใส่เวลาเริ่มก่อน"}
-$("#startAt").onchange=()=>{startAt=/^\d{2}:\d{2}/.test($("#startAt").value)?$("#startAt").value.slice(0,5):"";planChanged();updateStartIn()};
+$("#startAt").onchange=()=>{startAt=/^\d{2}:\d{2}/.test($("#startAt").value)?$("#startAt").value.slice(0,5):"";planChanged();updateStartIn();renderBestTime()};
 $("#endAt").onchange=()=>{const e=hm2min($("#endAt").value),s=hm2min(startAt);if(e==null||s==null){syncEndAt();return}
  let d=((e-s)%1440+1440)%1440;
  if(d<DUR_MIN){$("#planSummary").insertAdjacentHTML("afterbegin",`<b style="color:var(--warn)">⚠ ไลฟ์ต้องยาวอย่างน้อย ${DUR_MIN} นาที</b><br>`);d=DUR_MIN}
@@ -1766,15 +1768,24 @@ function trGroups(L,keyOf,labels){const g=labels.map((l,i)=>({l,i,n:0,s:0,m:0}))
  return{used,best}}
 function trListHTML(title,G){if(!G.used.length)return"";const mx=Math.max(...G.used.map(x=>x.rate),1);
  return `<div><b style="font-size:13px">${title}</b><div class="trlist">`+G.used.map(x=>`<span>${esc(x.l)}${x===G.best?" ⭐":""}</span><span class="m${x===G.best?" best":""}" style="width:${Math.max(2,Math.round(x.rate/mx*100))}%"></span><span class="v">${fmt(Math.round(x.rate))}/ชม. · ${x.n} รอบ</span>`).join("")+`</div></div>`}
+var trSlotOf=hm=>{const h=parseInt(String(hm||"").slice(0,2),10);return isFinite(h)?TR_SLOTS.findIndex(x=>h>=x[2]&&h<x[3]):-1};
+function trStats(L){return{S:trGroups(L,r=>{const k=trSlotOf(r.st);return k<0?null:k},TR_SLOTS.map(x=>x[0]+" "+x[1])),
+ D:trGroups(L,r=>{const d=new Date(r.d+"T12:00");return isNaN(d)?null:d.getDay()},TR_DAYS.map(x=>"วัน"+x))}}
+/* plan tab hint (#bestTime): the best start-time slot from the history, with a button that sets startAt. */
+function renderBestTime(){const el=$("#bestTime");if(!el)return;const L=liveHist.filter(r=>r&&r.real>=1&&isFinite(r.s));
+ const {S,D}=L.length>=2?trStats(L):{S:{},D:{}};if(!S.best){el.hidden=true;return}
+ const k=S.best.i,from=String(TR_SLOTS[k][2]).padStart(2,"0")+":00",inSlot=startAt&&trSlotOf(startAt)===k,today=new Date().getDay();
+ el.innerHTML=`💡 จากประวัติ ไลฟ์ช่วง<b>${esc(S.best.l)}</b> ขายได้ต่อชั่วโมงดีที่สุด (${fmt(Math.round(S.best.rate))} บาท/ชม. · ${S.best.n} รอบ)`+
+  (D.best?(D.best.i===today?` · วันนี้ตรงกับ<b>${esc(D.best.l)}</b> วันที่ขายดีที่สุด`:` · วันที่ขายดีที่สุดคือ<b>${esc(D.best.l)}</b>`):"")+" "+
+  (inSlot?`<span style="color:var(--talk);font-weight:600">✓ เวลาเริ่มที่ตั้งไว้อยู่ในช่วงนี้แล้ว</span>`:`<button class="btn sm" id="bestSet" type="button">ตั้งเริ่ม ${from} น.</button>`);
+ el.hidden=false;const b=$("#bestSet");if(b)b.onclick=()=>{$("#startAt").value=from;$("#startAt").onchange()}}
 function renderTrend(){const box=$("#trendBody");if(!box)return;
  const L=liveHist.filter(r=>r&&r.real>=1&&isFinite(r.s));
  if(L.length<2){box.innerHTML=`<div class="mini" style="margin-top:8px">ไลฟ์ครบ 2 รอบแล้วจะเริ่มเห็นกราฟยอดขายและช่วงเวลาที่ขายดี${L.length?" (ตอนนี้มี 1 รอบ)":""}</div>`;return}
  const tot=L.reduce((a,r)=>a+r.s,0),mins=L.reduce((a,r)=>a+r.real,0),best=L.reduce((a,r)=>r.s>a.s?r:a);
  const V=L.slice(-14),mx=Math.max(...V.map(r=>r.s),1),avg=tot/L.length,showAff=V.some(r=>r.aff);
  const bars=V.map((r,i)=>`<button type="button" data-tr="${i}" class="${r===best?"best":""}" aria-label="${esc(r.d)} ${esc(r.st||"")} ยอด ${fmt(r.s)} บาท"><i style="height:${Math.max(1.5,r.s/mx*100)}%"></i></button>`).join("");
- const slot=TR_SLOTS.map(x=>x[0]+" "+x[1]),day=TR_DAYS.map(x=>"วัน"+x);
- const S=trGroups(L,r=>{const h=parseInt(String(r.st||"").slice(0,2),10);return isFinite(h)?TR_SLOTS.findIndex(x=>h>=x[2]&&h<x[3]):null},slot);
- const D=trGroups(L,r=>{const d=new Date(r.d+"T12:00");return isNaN(d)?null:d.getDay()},day);
+ const {S,D}=trStats(L);
  const tops={};L.forEach(r=>(r.top||[]).forEach(x=>{const k=x.c;tops[k]=tops[k]||{c:x.c,n:x.n,k:0,q:0};tops[k].k++;tops[k].q+=x.q;tops[k].n=x.n}));
  const T=Object.values(tops).sort((a,b)=>b.k-a.k||b.q-a.q).slice(0,5);
  let tip="";if(S.best)tip=`ไลฟ์ช่วง<b>${esc(S.best.l)}</b> ได้ยอดต่อชั่วโมงสูงสุด เฉลี่ย ${fmt(Math.round(S.best.rate))} บาท/ชม. (${S.best.n} รอบ)`;
@@ -2187,6 +2198,16 @@ function cleanProduct(p){const o={code:unq(p.code),name:unq(p.name),price:num(p.
  return o}
 function cleanOrder(o){const qty=Math.max(1,Math.round(num(o.qty))||1),r={d:unq(o.d),t:unq(o.t),name:unq(o.name),code:unq(o.code),pname:unq(o.pname),qty,price:num(o.price)};
  if(num(o.cm)>0)r.cm=Math.min(100,num(o.cm));if(num(o.ts)>0)r.ts=num(o.ts);if(o.paid===1||o.paid===true||/^(ใช่|1|true|yes|y|✓)$/i.test(String(o.paid||"").trim()))r.paid=1;if(num(o.sk)>0)r.sk=Math.round(num(o.sk));return r}
+/* sort products by all recorded sales (qty*price per code); unsold products keep their order at the end.
+   Undo restores the previous order. The list order is the speaking order and the TikTok basket order. */
+$("#sortSales").onclick=()=>{if(running){$("#pMsg").textContent="เรียงลำดับไม่ได้ระหว่างไลฟ์ กดรีเซ็ตรอบก่อน";return}
+ const by={};orders.forEach(o=>{by[o.code]=(by[o.code]||0)+o.qty*o.price});
+ if(!products.some(p=>by[p.code])){$("#pMsg").textContent="ยังไม่มีออเดอร์ของสินค้าในรายการ จดออเดอร์ตอนไลฟ์ก่อนแล้วค่อยเรียง";return}
+ const before=products.slice(),idx=new Map(before.map((p,i)=>[p,i]));
+ products.sort((a,b)=>(by[b.code]||0)-(by[a.code]||0)||idx.get(a)-idx.get(b));
+ if(products.every((p,i)=>p===before[i])){$("#pMsg").textContent="เรียงตามยอดขายอยู่แล้ว";return}
+ afterChange();$("#pMsg").textContent="เรียงแล้ว: "+products.filter(p=>by[p.code]).slice(0,3).map(p=>`${p.code} ${fmt(by[p.code])} บาท`).join(" · ")+" อย่าลืมเรียงตะกร้าใน TikTok ให้ตรงกัน";
+ offerUndo("เรียงสินค้าตามยอดขายแล้ว",()=>{products=before;afterChange();$("#pMsg").textContent="กลับเป็นลำดับเดิมแล้ว"})};
 function afterChange(){store.set("ls_products",products);store.set("ls_orders",orders);plan=[];renderProducts();buildPlan();renderOrders();renderHome()}
 function importText(kind,text,fname){snapTake(kind==="restoreAll"?"ก่อนกู้คืน":"ก่อนนำเข้าไฟล์",true);
  if(/\.json$/i.test(fname)||/^\s*[\[{]/.test(text)){const j=JSON.parse(text);
