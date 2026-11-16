@@ -691,19 +691,23 @@ td.r,th.r{text-align:right}
         </div>
       </div>
       <div class="card" id="msCard">
-        <label style="display:flex;gap:6px;align-items:center;margin:0;font-size:14px;color:var(--ink)"><input type="checkbox" id="msOn" style="width:auto"> <b style="font-family:var(--display);font-weight:500">🐱 มาสคอตผู้ช่วย AI</b></label>
-        <div class="mini" style="margin-top:2px">ตัวการ์ตูนเล็ก ๆ ที่มุมฉากสินค้า AI ปากขยับตอน AI อ่านบท</div>
+        <label style="display:flex;gap:6px;align-items:center;margin:0;font-size:14px;color:var(--ink)"><input type="checkbox" id="msOn" style="width:auto"> <b style="font-family:var(--display);font-weight:500">🤖 อวตาร AI ผู้ช่วยไลฟ์</b> <span class="mini">(ไม่ใช้ก็ได้)</span></label>
+        <div class="mini" style="margin-top:2px">ตัวการ์ตูนพิธีกรหรือมาสคอตในฉากสินค้า AI ปากขยับและโบกมือตอน AI อ่านบท</div>
         <div id="msOpts" hidden>
           <div class="msrow">
             <iframe id="msPrev" title="ตัวอย่างฉากสินค้าที่มีมาสคอต" tabindex="-1"></iframe>
             <div style="flex:1;min-width:0">
               <label for="msKind">ตัวละคร</label>
-              <select id="msKind"><option value="cat">🐱 แมว</option><option value="bunny">🐰 กระต่าย</option><option value="bear">🐻 หมี</option></select>
+              <select id="msKind"><option value="host_f">👩 พิธีกรหญิง (การ์ตูน)</option><option value="host_m">👨 พิธีกรชาย (การ์ตูน)</option><option value="cat">🐱 แมว</option><option value="bunny">🐰 กระต่าย</option><option value="bear">🐻 หมี</option></select>
               <label for="msName" style="margin-top:6px">ชื่อ</label>
               <input id="msName" maxlength="16" placeholder="น้องไลฟ์">
+              <div class="row" style="gap:6px;margin-top:6px;flex-wrap:nowrap">
+                <div style="flex:1;min-width:0"><label for="msSize">ขนาด</label><select id="msSize"><option value="s">เล็ก</option><option value="m">กลาง</option><option value="l">ใหญ่</option></select></div>
+                <div style="flex:1;min-width:0"><label for="msSide">ฝั่ง</label><select id="msSide"><option value="r">ขวา</option><option value="l">ซ้าย</option></select></div>
+              </div>
             </div>
           </div>
-          <div class="mini" style="margin-top:6px">ขึ้นเฉพาะ<b>ช่วงสินค้า</b>ในฉากสินค้า AI (OBS และจอไลฟ์ในโปรแกรม) ช่วงคุยสดเป็นคนจริงเสมอ ตัวเล็กกว่าครึ่งจอมาก และมีป้าย "ผู้ช่วย AI" ตลอด ตามกฎ TikTok ที่ห้ามให้ AI แทนคนพูดสดทั้งไลฟ์</div>
+          <div class="mini" style="margin-top:6px">ขึ้นเฉพาะ<b>ช่วงสินค้า</b>ในฉากสินค้า AI (OBS และจอไลฟ์ในโปรแกรม) ช่วงคุยสดเป็นคนจริงเสมอ ขนาดใหญ่สุดก็ไม่ถึงครึ่งจอ และมีป้าย "ผู้ช่วย AI" ตลอด ตามกฎ TikTok ที่ห้ามให้ AI แทนคนพูดสดทั้งไลฟ์</div>
         </div>
       </div>
       <div class="card">
@@ -814,7 +818,7 @@ td.r,th.r{text-align:right}
 
 <input type="file" id="fileIn" accept=".csv,.json,text/csv,application/json" hidden>
 <script>
-const APP_VERSION="1.31.0"; // kept in sync with package.json by tools/make_release.py
+const APP_VERSION="1.32.0"; // kept in sync with package.json by tools/make_release.py
 const UPDATE_SITE="https://chaichots-design.github.io/livestudio/"; // web copy (GitHub Pages) URL ending in "/", set from tools/web_config.json by make_release.py
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){if(e&&(e.name==="QuotaExceededError"||e.code===22)){const q=document.getElementById("quotaNag");if(q)q.hidden=false}return false}}};
@@ -1491,15 +1495,15 @@ $("#faqDraftCopy").onclick=()=>copyText($("#faqDraft").value).then(()=>$("#faqAi
 /* AI helper mascot (ls_mascot {on, k, n}): a cartoon drawn by showcase.html in product segments only,
    field ms {k, n, sp}. sp follows speechSynthesis.speaking (polled), so the mouth moves while the AI
    voice reads; the scene is re-pushed only when that changes. Never in live-talk segments (hard rule). */
-var msCfg=Object.assign({on:false,k:"cat",n:"น้องไลฟ์"},store.get("ls_mascot",{}));let msSpeaking=false;
-function msData(){return{k:msCfg.k,n:(msCfg.n||"น้องไลฟ์").slice(0,16)}}
+var msCfg=Object.assign({on:false,k:"host_f",n:"น้องไลฟ์",z:"s",sd:"r"},store.get("ls_mascot",{}));let msSpeaking=false;
+function msData(){return{k:msCfg.k,n:(msCfg.n||"น้องไลฟ์").slice(0,16),...(msCfg.z!=="s"?{z:msCfg.z}:{}),...(msCfg.sd==="l"?{sd:"l"}:{})}}
 function msPrevRender(){if(!msCfg.on)return;const p=liveProducts()[0]||products[0];
  const d=p?{s:"prod",c:p.code,n:p.name,p:p.price,pr:p.promo,b:1,pts:(p.points||"").split("|").filter(Boolean),img:p.img||""}:{s:"prod",c:"A1",n:"สินค้าตัวอย่าง",p:199,b:1,pts:[]};
  d.ms=Object.assign(msData(),{sp:1});if(aff()){d.af=1;if(p)d.sh=shopName(p)}const u=showcaseURL(d);if($("#msPrev").src!==u)$("#msPrev").src=u}
-function msSave(){msCfg.on=$("#msOn").checked;msCfg.k=$("#msKind").value;msCfg.n=$("#msName").value.trim().slice(0,16);store.set("ls_mascot",msCfg);
+function msSave(){msCfg.on=$("#msOn").checked;msCfg.k=$("#msKind").value;msCfg.n=$("#msName").value.trim().slice(0,16);msCfg.z=$("#msSize").value;msCfg.sd=$("#msSide").value;store.set("ls_mascot",msCfg);
  $("#msOpts").hidden=!msCfg.on;msPrevRender();if(running)pushOverlay()}
-$("#msOn").checked=msCfg.on;$("#msKind").value=msCfg.k;$("#msName").value=msCfg.n;$("#msOpts").hidden=!msCfg.on;
-$("#msOn").onchange=msSave;$("#msKind").onchange=msSave;$("#msName").onchange=msSave;
+$("#msOn").checked=msCfg.on;$("#msKind").value=msCfg.k;$("#msName").value=msCfg.n;$("#msSize").value=msCfg.z||"s";$("#msSide").value=msCfg.sd||"r";$("#msOpts").hidden=!msCfg.on;
+["#msOn","#msKind","#msName","#msSize","#msSide"].forEach(s=>$(s).onchange=msSave);
 setTimeout(msPrevRender,0);
 setInterval(()=>{let sp=false;try{sp=!!speechSynthesis.speaking}catch(e){}if(sp===msSpeaking)return;msSpeaking=sp;if(msCfg.on&&running){stPush();pushShowcase()}},400);
 

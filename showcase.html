@@ -73,6 +73,15 @@ body{font-family:"Kanit","IBM Plex Sans Thai","Leelawadee UI",sans-serif;color:#
 .mascot svg{height:17vh;width:auto;overflow:visible;animation:bob 3.2s ease-in-out infinite;filter:drop-shadow(0 calc(var(--u)*1) calc(var(--u)*2) rgba(0,0,0,.35))}
 @media (orientation:landscape){.mascot{bottom:calc(var(--u)*4)}.mascot svg{height:30vh}}
 @media (orientation:portrait){body.has-ms .info{padding-right:15vh}}
+/* avatar size z: s (default) / m / l, side sd: r (default) / l. Even "l" stays well under half the frame
+   (portrait about 22vh x 26vh of a 56vh x 100vh canvas, landscape about 37vh x 44vh of 178vh x 100vh). */
+.mascot.z-m svg{height:21vh}.mascot.z-l svg{height:26vh}
+@media (orientation:landscape){.mascot.z-m svg{height:37vh}.mascot.z-l svg{height:44vh}}
+@media (orientation:portrait){body.ms-m .info{padding-right:18vh}body.ms-l .info{padding-right:22vh}
+  body.ms-left .info{padding-right:0!important;padding-left:15vh}body.ms-left.ms-m .info{padding-left:18vh}body.ms-left.ms-l .info{padding-left:22vh}}
+@media (orientation:landscape){body.has-ms.ms-m .info{padding-bottom:28vh}body.has-ms.ms-l .info{padding-bottom:36vh}}
+.mascot.sd-l{right:auto;left:calc(var(--u)*4)}
+.mascot.sd-l .arm{transform-origin:80% 90%}
 .mlabel{font-family:"IBM Plex Sans Thai",sans-serif;font-weight:600;font-size:calc(var(--u)*2.3);background:rgba(20,12,26,.78);border:1px solid rgba(255,255,255,.4);
   padding:calc(var(--u)*.3) calc(var(--u)*1.4);border-radius:999px;white-space:nowrap}
 @keyframes bob{50%{transform:translateY(calc(var(--u)*-1.2))}}
@@ -114,8 +123,31 @@ function cyclePoints(){clearInterval(ptTimer);const els=[...document.querySelect
   ptTimer=setInterval(()=>{const a=els[i];i=(i+1)%els.length;const b=els[i];
     a.classList.remove("on");a.classList.add("out");b.classList.remove("out");void b.offsetWidth;b.classList.add("on");
     setTimeout(()=>{a.style.transition="none";a.classList.remove("out");void a.offsetWidth;a.style.transition=""},700)},4000)}
-const MS={cat:{f:"#ffb36b",d:"#d9772e",i:"#ffd2df"},bunny:{f:"#fbf7fb",d:"#c9b8cf",i:"#ffbcd2"},bear:{f:"#c08a62",d:"#86552f",i:"#f0cfae"}};
-function mascotSVG(k){const c=MS[k]||MS.cat,S=`stroke="${c.d}" stroke-width="4"`;
+const MS={cat:{f:"#ffb36b",d:"#d9772e",i:"#ffd2df"},bunny:{f:"#fbf7fb",d:"#c9b8cf",i:"#ffbcd2"},bear:{f:"#c08a62",d:"#86552f",i:"#f0cfae"},
+  host_f:{f:"#f6cfae",d:"#b9805c",i:"#ffb3c4",h:"#3b2430",s:"#e2365b"},host_m:{f:"#efc3a0",d:"#a8714e",i:"#f5b0a8",h:"#2a2230",s:"#2f6fdd"}};
+/* cartoon presenter (flat drawing, big eyes, headset mic): clearly a drawing, not a realistic person */
+function hostSVG(k){const c=MS[k],S=`stroke="${c.d}" stroke-width="4"`,f=k==="host_f";
+  return `<svg viewBox="0 0 210 250" role="img" aria-label="อวตารพิธีกร AI">
+   <g class="arm"><path d="M150 176 Q178 150 182 118" stroke="${c.s}" stroke-width="22" fill="none" stroke-linecap="round"/><circle cx="183" cy="112" r="12" fill="${c.f}" ${S}/></g>
+   ${f?`<path d="M38 112 Q34 40 100 36 Q166 40 162 112 L166 176 Q100 196 34 176 Z" fill="${c.h}"/>`:""}
+   <path d="M40 250 L44 206 Q50 172 100 168 Q150 172 156 206 L160 250 Z" fill="${c.s}" ${S}/>
+   <path d="M84 170 L100 192 L116 170" fill="#fff" stroke="${c.d}" stroke-width="3"/>
+   <rect x="80" y="206" width="40" height="24" rx="6" fill="#fff"/><text x="100" y="225" text-anchor="middle" font-family="Kanit,sans-serif" font-weight="700" font-size="18" fill="${c.s}">AI</text>
+   <path d="M60 196 Q40 214 46 246" stroke="${c.s}" stroke-width="20" fill="none" stroke-linecap="round"/>
+   <rect x="90" y="148" width="20" height="24" rx="8" fill="${c.f}"/>
+   <ellipse cx="100" cy="102" rx="54" ry="58" fill="${c.f}" ${S}/>
+   ${f?`<path d="M46 98 Q50 46 100 44 Q150 46 154 98 Q132 70 104 66 Q84 82 46 98 Z" fill="${c.h}"/>`
+      :`<path d="M46 96 Q44 44 100 40 Q158 44 154 96 Q150 70 128 62 Q104 76 72 66 Q52 74 46 96 Z" fill="${c.h}"/>`}
+   <path d="M44 104 Q44 52 100 50 Q156 52 156 104" stroke="#2a1d2e" stroke-width="5" fill="none"/>
+   <rect x="148" y="96" width="14" height="24" rx="6" fill="#2a1d2e"/><path d="M152 118 Q146 140 116 138" stroke="#2a1d2e" stroke-width="4" fill="none"/><circle cx="114" cy="138" r="5" fill="#2a1d2e"/>
+   <ellipse cx="68" cy="122" rx="10" ry="6" fill="${c.i}"/><ellipse cx="132" cy="122" rx="10" ry="6" fill="${c.i}"/>
+   <path d="M66 88 Q78 82 88 88" stroke="${c.h}" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M112 88 Q122 82 134 88" stroke="${c.h}" stroke-width="4" fill="none" stroke-linecap="round"/>
+   <g class="eye"><ellipse cx="78" cy="104" rx="8" ry="11" fill="#2a1d2e"/><circle cx="81" cy="99" r="3" fill="#fff"/></g>
+   <g class="eye"><ellipse cx="122" cy="104" rx="8" ry="11" fill="#2a1d2e"/><circle cx="125" cy="99" r="3" fill="#fff"/></g>
+   <path d="M86 128 Q100 138 114 128" stroke="#2a1d2e" stroke-width="4" fill="none" stroke-linecap="round"/>
+   <ellipse class="mo" cx="100" cy="135" rx="10" ry="9" fill="#7a1f3a"/>
+  </svg>`}
+function mascotSVG(k){if(k==="host_f"||k==="host_m")return hostSVG(k);const c=MS[k]||MS.cat,S=`stroke="${c.d}" stroke-width="4"`;
   const ears=k==="bunny"?`<ellipse cx="72" cy="38" rx="15" ry="42" fill="${c.f}" ${S} transform="rotate(-10 72 38)"/><ellipse cx="72" cy="40" rx="7" ry="30" fill="${c.i}" transform="rotate(-10 72 40)"/><ellipse cx="128" cy="38" rx="15" ry="42" fill="${c.f}" ${S} transform="rotate(10 128 38)"/><ellipse cx="128" cy="40" rx="7" ry="30" fill="${c.i}" transform="rotate(10 128 40)"/>`
    :k==="bear"?`<circle cx="50" cy="56" r="22" fill="${c.f}" ${S}/><circle cx="50" cy="56" r="11" fill="${c.i}"/><circle cx="150" cy="56" r="22" fill="${c.f}" ${S}/><circle cx="150" cy="56" r="11" fill="${c.i}"/>`
    :`<path d="M42 78 L52 20 L92 52 Z" fill="${c.f}" ${S} stroke-linejoin="round"/><path d="M54 62 L58 34 L80 52 Z" fill="${c.i}"/><path d="M158 78 L148 20 L108 52 Z" fill="${c.f}" ${S} stroke-linejoin="round"/><path d="M146 62 L142 34 L120 52 Z" fill="${c.i}"/>`;
@@ -140,7 +172,10 @@ function mascotSVG(k){const c=MS[k]||MS.cat,S=`stroke="${c.d}" stroke-width="4"`
 let lastMs="";
 function renderMascot(ms){const el=document.getElementById("mascot"),key=JSON.stringify(ms||null);if(key===lastMs)return;
   const prev=lastMs?JSON.parse(lastMs):null,same=prev&&ms&&prev.k===ms.k&&prev.n===ms.n;lastMs=key;
-  document.body.classList.toggle("has-ms",!!ms);el.hidden=!ms;if(!ms){el.innerHTML="";return}
+  const z=ms&&(ms.z==="m"||ms.z==="l")?ms.z:"s",left=!!(ms&&ms.sd==="l");
+  document.body.classList.toggle("has-ms",!!ms);document.body.classList.toggle("ms-m",!!ms&&z==="m");document.body.classList.toggle("ms-l",!!ms&&z==="l");document.body.classList.toggle("ms-left",!!ms&&left);
+  el.classList.toggle("z-m",z==="m");el.classList.toggle("z-l",z==="l");el.classList.toggle("sd-l",left);
+  el.hidden=!ms;if(!ms){el.innerHTML="";return}
   if(!same)el.innerHTML=mascotSVG(MS[ms.k]?ms.k:"cat")+`<div class="mlabel">🤖 ${esc(String(ms.n||"น้องไลฟ์").slice(0,16))} · ผู้ช่วย AI</div>`;
   el.classList.toggle("sp",!!ms.sp)}
 let lastMsg="";
